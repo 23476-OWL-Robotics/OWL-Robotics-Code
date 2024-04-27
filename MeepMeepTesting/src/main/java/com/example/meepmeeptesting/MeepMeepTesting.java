@@ -20,6 +20,7 @@ public class MeepMeepTesting {
                 .build();
 
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, Math.toRadians(90)))
+                .splineToConstantHeading(new Vector2d(48, 36), Math.toRadians(0))
                 .build());
 
         myBot2.runAction(myBot2.getDrive().actionBuilder(new Pose2d(-48, 0, Math.toRadians(90)))
@@ -36,7 +37,7 @@ public class MeepMeepTesting {
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
-                .addEntity(myBot2)
+                .addEntity(myBot)
                 .start();
     }
 }
