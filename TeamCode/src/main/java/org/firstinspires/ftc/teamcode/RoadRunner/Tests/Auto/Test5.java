@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.RoadRunner.Tests.Auto;
 
 //Road Runner Imports
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Rotation2d;
-import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 
@@ -19,14 +22,55 @@ import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 @Autonomous
 public class Test5 extends LinearOpMode {
 
+    //Create Check Class
+    public class Check {
+
+        //Create CheckPosition Action Class
+        public class CheckPosition implements Action {
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                heading = drive.pose.heading;
+
+                telemetry.addData("Position = ", position);
+                telemetry.update();
+
+                return true;
+            }
+        }
+        public Action checkPosition() {
+            return new CheckPosition();
+        }
+
+        //Create CheckHeading Action Class
+        public class CheckHeading implements Action {
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                heading = drive.pose.heading;
+
+                telemetry.addData("Heading = ", heading);
+                telemetry.update();
+
+                return true;
+            }
+        }
+        public Action checkHeading() {
+            return new CheckHeading();
+        }
+    }
+
+    //Add Mecanum Drive
+    MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, Math.toRadians(0)));
+
+    //Create position & heading
+    Vector2d position;
+    Rotation2d heading;
+
     public void runOpMode() {
 
-        //Add Mecanum Drive
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, Math.toRadians(0)));
-
-        //Create position & heading
-        Vector2d position;
-        Rotation2d heading;
+        //Add Check Class
+        Check check = new Check();
 
         //Create a new Action
         Action testAction;
@@ -43,19 +87,12 @@ public class Test5 extends LinearOpMode {
         if (opModeIsActive()) {
 
             Actions.runBlocking(
-                    new SequentialAction(
-                            testAction
+                    new ParallelAction(
+                            testAction,
+                            check.checkPosition(),
+                            check.checkHeading()
                     )
             );
-
-            //Add values to position and heading
-            position = drive.pose.position;
-            heading = drive.pose.heading;
-
-            //Add telemetry for Position and Heading
-            telemetry.addData("Position = ", position);
-            telemetry.addData("Heading = ", heading);
-            telemetry.update();
         }
     }
 }
