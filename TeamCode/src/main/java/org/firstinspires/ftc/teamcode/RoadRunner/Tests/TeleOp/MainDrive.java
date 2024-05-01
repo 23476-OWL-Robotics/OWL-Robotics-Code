@@ -1,9 +1,15 @@
 package org.firstinspires.ftc.teamcode.RoadRunner.Tests.TeleOp;
 
+import com.acmerobotics.roadrunner.ftc.Encoder;
+import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
+import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import java.math.BigInteger;
 
 @TeleOp
 public class MainDrive extends LinearOpMode{
@@ -13,6 +19,10 @@ public class MainDrive extends LinearOpMode{
     public DcMotor backLeftMotor;
     public DcMotor backRightMotor;
 
+    public Encoder par0;
+    public Encoder par1;
+    public Encoder perp;
+
     public void runOpMode() {
 
         //ToDo: Set Robot Motor Names
@@ -21,8 +31,16 @@ public class MainDrive extends LinearOpMode{
         backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
         backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
 
+        //ToDo: Set Encoder Names to Matching Motor Port Names
+        par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "par0")));
+        par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "par1")));
+        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "perp")));
+
         //ToDo: Set Motor Directions
-        //frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //  frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        //ToDo: Set Encoder Directions
+        //  par0.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //Create GamePad JoyStick doubles
         double y;
@@ -31,6 +49,11 @@ public class MainDrive extends LinearOpMode{
         //Create GamePad Trigger doubles
         double l;
         double r;
+
+        //Create Encoder int
+        int par0Position;
+        int par1Position;
+        int perpPosition;
 
         waitForStart();
         if (opModeIsActive()) {
@@ -49,6 +72,11 @@ public class MainDrive extends LinearOpMode{
                 l = gamepad1.left_trigger;
                 r = gamepad1.right_trigger;
 
+                //Set Encoder Values
+                par0Position = par0.getPositionAndVelocity().position;
+                par1Position = par1.getPositionAndVelocity().position;
+                perpPosition = perp.getPositionAndVelocity().position;
+
                 //Drive Code
                 if (y > 0.2 || y < -0.2 || x > 0.2 || x < -0.2) {
                     frontLeftMotor.setPower(y - x);
@@ -66,6 +94,10 @@ public class MainDrive extends LinearOpMode{
                     backLeftMotor.setPower(0);
                     backRightMotor.setPower(0);
                 }
+
+                telemetry.addData("Par0 = ", par0Position);
+                telemetry.addData("Par1 = ", par1Position);
+                telemetry.addData("Perp = ", perpPosition);
             }
         }
     }
