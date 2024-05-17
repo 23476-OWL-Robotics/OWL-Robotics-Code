@@ -28,6 +28,7 @@ public class LocationDrive extends LinearOpMode {
         // Create GamePad JoyStick X and Y doubles
         double x;
         double y;
+        double speed = 0.1;
 
         waitForStart();
         while (opModeIsActive()) {
@@ -48,25 +49,31 @@ public class LocationDrive extends LinearOpMode {
             // Drive code for Robot
             // The power is purposefully low to get good accuracy with the dead wheels.
             if (y > 0.2 || y < -0.2 || x > 0.2 || x < -0.2) {
-                drive.leftFront.setPower((y + x) * 0.1);
-                drive.rightFront.setPower((y - x) * 0.1);
-                drive.leftBack.setPower((y + x) * 0.1);
-                drive.rightBack.setPower((y - x) * 0.1);
+                drive.leftFront.setPower((y + x) * speed);
+                drive.rightFront.setPower((y - x) * speed);
+                drive.leftBack.setPower((y + x) * speed);
+                drive.rightBack.setPower((y - x) * speed);
             } else if (gamepad1.left_bumper) {
-                drive.leftFront.setPower(-0.1);
-                drive.rightFront.setPower(0.1);
-                drive.leftBack.setPower(0.1);
-                drive.rightBack.setPower(-0.1);
+                drive.leftFront.setPower(-speed);
+                drive.rightFront.setPower(speed);
+                drive.leftBack.setPower(speed);
+                drive.rightBack.setPower(-speed);
             } else if (gamepad1.right_bumper) {
-                drive.leftFront.setPower(0.1);
-                drive.rightFront.setPower(-0.1);
-                drive.leftBack.setPower(-0.1);
-                drive.rightBack.setPower(0.1);
+                drive.leftFront.setPower(speed);
+                drive.rightFront.setPower(-speed);
+                drive.leftBack.setPower(-speed);
+                drive.rightBack.setPower(speed);
             } else {
                 drive.leftFront.setPower(0);
                 drive.rightFront.setPower(0);
                 drive.leftBack.setPower(0);
                 drive.rightBack.setPower(0);
+            }
+
+            if (gamepad1.dpad_up) {
+                speed += 0.1;
+            } else if (gamepad1.dpad_down) {
+                speed -= 0.1;
             }
 
             // Telemetry for positioning
