@@ -3,15 +3,15 @@ package org.firstinspires.ftc.teamcode.Other;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class PID_Controller {
+class PID_Controller {
 
     public static class Params {
-        double rotPerTick = 0.0;
+        double rotPerTick = 0.000695;
         double inPerTick = 0.0;
 
-        double Kp = 0.0;
-        double Ki = 0.0;
-        double Kd = 0.0;
+        double Kp = 0.0007;
+        double Ki = 0.0001;
+        double Kd = 0.000000001;
     }
 
     Params params = new Params();
