@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Other;
+package org.firstinspires.ftc.teamcode.Other.PID_Controller;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -9,9 +9,9 @@ class PID_Controller {
         double rotPerTick = 0.000695;
         double inPerTick = 0.0;
 
-        double Kp = 0.0007;
-        double Ki = 0.0001;
-        double Kd = 0.000000001;
+        double Kp = 0.0005;
+        double Ki = 0.00002;
+        double Kd = 0.0;
     }
 
     Params params = new Params();
@@ -54,14 +54,18 @@ class PID_Controller {
 
             out = (params.Kp * error) + (params.Ki * integralSum) + (params.Kd * derivative);
 
-            motor1.setPower(out);
+            if (out > 0.6) {
+                motor1.setPower(0.6);
+            } else {
+                motor1.setPower(out);
+            }
 
             lastError = error;
 
             // reset the timer for next time
             timer.reset();
 
-            if (encoderPosition <= reference + 10 && encoderPosition >= reference + 10) {
+            if (encoderPosition <= reference + 1 && encoderPosition >= reference - 1) {
                 setPointIsNotReached = false;
             }
         }
@@ -98,14 +102,18 @@ class PID_Controller {
 
             out = (params.Kp * error) + (params.Ki * integralSum) + (params.Kd * derivative);
 
-            motor1.setPower(out);
+            if (out > 0.7) {
+                motor1.setPower(0.7);
+            } else {
+                motor1.setPower(out);
+            }
 
             lastError = error;
 
             // reset the timer for next time
             timer.reset();
 
-            if (encoderPosition <= reference + 10 && encoderPosition >= reference + 10) {
+            if (encoderPosition <= reference + 1 && encoderPosition >= reference - 1) {
                 setPointIsNotReached = false;
             }
         }
@@ -142,14 +150,18 @@ class PID_Controller {
 
             out = (params.Kp * error) + (params.Ki * integralSum) + (params.Kd * derivative);
 
-            motor1.setPower(out);
+            if (out > 0.7) {
+                motor1.setPower(0.7);
+            } else {
+                motor1.setPower(out);
+            }
 
             lastError = error;
 
             // reset the timer for next time
             timer.reset();
 
-            if (encoderPosition <= reference + 10 && encoderPosition >= reference + 10) {
+            if (encoderPosition <= reference + 1 && encoderPosition >= reference - 1) {
                 setPointIsNotReached = false;
             }
         }
