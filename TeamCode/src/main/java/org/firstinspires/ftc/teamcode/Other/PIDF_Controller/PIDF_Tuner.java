@@ -12,18 +12,23 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp
 public class PIDF_Tuner extends OpMode {
 
+    // Conversion Parameters
     double rotPerTick = 0.000695;
     double inPerTick = 0.0;
+    double degPerTick = 0.0;
 
+    // PIDF Parameters
     public static double Kp = 0.00059;
     public static double Ki = 0.0;
     public static double Kd = 0.0;
     public static double Kf = 0.0;
 
+    // Target for FTC Dash
     public static double target = 0.0;
 
     DcMotorEx motor;
 
+    // Tuner doubles
     double reference;
     double integralSum = 0.0;
     double feedForward;
@@ -46,7 +51,9 @@ public class PIDF_Tuner extends OpMode {
     @Override
     public void loop() {
 
+        // Get encoder reference
         reference = target / rotPerTick;
+        // Get encoder position
         encoderPosition = motor.getCurrentPosition();
 
         // find the error
@@ -57,17 +64,22 @@ public class PIDF_Tuner extends OpMode {
         // sum of all error over time
         integralSum = integralSum + (error * timer.seconds());
 
+        // feedForward for gravity counteraction
         feedForward = Math.cos(Math.toRadians(reference));
 
+        // Motor out
         out = (Kp * error) + (Ki * integralSum) + (Kd * derivative) + (Kf * feedForward);
 
+        // Keep the motor from going past 60% power
         motor.setPower(Math.min(out, 0.6));
 
+        // Set lastError
         lastError = error;
 
         // reset the timer for next time
         timer.reset();
 
+        // Telemetry for FTC Dash
         telemetry.addData("Reference ", reference);
         telemetry.addData("Position ", encoderPosition);
         telemetry.addLine();
