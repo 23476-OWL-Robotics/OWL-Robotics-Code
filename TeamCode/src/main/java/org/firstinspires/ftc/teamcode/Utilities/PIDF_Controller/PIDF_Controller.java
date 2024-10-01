@@ -64,8 +64,12 @@ public class PIDF_Controller{
     }
 
     // Create stopController function
-    public void stopController() {
+    public void pauseController() {
         running = false;
+    }
+    // Create startController function
+    public void startController() {
+        running = true;
     }
 
     public boolean targetReached = false;
