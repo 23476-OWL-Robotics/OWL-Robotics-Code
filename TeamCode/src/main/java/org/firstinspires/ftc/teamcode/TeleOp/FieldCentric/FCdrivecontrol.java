@@ -63,14 +63,7 @@ public class FCdrivecontrol extends FieldCentric {
         imu_IMU.resetYaw();
     }
 
-    /**
-     * Describe this function...
-     */
-    public void gamepad_to_variables() {
-        X_stick = gamepad1.right_stick_x;
-        Y_stick = -gamepad1.right_stick_y;
-        Turning = gamepad1.left_stick_x * 0.25;
-    }
+
     /**
      * Describe this function...
      */

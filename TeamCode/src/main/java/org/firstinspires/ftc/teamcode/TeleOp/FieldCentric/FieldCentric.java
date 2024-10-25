@@ -1,16 +1,25 @@
 package org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
 
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "FieldCentric")
 public class FieldCentric extends LinearOpMode {
 
+    FCdrivecontrol drive = new FCdrivecontrol();
+    FCarmscontrol arms = new FCarmscontrol();
+    FCcommon common = new FCcommon();
+    DcMotorEx armMotor;
+    DcMotorEx intakeMotor;
+    DcMotorEx leftAssentMotor;
+    DcMotorEx rightAssentMotor;
+
+    Servo specimenClaw;
 
 /*
     public IMU imu_IMU;
@@ -43,42 +52,62 @@ public class FieldCentric extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
-        FCdrivecontrol control = new FCdrivecontrol();
+        armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+        //leftAssentMotor = hardwareMap.get(DcMotorEx.class, "leftAssentMotor");
+        //rightAssentMotor = hardwareMap.get(DcMotorEx.class, "rightAssentMotor");
 
-        control.imu_IMU = hardwareMap.get(IMU.class, "imu");
-        control.backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
-        control.frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
-        control.backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
-        control.frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
+        specimenClaw = hardwareMap.get(Servo.class, "specimenClaw");
+
+        drive.imu_IMU = hardwareMap.get(IMU.class, "imu");
+        drive.backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
+        drive.frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+        drive.backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
+        drive.frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
+
+
 
         // Put initialization blocks here.
-        control.set_up_imu();
-        control.motor_setup();
+        drive.set_up_imu();
+        drive.motor_setup();
         waitForStart();
-        control.rotX = 0;
-        control.rotY = 0;
-        control.heading_divisoin = 1;
+        drive.rotX = 0;
+        drive.rotY = 0;
+        drive.heading_divisoin = 1;
         if (opModeIsActive()) {
             // Put run blocks here.
             while (opModeIsActive()) {
-                control.X_stick = gamepad1.right_stick_x;
-                control.Y_stick = -gamepad1.right_stick_y;
-                control.Turning = gamepad1.left_stick_x * 1;
-                //control.gamepad_to_variables();
-                control.rotate_X_and_Y();
-                control.drive_control();
-                control.motor_power_sets();
-                //control.telemetry2();
-                telemetry.addData("x input", control.X_stick);
-                telemetry.addData("y input", control.Y_stick);
-                telemetry.addData("my yaw pitch roll", control.myYawPitchRollAngles);
-                telemetry.addData("BotHeading var", control.BotHeading);
-                telemetry.addData("turning", control.Turning);
-                telemetry.addData("rotY", control.rotY);
-                telemetry.addData("rotX", control.rotX);
-                telemetry.update();
+
+                gamepadToVariables(1);
+                drive.rotate_X_and_Y();
+                drive.drive_control();
+                drive.motor_power_sets();
+                useTelemetry();
+                armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+                armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
             }
         }
+
+    }
+    public void useTelemetry(){
+
+        telemetry.addData("x input", drive.X_stick);
+        telemetry.addData("y input", drive.Y_stick);
+        telemetry.addData("my yaw pitch roll", drive.myYawPitchRollAngles);
+        telemetry.addData("BotHeading var", drive.BotHeading);
+        telemetry.addData("turning", drive.Turning);
+        telemetry.addData("rotY", drive.rotY);
+        telemetry.addData("rotX", drive.rotX);
+        telemetry.update();
+    }
+    public void gamepadToVariables(float turnmod){
+        drive.X_stick = gamepad1.right_stick_x;
+        drive.Y_stick = -gamepad1.right_stick_y;
+        drive.Turning = gamepad1.left_stick_x * turnmod;
     }
 
 
