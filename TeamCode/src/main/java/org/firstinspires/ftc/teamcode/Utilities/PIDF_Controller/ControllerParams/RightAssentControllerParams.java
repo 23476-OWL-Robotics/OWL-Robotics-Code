@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams;
 
-public class ArmControllerParams {
+public class RightAssentControllerParams {
 
-    double inPerTick = 0.0; // inPerTick
+    double inPerTick = 0.0;
 
     double p = 0.0;
     double i = 0.0;

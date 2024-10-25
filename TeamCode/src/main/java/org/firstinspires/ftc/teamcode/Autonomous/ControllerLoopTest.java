@@ -51,7 +51,7 @@ public class ControllerLoopTest extends LinearOpMode {
                     controller.pauseController();
                     return true;
                 } else {
-                    controller.runController();
+                    controller.loopController();
                     return false;
                 }
             }
@@ -74,7 +74,7 @@ public class ControllerLoopTest extends LinearOpMode {
                     controller.pauseController();
                     return true;
                 } else {
-                    controller.runController();
+                    controller.loopController();
                     return false;
                 }
             }

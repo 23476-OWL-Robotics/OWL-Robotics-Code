@@ -65,14 +65,13 @@ public class PIDF_TeleOp_Implementation extends LinearOpMode {
                 // Below, I am telling the controller to extend the slides 1 inch
                 controller.extendTo(1);
 
-                // If you wish to pause the controller in the middle of the program, use pauseController
-                controller.pauseController();
-                // To unpause, use startController
-                controller.startController();
+                // If you wish to pause the controller in the middle of the program, use runController
+                controller.runController(false);
+                controller.runController(true);
 
                 // This will loop the controller every time the program loops.
                 // This function is required in every program to run the controller
-                controller.runController();
+                controller.loopController();
             }
         }
     }

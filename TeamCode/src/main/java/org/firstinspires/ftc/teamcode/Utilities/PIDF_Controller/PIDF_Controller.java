@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.ControllerParams;
@@ -18,7 +17,8 @@ public class PIDF_Controller{
     double target;
 
     // Create running boolean
-    boolean running;
+    boolean running = true;
+    public boolean targetReached = false;
 
     // create ElapsedTime
     ElapsedTime timer = new ElapsedTime();
@@ -57,23 +57,15 @@ public class PIDF_Controller{
 
     // Create runController function
     // Run this in the opModeIsActive while loop
-    public void runController() {
-        if (running) {
+    public void loopController() {
+        if (running && !targetReached) {
             PIDF_Calculator();
         }
     }
 
-    // Create stopController function
-    public void pauseController() {
-        running = false;
+    public void runController(boolean run) {
+        running = run;
     }
-    // Create startController function
-    public void startController() {
-        running = true;
-    }
-
-    public boolean targetReached = false;
-
 
     // Create calculator variables and calculator function
     double reference;

@@ -7,11 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.ControllerTestControllerParams;
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
-
 @TeleOp
-public class SlideRobotDrive extends LinearOpMode {
+public class TankDrive extends LinearOpMode {
 
     DcMotorEx leftMotor1;
     DcMotorEx leftMotor2;
@@ -35,9 +32,6 @@ public class SlideRobotDrive extends LinearOpMode {
         threadMotor = hardwareMap.get(DcMotorEx.class, "motor");
         leftClaw = hardwareMap.get(Servo.class, "leftClaw");
         rightClaw = hardwareMap.get(Servo.class, "rightClaw");
-
-        ControllerTestControllerParams controllerParams = new ControllerTestControllerParams();
-        PIDF_Controller controller = new PIDF_Controller(controllerParams.params, threadMotor);
 
         waitForStart();
         if (opModeIsActive()) {
@@ -87,29 +81,6 @@ public class SlideRobotDrive extends LinearOpMode {
                         rightMotor2.setPower(0);
                     }
                 }
-
-                if (gamepad2.dpad_up) {
-                    threadMotor.setPower(0.5);
-                } else if (gamepad2.dpad_down) {
-                    threadMotor.setPower(-0.5);
-                } else {
-                    threadMotor.setPower(0);
-                }
-
-                if (gamepad2.a) {
-                    leftClaw.setPosition(0.5);
-                    rightClaw.setPosition(0.5);
-                } else if (gamepad2.b) {
-                    leftClaw.setPosition(0.7);
-                    rightClaw.setPosition(0.7);
-                }
-
-                controller.runController();
-
-                telemetry.addData("ThreadMotor: ", threadMotor.getCurrentPosition());
-                telemetry.addData("LeftClaw: ", leftClaw.getPosition());
-                telemetry.addData("RightClaw: ", rightClaw.getPosition());
-                telemetry.update();
             }
         }
     }
