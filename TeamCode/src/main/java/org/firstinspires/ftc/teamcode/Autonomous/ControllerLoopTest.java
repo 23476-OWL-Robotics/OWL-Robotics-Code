@@ -48,7 +48,7 @@ public class ControllerLoopTest extends LinearOpMode {
                 double pos = motor.getCurrentPosition();
                 p.put("Position: ", pos);
                 if (controller.targetReached) {
-                    controller.pauseController();
+                    //controller.pauseController();
                     return true;
                 } else {
                     controller.loopController();
@@ -71,7 +71,7 @@ public class ControllerLoopTest extends LinearOpMode {
                 double pos = motor.getCurrentPosition();
                 p.put("Position: ", pos);
                 if (controller.targetReached) {
-                    controller.pauseController();
+                    //controller.pauseController();
                     return true;
                 } else {
                     controller.loopController();

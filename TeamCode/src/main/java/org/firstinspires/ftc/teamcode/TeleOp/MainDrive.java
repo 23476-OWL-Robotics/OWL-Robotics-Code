@@ -45,20 +45,20 @@ public class MainDrive extends LinearOpMode {
 
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
-        leftAssentMotor = hardwareMap.get(DcMotorEx.class, "leftAssentMotor");
-        rightAssentMotor = hardwareMap.get(DcMotorEx.class, "rightAssentMotor");
+        //leftAssentMotor = hardwareMap.get(DcMotorEx.class, "leftAssentMotor");
+        //rightAssentMotor = hardwareMap.get(DcMotorEx.class, "rightAssentMotor");
 
         specimenClaw = hardwareMap.get(Servo.class, "specimenClaw");
 
-        ArmControllerParams armControllerParams = new ArmControllerParams();
-        IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
-        LeftAssentControllerParams leftAssentControllerParams = new LeftAssentControllerParams();
-        RightAssentControllerParams rightAssentControllerParams = new RightAssentControllerParams();
+        //ArmControllerParams armControllerParams = new ArmControllerParams();
+        //IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
+        //LeftAssentControllerParams leftAssentControllerParams = new LeftAssentControllerParams();
+        //RightAssentControllerParams rightAssentControllerParams = new RightAssentControllerParams();
 
-        PIDF_Controller armController = new PIDF_Controller(armControllerParams.params, armMotor);
-        PIDF_Controller intakeController = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
-        PIDF_Controller leftAssentController = new PIDF_Controller(leftAssentControllerParams.params, leftAssentMotor);
-        PIDF_Controller rightAssentController = new PIDF_Controller(rightAssentControllerParams.params, rightAssentMotor);
+        //PIDF_Controller armController = new PIDF_Controller(armControllerParams.params, armMotor);
+        //PIDF_Controller intakeController = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
+        //PIDF_Controller leftAssentController = new PIDF_Controller(leftAssentControllerParams.params, leftAssentMotor);
+        //PIDF_Controller rightAssentController = new PIDF_Controller(rightAssentControllerParams.params, rightAssentMotor);
 
         waitForStart();
         if (opModeIsActive()) {
@@ -73,13 +73,13 @@ public class MainDrive extends LinearOpMode {
             backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            //leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            //rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             while (opModeIsActive()) {
 
@@ -113,9 +113,9 @@ public class MainDrive extends LinearOpMode {
                         backRightMotor.setPower(y + x);
                     } else if (ls > 0.2 || rs > 0.1) {
                         frontLeftMotor.setPower(ls - rs);
-                        frontRightMotor.setPower((-ls + rs) * strafeCorrection);
+                        frontRightMotor.setPower(-ls + rs);
                         backLeftMotor.setPower((-ls + rs) * strafeCorrection);
-                        backRightMotor.setPower(ls - rs);
+                        backRightMotor.setPower((ls - rs) * strafeCorrection);
                     } else {
                         frontLeftMotor.setPower(0);
                         frontRightMotor.setPower(0);
@@ -144,15 +144,15 @@ public class MainDrive extends LinearOpMode {
                     specimenClaw.setPosition(1);
                 }
 
-                armController.loopController();
-                intakeController.loopController();
-                leftAssentController.loopController();
-                rightAssentController.loopController();
+                //armController.loopController();
+                //intakeController.loopController();
+                //leftAssentController.loopController();
+                //rightAssentController.loopController();
 
                 telemetry.addData("Arm: ", armMotor.getCurrentPosition());
                 telemetry.addData("Intake: ", intakeMotor.getCurrentPosition());
-                telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
-                telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
+                //telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
+                //telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
                 telemetry.update();
             }
         }

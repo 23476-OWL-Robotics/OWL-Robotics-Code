@@ -11,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 @TeleOp(name = "FieldCentric")
 public class FieldCentric extends LinearOpMode {
 
-     FCdrivecontrol control = new FCdrivecontrol();
 
+/*
     public IMU imu_IMU;
     public DcMotor backLeftMotor;
     public DcMotor frontLeftMotor;
@@ -31,7 +31,7 @@ public class FieldCentric extends LinearOpMode {
     public double Turning;
     public int heading_divisoin;
     public double rotY;
-
+*/
 
 
     /**
@@ -43,28 +43,40 @@ public class FieldCentric extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
-        imu_IMU = hardwareMap.get(IMU.class, "imu");
-        backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
-        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
-        backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
-        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
+        FCdrivecontrol control = new FCdrivecontrol();
+
+        control.imu_IMU = hardwareMap.get(IMU.class, "imu");
+        control.backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
+        control.frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+        control.backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
+        control.frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
 
         // Put initialization blocks here.
         control.set_up_imu();
         control.motor_setup();
         waitForStart();
-        rotX = 0;
-        rotY = 0;
-        heading_divisoin = 1;
+        control.rotX = 0;
+        control.rotY = 0;
+        control.heading_divisoin = 1;
         if (opModeIsActive()) {
             // Put run blocks here.
             while (opModeIsActive()) {
-                control.gamepad_to_variables();
+                control.X_stick = gamepad1.right_stick_x;
+                control.Y_stick = -gamepad1.right_stick_y;
+                control.Turning = gamepad1.left_stick_x * 1;
+                //control.gamepad_to_variables();
                 control.rotate_X_and_Y();
                 control.drive_control();
                 control.motor_power_sets();
-                control.telemetry2();
-
+                //control.telemetry2();
+                telemetry.addData("x input", control.X_stick);
+                telemetry.addData("y input", control.Y_stick);
+                telemetry.addData("my yaw pitch roll", control.myYawPitchRollAngles);
+                telemetry.addData("BotHeading var", control.BotHeading);
+                telemetry.addData("turning", control.Turning);
+                telemetry.addData("rotY", control.rotY);
+                telemetry.addData("rotX", control.rotX);
+                telemetry.update();
             }
         }
     }

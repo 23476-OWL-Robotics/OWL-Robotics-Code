@@ -1,12 +1,39 @@
 package org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-public class FCdrivecontrol extends FieldCentric{
+public class FCdrivecontrol extends FieldCentric {
+
+    @Override
+    public void runOpMode() {
+
+    }
+
+    public IMU imu_IMU;
+    public DcMotor backLeftMotor;
+    public DcMotor frontLeftMotor;
+    public DcMotor backRightMotor;
+    public DcMotor frontRightMotor;
+
+    YawPitchRollAngles myYawPitchRollAngles;
+    public double front_left_power;
+    public float X_stick;
+    public double BotHeading;
+    public double front_right_power;
+    public double back_left_power;
+    public double back_right_power;
+    public float Y_stick;
+    public double rotX;
+    public double Turning;
+    public int heading_divisoin;
+    public double rotY;
+
     /**
      * this function rotates an xy axis set by the imu BotHeading. this
      * function should turn any onmidrive into a field centric drive
@@ -22,10 +49,10 @@ public class FCdrivecontrol extends FieldCentric{
      * Describe this function...
      */
     public void drive_control() {
-        front_left_power = rotY + rotX + gamepad1.left_stick_x;
-        front_right_power = (rotY - rotX) - gamepad1.left_stick_x;
-        back_left_power = (rotY - rotX) + gamepad1.left_stick_x;
-        back_right_power = (rotY + rotX) - gamepad1.left_stick_x;
+        front_left_power = rotY + rotX + Turning;
+        front_right_power = (rotY - rotX) - Turning;
+        back_left_power = (rotY - rotX) + Turning;
+        back_right_power = (rotY + rotX) - Turning;
     }
 
     /**
