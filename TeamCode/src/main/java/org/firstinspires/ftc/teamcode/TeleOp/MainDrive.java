@@ -45,8 +45,8 @@ public class MainDrive extends LinearOpMode {
 
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
-        //leftAssentMotor = hardwareMap.get(DcMotorEx.class, "leftAssentMotor");
-        //rightAssentMotor = hardwareMap.get(DcMotorEx.class, "rightAssentMotor");
+        leftAssentMotor = hardwareMap.get(DcMotorEx.class, "leftAssentMotor");
+        rightAssentMotor = hardwareMap.get(DcMotorEx.class, "rightAssentMotor");
 
         specimenClaw = hardwareMap.get(Servo.class, "specimenClaw");
 
@@ -73,13 +73,13 @@ public class MainDrive extends LinearOpMode {
             backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            //leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            //rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            //leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            //rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             while (opModeIsActive()) {
 
@@ -125,11 +125,14 @@ public class MainDrive extends LinearOpMode {
                 }
 
                 if (gamepad2.dpad_up) {
-                    armMotor.setPower(0.7);
+                    leftAssentMotor.setPower(1);
+                    rightAssentMotor.setPower(-1);
                 } else if (gamepad2.dpad_down) {
-                    armMotor.setPower(-0.7);
+                    leftAssentMotor.setPower(-1);
+                    rightAssentMotor.setPower(1);
                 } else {
-                    armMotor.setPower(0);
+                    leftAssentMotor.setPower(0);
+                    rightAssentMotor.setPower(0);
                 }
 
                 if (gamepad2.dpad_left) {
@@ -151,8 +154,8 @@ public class MainDrive extends LinearOpMode {
 
                 telemetry.addData("Arm: ", armMotor.getCurrentPosition());
                 telemetry.addData("Intake: ", intakeMotor.getCurrentPosition());
-                //telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
-                //telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
+                telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
+                telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
                 telemetry.update();
             }
         }
