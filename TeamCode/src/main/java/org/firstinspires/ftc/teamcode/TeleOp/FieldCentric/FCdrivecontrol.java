@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
 //imports
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -20,6 +21,8 @@ public class FCdrivecontrol extends FieldCentric {
     public DcMotor frontLeftMotor;
     public DcMotor backRightMotor;
     public DcMotor frontRightMotor;
+    DcMotorEx leftAssentMotor;
+    DcMotorEx rightAssentMotor;
 
     //variable setups
     YawPitchRollAngles myYawPitchRollAngles;
@@ -53,7 +56,18 @@ public class FCdrivecontrol extends FieldCentric {
     }
 
     // hanging control
-    
+    public void hangControl(){
+        if (gamepad2.dpad_up) {
+            leftAssentMotor.setPower(1);
+            rightAssentMotor.setPower(-1);
+        } else if (gamepad2.dpad_down) {
+            leftAssentMotor.setPower(-1);
+            rightAssentMotor.setPower(1);
+        } else {
+            leftAssentMotor.setPower(0);
+            rightAssentMotor.setPower(0);
+        }
+    }
 
     //this initializes the imu
     public void set_up_imu() {

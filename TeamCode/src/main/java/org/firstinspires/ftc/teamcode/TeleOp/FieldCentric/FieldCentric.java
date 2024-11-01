@@ -50,6 +50,9 @@ public class FieldCentric extends LinearOpMode {
                 //arms control
                 arms.armControl();
 
+                //hang control
+                drive.hangControl();
+
                 //telemetry
                 common.useTelemetry();
 

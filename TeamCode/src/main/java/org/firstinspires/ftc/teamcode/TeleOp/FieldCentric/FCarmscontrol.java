@@ -20,8 +20,7 @@ public class FCarmscontrol extends FCdrivecontrol{
 
     DcMotorEx armMotor;
     DcMotorEx intakeMotor;
-    DcMotorEx leftAssentMotor;
-    DcMotorEx rightAssentMotor;
+
 
     Servo specimenClaw;
     Servo intakePivot;
