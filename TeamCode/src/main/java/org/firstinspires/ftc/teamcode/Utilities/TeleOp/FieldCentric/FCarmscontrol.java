@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
+package org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -7,10 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
 
-public class FCarmscontrol extends FCdrivecontrol{
-    int intakeWristPos;
+public class FCarmscontrol extends FCdrivecontrol {
+    public int intakeWristPos;
 
 
     float spinnerStick;

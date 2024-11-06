@@ -1,15 +1,16 @@
-package org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 //imports
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric.*;
 
 @TeleOp(name = "FieldCentric")
 public class FieldCentric extends LinearOpMode {
     //add other files
-    FCdrivecontrol drive = new FCdrivecontrol();
-    FCarmscontrol arms = new FCarmscontrol();
-    FCcommon common = new FCcommon();
+    public FCdrivecontrol drive = new FCdrivecontrol();
+    public FCarmscontrol arms = new FCarmscontrol();
+    public FCcommon common = new FCcommon();
 
 
     @Override

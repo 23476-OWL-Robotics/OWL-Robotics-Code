@@ -7,14 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.ArmControllerParams;
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.IntakeControllerParams;
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.LeftAssentControllerParams;
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.RightAssentControllerParams;
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
-
 @TeleOp
-public class MainDrive extends LinearOpMode {
+public class RobotCentric extends LinearOpMode {
 
     DcMotorEx frontLeftMotor;
     DcMotorEx frontRightMotor;
@@ -66,6 +60,7 @@ public class MainDrive extends LinearOpMode {
             frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
             frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -124,6 +119,7 @@ public class MainDrive extends LinearOpMode {
                     }
                 }
 
+                /*
                 if (gamepad2.dpad_up) {
                     leftAssentMotor.setPower(1);
                     rightAssentMotor.setPower(-1);
@@ -133,6 +129,15 @@ public class MainDrive extends LinearOpMode {
                 } else {
                     leftAssentMotor.setPower(0);
                     rightAssentMotor.setPower(0);
+                }
+                */
+
+                if (gamepad2.dpad_up) {
+                    armMotor.setPower(0.7);
+                } else if (gamepad2.dpad_down) {
+                    armMotor.setPower(-0.7);
+                } else {
+                    armMotor.setPower(0);
                 }
 
                 if (gamepad2.dpad_left) {

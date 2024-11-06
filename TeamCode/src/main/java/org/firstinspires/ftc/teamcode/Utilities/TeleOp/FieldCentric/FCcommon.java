@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
+package org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric;
 
 
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -10,8 +10,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
 
-public class FCcommon extends FieldCentric{
+public class FCcommon extends FieldCentric {
 
     // all telemetry things
     public void useTelemetry(){
