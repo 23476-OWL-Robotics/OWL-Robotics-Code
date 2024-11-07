@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
-public class AccentTuner extends LinearOpMode {
+public class AccentReset extends LinearOpMode {
 
     DcMotorEx leftAssentMotor;
     DcMotorEx rightAssentMotor;
@@ -23,9 +23,6 @@ public class AccentTuner extends LinearOpMode {
 
             leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-            leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 

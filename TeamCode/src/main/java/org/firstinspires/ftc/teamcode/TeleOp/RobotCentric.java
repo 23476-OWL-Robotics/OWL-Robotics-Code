@@ -2,10 +2,15 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp
 public class RobotCentric extends LinearOpMode {
@@ -21,6 +26,11 @@ public class RobotCentric extends LinearOpMode {
     DcMotorEx rightAssentMotor;
 
     Servo specimenClaw;
+    CRServo left;
+    CRServo right;
+
+    ColorSensor colorSensor;
+    DistanceSensor distanceSensor;
 
     double x;
     double y;
@@ -43,6 +53,10 @@ public class RobotCentric extends LinearOpMode {
         rightAssentMotor = hardwareMap.get(DcMotorEx.class, "rightAssentMotor");
 
         specimenClaw = hardwareMap.get(Servo.class, "specimenClaw");
+        left = hardwareMap.get(CRServo.class, "left");
+        right = hardwareMap.get(CRServo.class, "right");
+        colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
 
         //ArmControllerParams armControllerParams = new ArmControllerParams();
         //IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
@@ -61,6 +75,7 @@ public class RobotCentric extends LinearOpMode {
             backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            right.setDirection(DcMotorSimple.Direction.REVERSE);
 
             frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -119,19 +134,19 @@ public class RobotCentric extends LinearOpMode {
                     }
                 }
 
-                /*
-                if (gamepad2.dpad_up) {
+                // Accent Buttons
+                if (gamepad2.right_bumper) {
                     leftAssentMotor.setPower(1);
                     rightAssentMotor.setPower(-1);
-                } else if (gamepad2.dpad_down) {
+                } else if (gamepad2.left_bumper) {
                     leftAssentMotor.setPower(-1);
                     rightAssentMotor.setPower(1);
                 } else {
                     leftAssentMotor.setPower(0);
                     rightAssentMotor.setPower(0);
                 }
-                */
 
+                // Arm Slide Buttons
                 if (gamepad2.dpad_up) {
                     armMotor.setPower(0.7);
                 } else if (gamepad2.dpad_down) {
@@ -140,12 +155,26 @@ public class RobotCentric extends LinearOpMode {
                     armMotor.setPower(0);
                 }
 
-                if (gamepad2.dpad_left) {
+                // Intake Slide Buttons
+                if (gamepad2.a) {
                     intakeMotor.setPower(0.7);
-                } else if (gamepad2.dpad_right) {
+                } else if (gamepad2.y) {
                     intakeMotor.setPower(-0.7);
                 } else intakeMotor.setPower(0);
 
+                // Intake Buttons
+                if (gamepad2.left_trigger > 0.2) {
+                    left.setPower(1);
+                    right.setPower(1);
+                } else if (gamepad2.right_trigger > 0.2) {
+                    left.setPower(-1);
+                    right.setPower(-1);
+                } else {
+                    left.setPower(0);
+                    right.setPower(0);
+                }
+
+                // Specimen Claw Buttons
                 if (gamepad2.x) {
                     specimenClaw.setPosition(0.75);
                 } else if (gamepad2.b) {
@@ -161,6 +190,12 @@ public class RobotCentric extends LinearOpMode {
                 telemetry.addData("Intake: ", intakeMotor.getCurrentPosition());
                 telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
                 telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
+                telemetry.addLine();
+                telemetry.addData("Sensor Distance", distanceSensor.getDistance(DistanceUnit.INCH));
+                telemetry.addData("Color RED", colorSensor.red());
+                telemetry.addData("Color GREEN", colorSensor.green());
+                telemetry.addData("Color BLUE", colorSensor.blue());
+                telemetry.update();
                 telemetry.update();
             }
         }

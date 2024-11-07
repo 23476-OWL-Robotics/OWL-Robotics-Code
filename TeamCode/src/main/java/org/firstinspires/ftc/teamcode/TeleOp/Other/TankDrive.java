@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 public class TankDrive extends LinearOpMode {
@@ -14,11 +13,6 @@ public class TankDrive extends LinearOpMode {
     DcMotorEx leftMotor2;
     DcMotorEx rightMotor1;
     DcMotorEx rightMotor2;
-
-    DcMotorEx threadMotor;
-
-    Servo leftClaw;
-    Servo rightClaw;
 
     double x, y;
 
@@ -29,9 +23,6 @@ public class TankDrive extends LinearOpMode {
         leftMotor2 = hardwareMap.get(DcMotorEx.class, "leftMotor2");
         rightMotor1 = hardwareMap.get(DcMotorEx.class, "rightMotor1");
         rightMotor2 = hardwareMap.get(DcMotorEx.class, "rightMotor2");
-        threadMotor = hardwareMap.get(DcMotorEx.class, "motor");
-        leftClaw = hardwareMap.get(Servo.class, "leftClaw");
-        rightClaw = hardwareMap.get(Servo.class, "rightClaw");
 
         waitForStart();
         if (opModeIsActive()) {
@@ -40,14 +31,9 @@ public class TankDrive extends LinearOpMode {
             leftMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            threadMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             rightMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
             rightMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-            threadMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            threadMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            rightClaw.setDirection(Servo.Direction.REVERSE);
 
             while (opModeIsActive()) {
 

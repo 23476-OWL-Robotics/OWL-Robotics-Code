@@ -25,6 +25,14 @@ public class EncoderCounter extends LinearOpMode {
             // motor.setDirection(DcMotorSimple.Direction.REVERSE);
             while (opModeIsActive()) {
 
+                if (gamepad1.dpad_up) {
+                    motor.setPower(0.5);
+                } else if (gamepad1.dpad_down) {
+                    motor.setPower(-0.5);
+                } else {
+                    motor.setPower(0);
+                }
+
                 telemetry.addData("Encoder Position: ", motor.getCurrentPosition());
                 telemetry.update();
             }
