@@ -139,10 +139,10 @@ public class RobotCentric extends LinearOpMode {
                 // Accent Buttons
                 if (gamepad2.right_bumper) {
                     leftAssentMotor.setPower(1);
-                    rightAssentMotor.setPower(-1);
+                    rightAssentMotor.setPower(1);
                 } else if (gamepad2.left_bumper) {
                     leftAssentMotor.setPower(-1);
-                    rightAssentMotor.setPower(1);
+                    rightAssentMotor.setPower(-1);
                 } else {
                     leftAssentMotor.setPower(0);
                     rightAssentMotor.setPower(0);
