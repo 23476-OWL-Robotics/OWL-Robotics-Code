@@ -78,6 +78,7 @@ public class RobotCentric extends LinearOpMode {
             armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             right.setDirection(DcMotorSimple.Direction.REVERSE);
+            intakePivot.setDirection(Servo.Direction.REVERSE);
 
             frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -186,7 +187,7 @@ public class RobotCentric extends LinearOpMode {
                 if (gamepad2.dpad_left) {
                     intakePivot.setPosition(0);
                 } else if (gamepad2.dpad_right) {
-                    intakePivot.setPosition(0.5);
+                    intakePivot.setPosition(0.3);
                 }
 
                 //armController.loopController();
