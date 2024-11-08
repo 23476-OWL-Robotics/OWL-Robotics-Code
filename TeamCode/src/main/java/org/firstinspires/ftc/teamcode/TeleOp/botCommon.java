@@ -18,48 +18,52 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public abstract class botCommon extends LinearOpMode {
 
-        //viper motors
-        public DcMotorEx armMotor;
-        public DcMotorEx intakeMotor;
+    //viper motors
+    public DcMotorEx armMotor;
+    public DcMotorEx intakeMotor;
 
-        //direct servos
-        public Servo specimenClaw;
-        public Servo intakePivot;
+    //direct servos
+    public Servo specimenClaw;
+    public Servo intakePivot;
 
-        //CR servos
-        public CRServo left;
-        public CRServo right;
+    //CR servos
+    public CRServo left;
+    public CRServo right;
 
-        //sensors
-        public DistanceSensor blockDet_DistanceSensor;
-        public ColorSensor blockDet;
+    //sensors
+    public DistanceSensor blockDet_DistanceSensor;
+    public ColorSensor blockDet;
 
-        //imu
-        public IMU imu_IMU;
-        public YawPitchRollAngles myYawPitchRollAngles;
-        public void set_up_imu() {
-            imu_IMU.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
-            imu_IMU.resetYaw();
-        }
+    //imu
+    public IMU imu_IMU;
+    public YawPitchRollAngles myYawPitchRollAngles;
+    public void set_up_imu() {
+        imu_IMU.initialize(
+                new IMU.Parameters(
+                        new RevHubOrientationOnRobot(
+                                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                                RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+        imu_IMU.resetYaw();
+    }
 
-        //dive motors
-        public DcMotor backLeftMotor;
-        public DcMotor frontLeftMotor;
-        public DcMotor backRightMotor;
-        public DcMotor frontRightMotor;
+    //dive motors
+    public DcMotor backLeftMotor;
+    public DcMotor frontLeftMotor;
+    public DcMotor backRightMotor;
+    public DcMotor frontRightMotor;
 
-        //ascent motors
-        public DcMotorEx leftAssentMotor;
-        public DcMotorEx rightAssentMotor;
+    //ascent motors
+    public DcMotorEx leftAssentMotor;
+    public DcMotorEx rightAssentMotor;
 
-        //variable setups
-        public double front_left_power;
-        public double front_right_power;
-        public double back_left_power;
-        public double back_right_power;
-        public double BotHeading;
-        public double rotX;
-        public double rotY;
+    //variable setups
+    public double front_left_power;
+    public double front_right_power;
+    public double back_left_power;
+    public double back_right_power;
+    public double BotHeading;
+    public double rotX;
+    public double rotY;
 
     //map hardware devices
     public void hardwareMaps(){

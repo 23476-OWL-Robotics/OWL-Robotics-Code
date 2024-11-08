@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.TeleOp.botCommon;
 
 public class testingAbstract extends botCommon {
 
-
     @Override
     public void runOpMode() throws InterruptedException {
         useTelemetry();

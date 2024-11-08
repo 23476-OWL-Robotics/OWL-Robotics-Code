@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric.*;
 
 @TeleOp(name = "FieldCentric")
 public class FieldCentric extends LinearOpMode {
+
     //add other files
     public FCdrivecontrol drive = new FCdrivecontrol();
     public FCarmscontrol arms = new FCarmscontrol();
@@ -54,11 +55,7 @@ public class FieldCentric extends LinearOpMode {
 
                 //telemetry
                 common.useTelemetry();
-
-
             }
         }
-
     }
-
 }

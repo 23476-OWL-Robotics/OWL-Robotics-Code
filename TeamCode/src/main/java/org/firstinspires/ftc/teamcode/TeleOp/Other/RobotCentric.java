@@ -40,6 +40,8 @@ public class RobotCentric extends LinearOpMode {
 
     double strafeCorrection = 0.9;
 
+    double GoBildaServoDownValue = 0.52;
+
     @Override
     public void runOpMode() {
 
@@ -185,9 +187,9 @@ public class RobotCentric extends LinearOpMode {
 
 
                 if (gamepad2.dpad_left) {
-                    intakePivot.setPosition(1);
+                    intakePivot.setPosition(0.9);
                 } else if (gamepad2.dpad_right) {
-                    intakePivot.setPosition(0.51);
+                    intakePivot.setPosition(0.31);
                 } else if (gamepad2.left_trigger > 0.2) {
                     left.setPower(1);
                     right.setPower(1);
