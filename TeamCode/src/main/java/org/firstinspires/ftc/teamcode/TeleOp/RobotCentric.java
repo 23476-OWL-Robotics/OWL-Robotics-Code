@@ -26,6 +26,7 @@ public class RobotCentric extends LinearOpMode {
     DcMotorEx rightAssentMotor;
 
     Servo specimenClaw;
+    Servo intakePivot;
     CRServo left;
     CRServo right;
 
@@ -57,6 +58,7 @@ public class RobotCentric extends LinearOpMode {
         right = hardwareMap.get(CRServo.class, "right");
         colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
+        intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
         //ArmControllerParams armControllerParams = new ArmControllerParams();
         //IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
@@ -179,6 +181,12 @@ public class RobotCentric extends LinearOpMode {
                     specimenClaw.setPosition(0.75);
                 } else if (gamepad2.b) {
                     specimenClaw.setPosition(1);
+                }
+
+                if (gamepad2.dpad_left) {
+                    intakePivot.setPosition(0);
+                } else if (gamepad2.dpad_right) {
+                    intakePivot.setPosition(0.5);
                 }
 
                 //armController.loopController();
