@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 //imports
 
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -11,34 +12,56 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public abstract class botCommon extends LinearOpMode {
 
-    public DcMotorEx armMotor;
-    public DcMotorEx intakeMotor;
+        //viper motors
+        public DcMotorEx armMotor;
+        public DcMotorEx intakeMotor;
 
+        //direct servos
+        public Servo specimenClaw;
+        public Servo intakePivot;
 
-    public Servo specimenClaw;
-    public Servo intakePivot;
+        //CR servos
+        public CRServo left;
+        public CRServo right;
 
-    public CRServo portIntake;
-    public CRServo starbordIntake;
+        //sensors
+        public DistanceSensor blockDet_DistanceSensor;
+        public ColorSensor blockDet;
 
-    public DistanceSensor blockDet_DistanceSensor;
-    public ColorSensor blockDet;
+        //imu
+        public IMU imu_IMU;
+        public YawPitchRollAngles myYawPitchRollAngles;
+        public void set_up_imu() {
+            imu_IMU.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+            imu_IMU.resetYaw();
+        }
 
-    public IMU imu_IMU;
-    public DcMotor backLeftMotor;
-    public DcMotor frontLeftMotor;
-    public DcMotor backRightMotor;
-    public DcMotor frontRightMotor;
-    public DcMotorEx leftAssentMotor;
-    public DcMotorEx rightAssentMotor;
+        //dive motors
+        public DcMotor backLeftMotor;
+        public DcMotor frontLeftMotor;
+        public DcMotor backRightMotor;
+        public DcMotor frontRightMotor;
 
-    //variable setups
-    public YawPitchRollAngles myYawPitchRollAngles;
+        //ascent motors
+        public DcMotorEx leftAssentMotor;
+        public DcMotorEx rightAssentMotor;
+
+        //variable setups
+        public double front_left_power;
+        public double front_right_power;
+        public double back_left_power;
+        public double back_right_power;
+        public double BotHeading;
+        public double rotX;
+        public double rotY;
+
+    //map hardware devices
     public void hardwareMaps(){
         //map slide motors
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
@@ -50,9 +73,9 @@ public abstract class botCommon extends LinearOpMode {
         specimenClaw = hardwareMap.get(Servo.class, "specimenClaw");
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
-        //map continuos servos
-        portIntake = hardwareMap.get(CRServo.class, "portIntake");
-        starbordIntake = hardwareMap.get(CRServo.class, "starbordIntake");
+        //map continuous servos
+        left = hardwareMap.get(CRServo.class, "left");
+        right = hardwareMap.get(CRServo.class, "starboardIntake");
 
         //map sensors
         blockDet_DistanceSensor = hardwareMap.get(DistanceSensor.class, "blockDet");
@@ -68,25 +91,52 @@ public abstract class botCommon extends LinearOpMode {
         frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
     }
 
+    //all telemetry values for testing
     public void useTelemetry(){
 
-        /*telemetry.addData("x input", X_stick);
-        telemetry.addData("y input", Y_stick);
-        telemetry.addLine("-----------------");
-        telemetry.addData("my yaw pitch roll", myYawPitchRollAngles);
-        telemetry.addData("BotHeading var", BotHeading);
-        telemetry.addData("turning", Turning);
-        telemetry.addData("rotY", rotY);
-        telemetry.addData("rotX", rotX);
-        telemetry.addLine("-----------------");
-        telemetry.addData("spinner power", spinnerStick);
-        telemetry.addData("intake wrist position", intakeWristPos);
-        telemetry.addLine("-----------------");*/
+        telemetry.addLine("---encoder motors---");
+        telemetry.addData("Arm: ", armMotor.getCurrentPosition());
+        telemetry.addData("Intake: ", intakeMotor.getCurrentPosition());
+        telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
+        telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
+        telemetry.addLine();
+        telemetry.addLine("---color/distance sensor---");
         telemetry.addData("distance", blockDet_DistanceSensor.getDistance(DistanceUnit.CM));
         telemetry.addData("red", blockDet.red());
         telemetry.addData("green", blockDet.green());
         telemetry.addData("blue", blockDet.blue());
+        telemetry.addLine();
         telemetry.update();
 
+    }
+
+    public void initializeMotors(){
+        //set zero powers
+        frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //set encoder modes
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        //set motor directions
+        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+    }
+
+    //sends powers to drive motors
+    public void drive_power_sets() {
+        backLeftMotor.setPower(back_left_power);
+        backRightMotor.setPower(back_right_power);
+        frontLeftMotor.setPower(front_left_power);
+        frontRightMotor.setPower(front_right_power);
     }
 }

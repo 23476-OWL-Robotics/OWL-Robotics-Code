@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.TeleOp.Other;
 
 //imports
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -30,7 +30,7 @@ public class FieldCentric extends LinearOpMode {
 
         // inital variable values
         common.initValSets();
-        
+
         waitForStart();
 
 

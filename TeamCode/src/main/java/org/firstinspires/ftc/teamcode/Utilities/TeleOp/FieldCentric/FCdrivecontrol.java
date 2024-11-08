@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
+import org.firstinspires.ftc.teamcode.TeleOp.Other.FieldCentric;
 
 public class FCdrivecontrol extends FieldCentric {
 

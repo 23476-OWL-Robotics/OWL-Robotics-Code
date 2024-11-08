@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
+import org.firstinspires.ftc.teamcode.TeleOp.Other.FieldCentric;
 
 public class FCcommon extends FieldCentric {
 
@@ -67,8 +67,8 @@ public class FCcommon extends FieldCentric {
         arms.intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
         //map continuos servos
-        arms.portIntake = hardwareMap.get(CRServo.class, "portIntake");
-        arms. starbordIntake = hardwareMap.get(CRServo.class, "starbordIntake");
+        arms.portIntake = hardwareMap.get(CRServo.class, "left");
+        arms. starbordIntake = hardwareMap.get(CRServo.class, "starboardIntake");
 
         //map sensors
         arms.blockDet_DistanceSensor = hardwareMap.get(DistanceSensor.class, "blockDet");
