@@ -40,7 +40,7 @@ public class FCdrivecontrol extends FieldCentric {
     public double rotY;
 
 
-    //this function rotates an xy axis set by the imu BotHeading. this function should turn any onmidrive into a field centric drive
+    //this function rotates an xy axis set by the imu BotHeading. this function should turn any Omni-drive into a field centric drive
     public void rotate_X_and_Y() {
         myYawPitchRollAngles = imu_IMU.getRobotYawPitchRollAngles();
         BotHeading = myYawPitchRollAngles.getYaw(AngleUnit.DEGREES) / heading_divisoin;
@@ -48,7 +48,7 @@ public class FCdrivecontrol extends FieldCentric {
         rotY = X_stick * Math.sin(-BotHeading / 180 * Math.PI) + Y_stick * Math.cos(-BotHeading / 180 * Math.PI);
     }
 
-    // driving contorl
+    // driving control
     public void drive_control() {
         front_left_power = rotY + rotX + Turning;
         front_right_power = (rotY - rotX) - Turning;
