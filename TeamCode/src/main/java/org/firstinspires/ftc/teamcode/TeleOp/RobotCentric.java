@@ -186,7 +186,7 @@ public class RobotCentric extends LinearOpMode {
                 if (gamepad2.dpad_left) {
                     intakePivot.setPosition(1);
                 } else if (gamepad2.dpad_right) {
-                    intakePivot.setPosition(0.6);
+                    intakePivot.setPosition(0.5);
                 }
 
                 //armController.loopController();
