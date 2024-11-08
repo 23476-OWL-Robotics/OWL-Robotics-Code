@@ -189,7 +189,7 @@ public class RobotCentric extends LinearOpMode {
                 if (gamepad2.dpad_left) {
                     intakePivot.setPosition(0.9);
                 } else if (gamepad2.dpad_right) {
-                    intakePivot.setPosition(0.31);
+                    intakePivot.setPosition(0.3);
                 } else if (gamepad2.left_trigger > 0.2) {
                     left.setPower(1);
                     right.setPower(1);
@@ -198,11 +198,11 @@ public class RobotCentric extends LinearOpMode {
                     right.setPower(-1);
                 } else {
                     if (intakeMotor.getCurrentPosition() < -500) {
-                        intakePivot.setPosition(0.51);
+                        intakePivot.setPosition(0.3);
                         left.setPower(1);
                         right.setPower(1);
                     } else {
-                        intakePivot.setPosition(1);
+                        intakePivot.setPosition(0.9);
                         left.setPower(0);
                         right.setPower(0);
                     }
