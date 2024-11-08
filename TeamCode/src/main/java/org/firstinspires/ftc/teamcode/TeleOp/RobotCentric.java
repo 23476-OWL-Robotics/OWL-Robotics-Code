@@ -150,9 +150,9 @@ public class RobotCentric extends LinearOpMode {
 
                 // Arm Slide Buttons
                 if (gamepad2.left_stick_y > 0.2) {
-                    armMotor.setPower(gamepad2.left_stick_y);
+                    armMotor.setPower(0.7);
                 } else if (gamepad2.left_stick_y < -0.2) {
-                    armMotor.setPower(gamepad2.left_stick_y);
+                    armMotor.setPower(-0.7);
                 } else {
                     armMotor.setPower(0);
                 }
