@@ -149,10 +149,10 @@ public class RobotCentric extends LinearOpMode {
                 }
 
                 // Arm Slide Buttons
-                if (gamepad2.dpad_up) {
-                    armMotor.setPower(0.7);
-                } else if (gamepad2.dpad_down) {
-                    armMotor.setPower(-0.7);
+                if (gamepad2.left_stick_y > 0.2) {
+                    armMotor.setPower(gamepad2.left_stick_y);
+                } else if (gamepad2.left_stick_y < -0.2) {
+                    armMotor.setPower(gamepad2.left_stick_y);
                 } else {
                     armMotor.setPower(0);
                 }
@@ -182,7 +182,7 @@ public class RobotCentric extends LinearOpMode {
                 } else if (gamepad2.b) {
                     specimenClaw.setPosition(1);
                 }
-                
+
 
                 if (gamepad2.dpad_left) {
                     intakePivot.setPosition(1);
