@@ -183,6 +183,12 @@ public class RobotCentric extends LinearOpMode {
                     specimenClaw.setPosition(1);
                 }
 
+                if (intakeMotor.getCurrentPosition() > 300) {
+                    intakePivot.setPosition(0.51);
+                } else {
+                    intakePivot.setPosition(1);
+                }
+
                 if (gamepad2.dpad_left) {
                     intakePivot.setPosition(1);
                 } else if (gamepad2.dpad_right) {
