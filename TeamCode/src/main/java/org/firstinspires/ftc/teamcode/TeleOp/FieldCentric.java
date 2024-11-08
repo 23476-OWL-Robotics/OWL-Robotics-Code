@@ -28,13 +28,11 @@ public class FieldCentric extends LinearOpMode {
         //IMU setup
         drive.set_up_imu();
 
-
-        waitForStart();
         // inital variable values
-        drive.rotX = 0;
-        drive.rotY = 0;
-        drive.heading_divisoin = 1;
-        arms.intakeWristPos = 1;
+        common.initValSets();
+        
+        waitForStart();
+
 
         if (opModeIsActive()) {
             // Put run blocks here.

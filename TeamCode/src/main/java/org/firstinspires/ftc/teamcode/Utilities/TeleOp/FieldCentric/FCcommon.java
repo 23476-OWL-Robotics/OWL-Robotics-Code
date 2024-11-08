@@ -14,6 +14,14 @@ import org.firstinspires.ftc.teamcode.TeleOp.FieldCentric;
 
 public class FCcommon extends FieldCentric {
 
+    //set inital variable values
+    public void initValSets(){
+        drive.rotX = 0;
+        drive.rotY = 0;
+        drive.heading_divisoin = 1;
+        arms.intakeWristPos = 1;
+    }
+
     // all telemetry things
     public void useTelemetry(){
 
