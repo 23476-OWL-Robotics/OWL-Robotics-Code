@@ -26,6 +26,7 @@ public class RobotCentric extends LinearOpMode {
     DcMotorEx rightAssentMotor;
 
     Servo specimenClaw;
+    Servo intakePivot;
     CRServo left;
     CRServo right;
 
@@ -55,8 +56,9 @@ public class RobotCentric extends LinearOpMode {
         specimenClaw = hardwareMap.get(Servo.class, "specimenClaw");
         left = hardwareMap.get(CRServo.class, "left");
         right = hardwareMap.get(CRServo.class, "right");
-        colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
+        //colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
+        //distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
+        intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
         //ArmControllerParams armControllerParams = new ArmControllerParams();
         //IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
@@ -73,7 +75,7 @@ public class RobotCentric extends LinearOpMode {
 
             frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            //armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             right.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -137,20 +139,20 @@ public class RobotCentric extends LinearOpMode {
                 // Accent Buttons
                 if (gamepad2.right_bumper) {
                     leftAssentMotor.setPower(1);
-                    rightAssentMotor.setPower(-1);
+                    rightAssentMotor.setPower(1);
                 } else if (gamepad2.left_bumper) {
                     leftAssentMotor.setPower(-1);
-                    rightAssentMotor.setPower(1);
+                    rightAssentMotor.setPower(-1);
                 } else {
                     leftAssentMotor.setPower(0);
                     rightAssentMotor.setPower(0);
                 }
 
                 // Arm Slide Buttons
-                if (gamepad2.dpad_up) {
-                    armMotor.setPower(0.7);
-                } else if (gamepad2.dpad_down) {
-                    armMotor.setPower(-0.7);
+                if (gamepad2.left_stick_y > 0.2) {
+                    armMotor.setPower(gamepad2.left_stick_y);
+                } else if (gamepad2.left_stick_y < -0.2) {
+                    armMotor.setPower(gamepad2.left_stick_y);
                 } else {
                     armMotor.setPower(0);
                 }
@@ -181,6 +183,29 @@ public class RobotCentric extends LinearOpMode {
                     specimenClaw.setPosition(1);
                 }
 
+
+                if (gamepad2.dpad_left) {
+                    intakePivot.setPosition(1);
+                } else if (gamepad2.dpad_right) {
+                    intakePivot.setPosition(0.51);
+                } else if (gamepad2.left_trigger > 0.2) {
+                    left.setPower(1);
+                    right.setPower(1);
+                } else if (gamepad2.right_trigger > 0.2) {
+                    left.setPower(-1);
+                    right.setPower(-1);
+                } else {
+                    if (intakeMotor.getCurrentPosition() < -500) {
+                        intakePivot.setPosition(0.51);
+                        left.setPower(1);
+                        right.setPower(1);
+                    } else {
+                        intakePivot.setPosition(1);
+                        left.setPower(0);
+                        right.setPower(0);
+                    }
+                }
+
                 //armController.loopController();
                 //intakeController.loopController();
                 //leftAssentController.loopController();
@@ -191,11 +216,10 @@ public class RobotCentric extends LinearOpMode {
                 telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
                 telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
                 telemetry.addLine();
-                telemetry.addData("Sensor Distance", distanceSensor.getDistance(DistanceUnit.INCH));
-                telemetry.addData("Color RED", colorSensor.red());
-                telemetry.addData("Color GREEN", colorSensor.green());
-                telemetry.addData("Color BLUE", colorSensor.blue());
-                telemetry.update();
+                //telemetry.addData("Sensor Distance", distanceSensor.getDistance(DistanceUnit.INCH));
+                //telemetry.addData("Color RED", colorSensor.red());
+                //telemetry.addData("Color GREEN", colorSensor.green());
+                //telemetry.addData("Color BLUE", colorSensor.blue());
                 telemetry.update();
             }
         }
