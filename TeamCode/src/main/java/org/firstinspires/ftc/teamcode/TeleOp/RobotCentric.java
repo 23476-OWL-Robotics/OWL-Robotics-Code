@@ -75,7 +75,7 @@ public class RobotCentric extends LinearOpMode {
 
             frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            //armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             right.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -150,9 +150,9 @@ public class RobotCentric extends LinearOpMode {
 
                 // Arm Slide Buttons
                 if (gamepad2.left_stick_y > 0.2) {
-                    armMotor.setPower(0.7);
+                    armMotor.setPower(gamepad2.left_stick_y);
                 } else if (gamepad2.left_stick_y < -0.2) {
-                    armMotor.setPower(-0.7);
+                    armMotor.setPower(gamepad2.left_stick_y);
                 } else {
                     armMotor.setPower(0);
                 }
