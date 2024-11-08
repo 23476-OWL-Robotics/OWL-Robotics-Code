@@ -56,8 +56,8 @@ public class RobotCentric extends LinearOpMode {
         specimenClaw = hardwareMap.get(Servo.class, "specimenClaw");
         left = hardwareMap.get(CRServo.class, "left");
         right = hardwareMap.get(CRServo.class, "right");
-        colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
+        //colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
+        //distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
 
         //ArmControllerParams armControllerParams = new ArmControllerParams();
@@ -199,11 +199,10 @@ public class RobotCentric extends LinearOpMode {
                 telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
                 telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
                 telemetry.addLine();
-                telemetry.addData("Sensor Distance", distanceSensor.getDistance(DistanceUnit.INCH));
-                telemetry.addData("Color RED", colorSensor.red());
-                telemetry.addData("Color GREEN", colorSensor.green());
-                telemetry.addData("Color BLUE", colorSensor.blue());
-                telemetry.update();
+                //telemetry.addData("Sensor Distance", distanceSensor.getDistance(DistanceUnit.INCH));
+                //telemetry.addData("Color RED", colorSensor.red());
+                //telemetry.addData("Color GREEN", colorSensor.green());
+                //telemetry.addData("Color BLUE", colorSensor.blue());
                 telemetry.update();
             }
         }
