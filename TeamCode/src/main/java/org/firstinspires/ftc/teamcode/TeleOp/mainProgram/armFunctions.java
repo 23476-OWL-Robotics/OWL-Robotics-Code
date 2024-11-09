@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.TeleOp.mainProgram;
 
-public class armFunctions extends Main_TeleOp {
+import org.firstinspires.ftc.teamcode.TeleOp.botCommon;
+
+public class armFunctions extends botCommon {
 
     // Ascent Buttons
     public void ascentControl(boolean ascend, boolean descend){

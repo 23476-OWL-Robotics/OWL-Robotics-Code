@@ -9,14 +9,22 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-public abstract class botCommon extends LinearOpMode {
+public class botCommon {
+
+    HardwareMap hardwareMap;
+    Telemetry telemetry;
+    public Gamepad gamepad1;
+    public Gamepad gamepad2;
 
     //viper motors
     public DcMotorEx armMotor;
@@ -64,6 +72,16 @@ public abstract class botCommon extends LinearOpMode {
     public double BotHeading;
     public double rotX;
     public double rotY;
+
+    public botCommon(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Gamepad gamepad2) {
+        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+        this.gamepad1 = gamepad1;
+        this.gamepad2 = gamepad2;
+    }
+    public botCommon() {
+
+    }
 
     //map hardware devices
     public void hardwareMaps(){

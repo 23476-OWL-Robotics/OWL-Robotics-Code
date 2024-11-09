@@ -1,22 +1,26 @@
 package org.firstinspires.ftc.teamcode.TeleOp.mainProgram;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.TeleOp.botCommon;
 
 @TeleOp
-public class Main_TeleOp extends botCommon {
- driveFunctions drive = new driveFunctions();
- armFunctions arm = new armFunctions();
+public class Main_TeleOp extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
+        botCommon common = new botCommon(hardwareMap, telemetry, gamepad1, gamepad2);
+        driveFunctions drive = new driveFunctions();
+        armFunctions arm = new armFunctions();
+
         //ready motors for match
-        hardwareMaps();
-        initializeMotors();
+        common.hardwareMaps();
+        common.initializeMotors();
 
         //turn on imu
-        set_up_imu();
+        common.set_up_imu();
 
         while (opModeIsActive()) {
             //driving control
@@ -29,9 +33,9 @@ public class Main_TeleOp extends botCommon {
             arm.specimenControl(gamepad2.b,gamepad2.x);
 
             //set power to motors
-            drive_power_sets();
+            common.drive_power_sets();
             //output telemetry values
-            useTelemetry();
+            common.useTelemetry();
         }
 
 

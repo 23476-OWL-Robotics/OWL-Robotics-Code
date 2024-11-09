@@ -2,8 +2,9 @@ package org.firstinspires.ftc.teamcode.TeleOp.mainProgram;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.TeleOp.botCommon;
 
-public class driveFunctions extends Main_TeleOp {
+public class driveFunctions extends botCommon{
 
     public void D_Control(float X_in, float Y_in, float Turn_in){
         rotate_X_and_Y(X_in, Y_in, -1);
@@ -25,6 +26,4 @@ public class driveFunctions extends Main_TeleOp {
         back_left_power = (rotY - rotX) + Turn_in;
         back_right_power = (rotY + rotX) - Turn_in;
     }
-
-
 }

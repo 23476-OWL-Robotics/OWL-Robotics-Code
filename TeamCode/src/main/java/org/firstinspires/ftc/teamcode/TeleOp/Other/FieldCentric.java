@@ -3,7 +3,10 @@ package org.firstinspires.ftc.teamcode.TeleOp.Other;
 //imports
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric.*;
+
+import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric.FCarmscontrol;
+import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric.FCcommon;
+import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentric.FCdrivecontrol;
 
 @TeleOp(name = "FieldCentric")
 public class FieldCentric extends LinearOpMode {
