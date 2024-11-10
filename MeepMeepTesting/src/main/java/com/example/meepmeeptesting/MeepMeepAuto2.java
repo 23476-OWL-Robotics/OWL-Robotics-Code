@@ -48,7 +48,7 @@ public class MeepMeepAuto2 {
                 .splineToLinearHeading(new Pose2d(24, -12, Math.toRadians(0)), Math.toRadians(180))
                 .build());
 
-        botRed.runAction(botRed.getDrive().actionBuilder(new Pose2d(-36, -60, Math.toRadians(180)))
+        botRed.runAction(botRed.getDrive().actionBuilder(new Pose2d(-36, -60, Math.toRadians(90)))
                 .setTangent(Math.toRadians(45))
                 .splineToLinearHeading(new Pose2d(-12, -36, Math.toRadians(90)), Math.toRadians(45))
                 .waitSeconds(2)

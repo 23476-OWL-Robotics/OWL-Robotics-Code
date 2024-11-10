@@ -11,6 +11,10 @@ public class PoseUpdate {
 
     MecanumDrive drive;
 
+    public PoseUpdate(MecanumDrive drive) {
+        this.drive = drive;
+    }
+
     public class UpdatePose implements Action {
 
         @Override
