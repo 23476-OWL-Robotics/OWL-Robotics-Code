@@ -82,8 +82,8 @@ public class RobotCentric extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
 
-            frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             right.setDirection(DcMotorSimple.Direction.REVERSE);
