@@ -5,16 +5,25 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 
+/*
+    This class contains all of the trajectories for Autonomous when starting on the red side.
+    A visual representation can be found in MeepMeepAuto2.
+    Full trajectory found at the bottom of the file.
+ */
 public class RedTrajectories {
 
+    // Create a MecanumDrive instance.
     MecanumDrive drive;
 
+    // Create RedTrajectories Constructor
     public RedTrajectories(MecanumDrive drive) {
         this.drive = drive;
     }
 
+    // Robot starting position.
     Pose2d startPose = new Pose2d(-36, -60, Math.toRadians(90));
 
+    // Trajectories
     Action action1 = drive.actionBuilder(startPose)
             .setTangent(Math.toRadians(45))
             .splineToLinearHeading(new Pose2d(-12, -36, Math.toRadians(90)), Math.toRadians(45))

@@ -27,6 +27,7 @@ public class RobotCentric extends LinearOpMode {
 
     Servo specimenClaw;
     Servo intakePivot;
+    Servo sampleServo;
     CRServo left;
     CRServo right;
 
@@ -61,6 +62,7 @@ public class RobotCentric extends LinearOpMode {
         //colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
         //distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
+        sampleServo = hardwareMap.get(Servo.class, "sampleServo");
 
         //ArmControllerParams armControllerParams = new ArmControllerParams();
         //IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
@@ -72,14 +74,20 @@ public class RobotCentric extends LinearOpMode {
         //PIDF_Controller leftAssentController = new PIDF_Controller(leftAssentControllerParams.params, leftAssentMotor);
         //PIDF_Controller rightAssentController = new PIDF_Controller(rightAssentControllerParams.params, rightAssentMotor);
 
+        while (opModeInInit()) {
+            intakePivot.setPosition(0.9);
+            sampleServo.setPosition(0.6);
+        }
+
         waitForStart();
         if (opModeIsActive()) {
 
             frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-            //armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             right.setDirection(DcMotorSimple.Direction.REVERSE);
+            intakePivot.setDirection(Servo.Direction.REVERSE);
 
             frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -151,12 +159,16 @@ public class RobotCentric extends LinearOpMode {
                 }
 
                 // Arm Slide Buttons
-                if (gamepad2.left_stick_y > 0.2) {
-                    armMotor.setPower(gamepad2.left_stick_y);
-                } else if (gamepad2.left_stick_y < -0.2) {
-                    armMotor.setPower(gamepad2.left_stick_y);
+                if (gamepad2.right_stick_y > 0.2) {
+                    armMotor.setPower(-gamepad2.right_stick_y);
+                } else if (gamepad2.right_stick_y < -0.2) {
+                    armMotor.setPower(-gamepad2.right_stick_y);
                 } else {
-                    armMotor.setPower(0);
+                    if (armMotor.getCurrentPosition() > 500) {
+                        armMotor.setPower(0.005);
+                    } else {
+                        armMotor.setPower(0);
+                    }
                 }
 
                 // Intake Slide Buttons
@@ -187,9 +199,9 @@ public class RobotCentric extends LinearOpMode {
 
 
                 if (gamepad2.dpad_left) {
-                    intakePivot.setPosition(0.95);
+                    intakePivot.setPosition(0.9);
                 } else if (gamepad2.dpad_right) {
-                    intakePivot.setPosition(0.25);
+                    intakePivot.setPosition(0.35);
                 } else if (gamepad2.left_trigger > 0.2) {
                     left.setPower(1);
                     right.setPower(1);
@@ -198,14 +210,20 @@ public class RobotCentric extends LinearOpMode {
                     right.setPower(-1);
                 } else {
                     if (intakeMotor.getCurrentPosition() < -500) {
-                        intakePivot.setPosition(0.25);
+                        intakePivot.setPosition(0.35);
                         left.setPower(1);
                         right.setPower(1);
                     } else {
-                        intakePivot.setPosition(0.95);
+                        intakePivot.setPosition(0.9);
                         left.setPower(0);
                         right.setPower(0);
                     }
+                }
+
+                if (gamepad2.dpad_up) {
+                    sampleServo.setPosition(1);
+                } else if (gamepad2.dpad_down) {
+                    sampleServo.setPosition(0.6);
                 }
 
                 //armController.loopController();

@@ -19,21 +19,30 @@ import org.firstinspires.ftc.teamcode.Utilities.TeleOp.SampleDetection;
 
 import java.util.concurrent.TimeUnit;
 
+/*
+    This file contains Actions for the robot intake.
+    These actions can be called in actions.runBlocking
+ */
 public class Intake {
 
+    // Create Motor and Servos
     DcMotorEx intakeMotor;
     CRServo left;
     CRServo right;
     Servo intakePivot;
 
+    // Create distanceSensor
     DistanceSensor distanceSensor;
 
+    // Variables for Intake
     int inches;
     boolean sampleDetected = false;
 
+    // Create PIDF Controller and Intake Parameters
     IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
     PIDF_Controller controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
 
+    // Intake Constructor
     public Intake(HardwareMap hardwareMap) {
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         left = hardwareMap.get(CRServo.class, "left");

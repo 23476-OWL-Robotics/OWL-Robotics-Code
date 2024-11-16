@@ -37,8 +37,5 @@ public class Main_TeleOp extends LinearOpMode {
             //output telemetry values
             common.useTelemetry();
         }
-
-
-
     }
 }
