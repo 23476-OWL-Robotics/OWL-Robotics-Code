@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.util.concurrent.TimeUnit;
+
 @TeleOp
 public class RobotCentric extends LinearOpMode {
 
@@ -40,11 +42,12 @@ public class RobotCentric extends LinearOpMode {
     double rs;
 
     double strafeCorrection = 0.9;
+    boolean intake = false;
 
     double GoBildaServoDownValue = 0.52;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         frontLeftMotor = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
@@ -213,8 +216,15 @@ public class RobotCentric extends LinearOpMode {
                         intakePivot.setPosition(0.35);
                         left.setPower(1);
                         right.setPower(1);
+                        intake = true;
                     } else {
-                        intakePivot.setPosition(0.9);
+                        if (intake && intakeMotor.getCurrentPosition() <= 5) {
+                            left.setPower(-1);
+                            right.setPower(-1);
+                            TimeUnit.MILLISECONDS.sleep(500);
+                            intakePivot.setPosition(0.7);
+                            intake = false;
+                        }
                         left.setPower(0);
                         right.setPower(0);
                     }
