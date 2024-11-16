@@ -78,7 +78,7 @@ public class RobotCentric extends LinearOpMode {
         //PIDF_Controller rightAssentController = new PIDF_Controller(rightAssentControllerParams.params, rightAssentMotor);
 
         while (opModeInInit()) {
-            intakePivot.setPosition(0.9);
+            intakePivot.setPosition(0.35);
             sampleServo.setPosition(0.6);
         }
 
@@ -216,15 +216,8 @@ public class RobotCentric extends LinearOpMode {
                         intakePivot.setPosition(0.35);
                         left.setPower(1);
                         right.setPower(1);
-                        intake = true;
                     } else {
-                        if (intake && intakeMotor.getCurrentPosition() <= 5) {
-                            left.setPower(-1);
-                            right.setPower(-1);
-                            TimeUnit.MILLISECONDS.sleep(500);
-                            intakePivot.setPosition(0.7);
-                            intake = false;
-                        }
+                        intakePivot.setPosition(0.35);
                         left.setPower(0);
                         right.setPower(0);
                     }
