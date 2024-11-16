@@ -178,10 +178,10 @@ public class RobotCentric extends LinearOpMode {
                 }
 
                 // Intake Slide Buttons
-                if (gamepad2.a) {
-                    intakeMotor.setPower(0.7);
-                } else if (gamepad2.y) {
-                    intakeMotor.setPower(-0.7);
+                if (gamepad2.left_stick_y > 0.2) {
+                    intakeMotor.setPower(gamepad2.right_stick_y);
+                } else if (gamepad2.left_stick_y < -0.2) {
+                    intakeMotor.setPower(gamepad2.right_stick_y);
                 } else intakeMotor.setPower(0);
 
                 // Intake Buttons
