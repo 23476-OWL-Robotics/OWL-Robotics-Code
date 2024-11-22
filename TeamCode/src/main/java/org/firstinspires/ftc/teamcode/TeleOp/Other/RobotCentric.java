@@ -118,10 +118,10 @@ public class RobotCentric extends LinearOpMode {
 
                 if (gamepad1.right_bumper) {
                     if (y > 0.05 || y < -0.05 || x > 0.05 || x < -0.05) {
-                        frontLeftMotor.setPower((y - x) * 0.3);
-                        frontRightMotor.setPower((y + x) * 0.3);
-                        backLeftMotor.setPower((y - x) * 0.3);
-                        backRightMotor.setPower((y + x) * 0.3);
+                        frontLeftMotor.setPower((y + x) * 0.3);
+                        frontRightMotor.setPower((y - x) * 0.3);
+                        backLeftMotor.setPower((y + x) * 0.3);
+                        backRightMotor.setPower((y - x) * 0.3);
                     } else if (ls > 0.2 || rs > 0.1) {
                         frontLeftMotor.setPower(((ls - rs) * 0.3) * strafeCorrection);
                         frontRightMotor.setPower(((-ls + rs) * 0.3) * strafeCorrection);
@@ -135,10 +135,10 @@ public class RobotCentric extends LinearOpMode {
                     }
                 } else {
                     if (y > 0.05 || y < -0.05 || x > 0.05 || x < -0.05) {
-                        frontLeftMotor.setPower(y - x);
-                        frontRightMotor.setPower(y + x);
-                        backLeftMotor.setPower(y - x);
-                        backRightMotor.setPower(y + x);
+                        frontLeftMotor.setPower(y + x);
+                        frontRightMotor.setPower(y - x);
+                        backLeftMotor.setPower(y + x);
+                        backRightMotor.setPower(y - x);
                     } else if (ls > 0.2 || rs > 0.1) {
                         frontLeftMotor.setPower(ls - rs);
                         frontRightMotor.setPower(-ls + rs);
