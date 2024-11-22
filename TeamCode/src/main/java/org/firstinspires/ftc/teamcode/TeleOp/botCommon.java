@@ -98,7 +98,7 @@ public class botCommon {
 
         //map continuous servos
         left = hardwareMap.get(CRServo.class, "left");
-        right = hardwareMap.get(CRServo.class, "starboardIntake");
+        right = hardwareMap.get(CRServo.class, "right");
 
         //map sensors
         blockDet_DistanceSensor = hardwareMap.get(DistanceSensor.class, "blockDet");
