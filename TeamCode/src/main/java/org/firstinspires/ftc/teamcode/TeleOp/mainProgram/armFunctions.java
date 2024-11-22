@@ -49,22 +49,25 @@ public class armFunctions extends botCommon {
 
     //intake control
     public void intakeControl(float manIn, float manOut, double deadZone){
-        manSpinControl(manIn, manOut, deadZone);
-        intakeMagicControl(deadZone);
+        if(!manSpinControl(manIn, manOut, deadZone)){
+            intakeMagicControl(deadZone);
+        }
+
     }
 
     //intake manual control
-    public void manSpinControl(float intake, float outtake, double deadZone){
+    public boolean manSpinControl(float intake, float outtake, double deadZone){
         // Intake Buttons
         if (intake > deadZone) {
             left.setPower(1);
             right.setPower(1);
+            return true;
         } else if (outtake > deadZone) {
             left.setPower(-1);
             right.setPower(-1);
+            return true;
         } else {
-            left.setPower(0);
-            right.setPower(0);
+            return false;
         }
     }
 

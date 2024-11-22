@@ -47,11 +47,7 @@ public class botCommon {
     public IMU imu_IMU;
     public YawPitchRollAngles myYawPitchRollAngles;
     public void set_up_imu() {
-        imu_IMU.initialize(
-                new IMU.Parameters(
-                        new RevHubOrientationOnRobot(
-                                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                                RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+        imu_IMU.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
         imu_IMU.resetYaw();
     }
 
