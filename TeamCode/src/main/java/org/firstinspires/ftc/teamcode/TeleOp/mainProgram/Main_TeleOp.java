@@ -18,26 +18,30 @@ public class Main_TeleOp extends LinearOpMode {
 
         //ready motors for match
         common.hardwareMaps();
-        common.initializeMotors();
 
         //turn on imu
         botCommon.imu_IMU = hardwareMap.get(IMU.class, "imu");
-        common.set_up_imu();
+        waitForStart();
 
-        while (opModeIsActive()) {
-            //driving control
-            drive.D_Control(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
 
-            //arms control
-            arm.ascentControl(gamepad2.right_bumper,gamepad2.left_bumper);
-            arm.slideControl(gamepad2.left_stick_y,gamepad2.right_stick_y,0.2);
-            arm.intakeControl(gamepad2.left_trigger,gamepad2.right_trigger,0.2);
-            arm.specimenControl(gamepad2.b,gamepad2.x);
+        if (opModeIsActive()) {
+            common.initializeMotors();
+            common.set_up_imu();
+            while (opModeIsActive()) {
+                //driving control
+                drive.D_Control(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
 
-            //set power to motors
-            common.drive_power_sets();
-            //output telemetry values
-            common.useTelemetry();
+                //arms control
+                arm.ascentControl(gamepad2.right_bumper,gamepad2.left_bumper);
+                arm.slideControl(gamepad2.left_stick_y,gamepad2.right_stick_y,0.2);
+                arm.intakeControl(gamepad2.left_trigger,gamepad2.right_trigger,0.2);
+                arm.specimenControl(gamepad2.b,gamepad2.x);
+
+                //set power to motors
+                common.drive_power_sets();
+                //output telemetry values
+                common.useTelemetry();
+            }
         }
     }
 }
