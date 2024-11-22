@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.TeleOp.mainProgram;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.teamcode.TeleOp.botCommon;
 
@@ -20,6 +21,7 @@ public class Main_TeleOp extends LinearOpMode {
         common.initializeMotors();
 
         //turn on imu
+        botCommon.imu_IMU = hardwareMap.get(IMU.class, "imu");
         common.set_up_imu();
 
         while (opModeIsActive()) {

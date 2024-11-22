@@ -44,8 +44,8 @@ public class botCommon {
     public ColorSensor blockDet;
 
     //imu
-    public IMU imu_IMU;
-    public YawPitchRollAngles myYawPitchRollAngles;
+    public static IMU imu_IMU;
+    public YawPitchRollAngles orientation;
     public void set_up_imu() {
         imu_IMU.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
         imu_IMU.resetYaw();
@@ -101,7 +101,7 @@ public class botCommon {
         blockDet = hardwareMap.get(ColorSensor.class, "blockDet");
 
         //IMU map
-        imu_IMU = hardwareMap.get(IMU.class, "imu");
+
 
         //map drive motors
         backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
