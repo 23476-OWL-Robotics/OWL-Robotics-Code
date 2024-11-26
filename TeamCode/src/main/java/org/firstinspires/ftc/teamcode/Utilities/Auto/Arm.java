@@ -22,7 +22,7 @@ public class Arm {
     int inches;
 
     ArmControllerParams armControllerParams = new ArmControllerParams();
-    PIDF_Controller controller = new PIDF_Controller(armControllerParams.params, armMotor);
+    PIDF_Controller controller;
 
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
@@ -41,13 +41,15 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
+                controller = new PIDF_Controller(armControllerParams.params, armMotor);
+                controller.setStopOnTargetReached(true);
                 controller.extendTo(inches);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.targetReached) {
+            if (!controller.running) {
                 return false;
             } else {
                 controller.loopController();
@@ -67,13 +69,15 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
+                controller = new PIDF_Controller(armControllerParams.params, armMotor);
+                controller.setStopOnTargetReached(true);
                 controller.retractTo(inches);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.targetReached) {
+            if (!controller.running) {
                 return false;
             } else {
                 controller.loopController();

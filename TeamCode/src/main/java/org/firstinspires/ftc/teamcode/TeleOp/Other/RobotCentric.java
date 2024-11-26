@@ -80,7 +80,7 @@ public class RobotCentric extends LinearOpMode {
         if (opModeInInit()) {
             intakePivot.setDirection(Servo.Direction.REVERSE);
             while (opModeInInit()) {
-                intakePivot.setPosition(0.9);
+                intakePivot.setPosition(0.5);
                 sampleServo.setPosition(0.6);
             }
         }
@@ -93,7 +93,7 @@ public class RobotCentric extends LinearOpMode {
             armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
             right.setDirection(DcMotorSimple.Direction.REVERSE);
-            intakePivot.setDirection(Servo.Direction.REVERSE);
+            //intakePivot.setDirection(Servo.Direction.REVERSE);
 
             frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -177,12 +177,22 @@ public class RobotCentric extends LinearOpMode {
                     }
                 }
 
+                /*
                 // Intake Slide Buttons
                 if (gamepad2.left_stick_y > 0.2) {
                     intakeMotor.setPower(gamepad2.right_stick_y);
                 } else if (gamepad2.left_stick_y < -0.2) {
                     intakeMotor.setPower(gamepad2.right_stick_y);
                 } else intakeMotor.setPower(0);
+                */
+
+                if (gamepad2.dpad_up) {
+                    intakeMotor.setPower(1);
+                } else if (gamepad2.dpad_down) {
+                    intakeMotor.setPower(-1);
+                } else {
+                    intakeMotor.setPower(0);
+                }
 
                 // Intake Buttons
                 if (gamepad2.left_trigger > 0.2) {
@@ -205,9 +215,9 @@ public class RobotCentric extends LinearOpMode {
 
 
                 if (gamepad2.dpad_left) {
-                    intakePivot.setPosition(0.9);
+                    intakePivot.setPosition(0.5);
                 } else if (gamepad2.dpad_right) {
-                    intakePivot.setPosition(0.35);
+                    intakePivot.setPosition(0.84);
                 } else if (gamepad2.left_trigger > 0.2) {
                     left.setPower(1);
                     right.setPower(1);
@@ -216,19 +226,19 @@ public class RobotCentric extends LinearOpMode {
                     right.setPower(-1);
                 } else {
                     if (intakeMotor.getCurrentPosition() < -500) {
-                        intakePivot.setPosition(0.35);
+                        intakePivot.setPosition(0.8);
                         left.setPower(1);
                         right.setPower(1);
                     } else {
-                        intakePivot.setPosition(0.9);
+                        intakePivot.setPosition(0.33);
                         left.setPower(0);
                         right.setPower(0);
                     }
                 }
 
-                if (gamepad2.dpad_up) {
+                if (gamepad2.a) {
                     sampleServo.setPosition(1);
-                } else if (gamepad2.dpad_down) {
+                } else if (gamepad2.y) {
                     sampleServo.setPosition(0.6);
                 }
 
@@ -241,6 +251,7 @@ public class RobotCentric extends LinearOpMode {
                 telemetry.addData("Intake: ", intakeMotor.getCurrentPosition());
                 telemetry.addData("Left Assent: ", leftAssentMotor.getCurrentPosition());
                 telemetry.addData("Right Assent: ", rightAssentMotor.getCurrentPosition());
+                telemetry.addData("Intake Pivot" ,intakePivot.getPosition());
                 telemetry.addLine();
                 //telemetry.addData("Sensor Distance", distanceSensor.getDistance(DistanceUnit.INCH));
                 //telemetry.addData("Color RED", colorSensor.red());

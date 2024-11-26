@@ -3,9 +3,12 @@ package org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
@@ -13,8 +16,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class PIDF_Tuner extends OpMode {
 
     // Conversion Parameters
-    double rotPerTick = 0.000693;
-    double inPerTick = 0.0;
+    double rotPerTick = 0.0;
+    double inPerTick = 0.006317227;
     double degPerTick = 0.0;
 
     // PIDF Parameters
@@ -44,15 +47,17 @@ public class PIDF_Tuner extends OpMode {
     public void init() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        motor = hardwareMap.get(DcMotorEx.class, "motor");
+        motor = hardwareMap.get(DcMotorEx.class, "armMotor");
         motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
     public void loop() {
 
         // Get encoder reference
-        reference = target / rotPerTick;
+        reference = target / inPerTick;
         // Get encoder position
         encoderPosition = motor.getCurrentPosition();
 
@@ -71,7 +76,7 @@ public class PIDF_Tuner extends OpMode {
         out = (Kp * error) + (Ki * integralSum) + (Kd * derivative) + (Kf * feedForward);
 
         // Keep the motor from going past 60% power
-        motor.setPower(Math.min(out, 0.6));
+        motor.setPower(Math.min(out, 0.8));
 
         // Set lastError
         lastError = error;
@@ -87,6 +92,7 @@ public class PIDF_Tuner extends OpMode {
         telemetry.addData("Ki ", Ki * integralSum);
         telemetry.addData("Kd ", Kd * derivative);
         telemetry.addData("Kf ", Kf * feedForward);
+        telemetry.addData("Out: ", out);
         telemetry.update();
     }
 }

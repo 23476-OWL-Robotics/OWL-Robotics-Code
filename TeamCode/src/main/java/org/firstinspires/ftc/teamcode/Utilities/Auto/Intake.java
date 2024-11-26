@@ -40,7 +40,7 @@ public class Intake {
 
     // Create PIDF Controller and Intake Parameters
     IntakeControllerParams intakeControllerParams = new IntakeControllerParams();
-    PIDF_Controller controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
+    PIDF_Controller controller;
 
     // Intake Constructor
     public Intake(HardwareMap hardwareMap) {
@@ -62,13 +62,15 @@ public class Intake {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
+                controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
+                controller.setStopOnTargetReached(true);
                 controller.extendTo(inches);
                 initialized = true;
             }
 
             double pos = intakeMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.targetReached) {
+            if (!controller.running) {
                 return true;
             } else {
                 controller.loopController();
@@ -76,7 +78,6 @@ public class Intake {
             }
         }
     }
-
     public Action intakeOut(int inches) {
         this.inches = inches;
         return new IntakeOut();
@@ -89,13 +90,15 @@ public class Intake {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
+                controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
+                controller.setStopOnTargetReached(true);
                 controller.retractTo(inches);
                 initialized = true;
             }
 
             double pos = intakeMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.targetReached) {
+            if (!controller.running) {
                 return true;
             } else {
                 controller.loopController();
@@ -103,7 +106,6 @@ public class Intake {
             }
         }
     }
-
     public Action intakeIn(int inches) {
         this.inches = inches;
         return new IntakeIn();

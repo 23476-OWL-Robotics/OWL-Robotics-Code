@@ -15,10 +15,12 @@ public class PIDF_Controller{
 
     // Controller target
     double target;
+    double MAX_SPEED;
 
     // Create running boolean
-    boolean running = true;
+    public boolean running;
     public boolean targetReached = false;
+    private boolean stopOnTargetReached;
 
     // create ElapsedTime
     ElapsedTime timer = new ElapsedTime();
@@ -36,6 +38,10 @@ public class PIDF_Controller{
         this.f = params.f;
 
         this.motor1 = motor1;
+    }
+
+    public void setMaxSpeed(double MAX_SPEED) {
+        this.MAX_SPEED = MAX_SPEED;
     }
 
     // Create rotateTo, extendTo, and retractTo functions
@@ -61,6 +67,9 @@ public class PIDF_Controller{
         if (running && !targetReached) {
             PIDF_Calculator();
         }
+    }
+    public void setStopOnTargetReached(boolean stop) {
+        this.stopOnTargetReached = stop;
     }
 
     public void runController(boolean run) {
@@ -97,11 +106,15 @@ public class PIDF_Controller{
 
         out = (p * error) + (i * integralSum) + (d * derivative) + (f * feedForward);
 
-        motor1.setPower(Math.min(out, 0.6));
+        motor1.setPower(Math.min(out, MAX_SPEED));
 
         if (encoderPosition < target + 5 && encoderPosition > target -5) {
             motor1.setPower(0);
             targetReached = true;
+            if (stopOnTargetReached) {
+                motor1.setPower(0);
+                running = false;
+            }
         }
 
         lastError = error;

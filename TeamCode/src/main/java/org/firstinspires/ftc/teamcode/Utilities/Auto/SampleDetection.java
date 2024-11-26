@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Utilities.TeleOp;
+package org.firstinspires.ftc.teamcode.Utilities.Auto;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -8,10 +8,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class SampleDetection {
 
-    private ColorSensor sensor;
+    ColorSensor sensor;
 
-    public SampleDetection(ColorSensor sensor) {
-        this.sensor = sensor;
+    public SampleDetection(HardwareMap hardwareMap) {
+        sensor = hardwareMap.get(ColorSensor.class, "sensor");
     }
 
     public boolean red = false;
@@ -19,6 +19,7 @@ public class SampleDetection {
     public boolean blue = false;
 
     public double sensorDistance;
+    public boolean sampleDetected;
 
     public void loopSensor() {
         sensorDistance = ((DistanceSensor) sensor).getDistance(DistanceUnit.CM);
@@ -33,6 +34,12 @@ public class SampleDetection {
             red = false;
             yellow = false;
             blue = false;
+        }
+
+        if (sensorDistance < 1) {
+            sampleDetected = true;
+        } else {
+            sampleDetected = false;
         }
     }
 }

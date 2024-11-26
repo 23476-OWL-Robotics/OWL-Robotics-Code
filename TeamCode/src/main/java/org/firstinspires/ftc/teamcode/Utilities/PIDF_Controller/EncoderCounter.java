@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,7 +15,7 @@ public class EncoderCounter extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        motor = hardwareMap.get(DcMotorEx.class, "motor");
+        motor = hardwareMap.get(DcMotorEx.class, "armMotor");
 
         waitForStart();
         if (opModeIsActive()) {
@@ -22,7 +23,7 @@ public class EncoderCounter extends LinearOpMode {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
             // ToDo: Set motor direction if needed
-            // motor.setDirection(DcMotorSimple.Direction.REVERSE);
+            motor.setDirection(DcMotorSimple.Direction.REVERSE);
             while (opModeIsActive()) {
 
                 if (gamepad1.dpad_up) {
