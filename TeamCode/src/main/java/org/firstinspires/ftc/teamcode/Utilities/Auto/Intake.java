@@ -50,9 +50,15 @@ public class Intake {
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
 
+        right.setDirection(DcMotorSimple.Direction.REVERSE);
+
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void init() {
+        intakePivot.setPosition(0.5);
     }
 
     public class IntakeOut implements Action {
@@ -118,6 +124,7 @@ public class Intake {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
+                intakePivot.setPosition(0.12);
                 left.setPower(1);
                 right.setPower(1);
                 intakeMotor.setPower(0.1);
@@ -125,12 +132,13 @@ public class Intake {
             }
 
             if (sampleDetected) {
+                intakePivot.setPosition(0.5);
                 left.setPower(0);
                 right.setPower(0);
                 intakeMotor.setPower(0);
                 return false;
             } else {
-                SampleDetected();
+                SampleDetection();
                 return true;
             }
         }
@@ -146,6 +154,7 @@ public class Intake {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
+                intakePivot.setPosition(0.69);
                 left.setPower(-1);
                 right.setPower(-1);
                 initialized = true;
@@ -155,6 +164,9 @@ public class Intake {
             } catch (InterruptedException e) {
                 // Nothing
             }
+            left.setPower(0);
+            right.setPower(0);
+            intakePivot.setPosition(0.5);
             return false;
         }
     }
@@ -162,9 +174,9 @@ public class Intake {
         return new TransferSample();
     }
 
-    public void SampleDetected() {
+    public void SampleDetection() {
         if (!sampleDetected) {
-            if (distanceSensor.getDistance(DistanceUnit.INCH) <= 1) {
+            if (distanceSensor.getDistance(DistanceUnit.CM) < 1) {
                 sampleDetected = true;
             }
         } else {

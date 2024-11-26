@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Utilities.Auto.BlueTrajectories;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.Intake;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.PoseUpdate;
 
+@Config
 @Autonomous
 public class Blue extends LinearOpMode {
 
@@ -28,6 +29,10 @@ public class Blue extends LinearOpMode {
         Intake intake = new Intake(hardwareMap);
         PoseUpdate pose = new PoseUpdate(drive);
 
+        while (opModeInInit()) {
+            arm.init();
+            intake.init();
+        }
         waitForStart();
         if (opModeIsActive()) {
             Actions.runBlocking(

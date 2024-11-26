@@ -16,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Utilities.Auto.Intake;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.PoseUpdate;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.RedTrajectories;
 
+@Config
 @Autonomous
 public class Red extends LinearOpMode {
 
@@ -28,6 +29,10 @@ public class Red extends LinearOpMode {
         Intake intake = new Intake(hardwareMap);
         PoseUpdate pose = new PoseUpdate(drive);
 
+        while (opModeInInit()) {
+            arm.init();
+            intake.init();
+        }
         waitForStart();
         if (opModeIsActive()) {
             Actions.runBlocking(

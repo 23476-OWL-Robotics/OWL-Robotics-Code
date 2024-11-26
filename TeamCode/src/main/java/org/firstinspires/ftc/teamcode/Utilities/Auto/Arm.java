@@ -13,6 +13,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.ArmControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
 
+import java.util.concurrent.TimeUnit;
+
 public class Arm {
 
     DcMotorEx armMotor;
@@ -30,8 +32,13 @@ public class Arm {
         specimenServo = hardwareMap.get(Servo.class, "specimenServo");
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void init() {
+        sampleServo.setPosition(0.485);
+        specimenServo.setPosition(1);
     }
 
     public class ArmUp implements Action {
@@ -57,7 +64,7 @@ public class Arm {
             }
         }
     }
-    public Action ArmUp (int inches) {
+    public Action armUp (int inches) {
         this.inches = inches;
         return new ArmUp();
     }
@@ -91,11 +98,27 @@ public class Arm {
     }
 
     public class ReleaseSpecimen implements Action {
+        private boolean initialized = false;
 
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
-            specimenServo.setPosition(0.75);
-            return false;
+
+            if (!initialized) {
+                controller = new PIDF_Controller(armControllerParams.params, armMotor);
+                controller.setStopOnTargetReached(true);
+                controller.retractTo(inches - 2);
+                initialized = true;
+            }
+
+            double pos = armMotor.getCurrentPosition();
+            p.put("Motor Position: ", pos);
+            if (!controller.running) {
+                specimenServo.setPosition(0.73);
+                return false;
+            } else {
+                controller.loopController();
+                return true;
+            }
         }
     }
     public Action releaseSpecimen() {
@@ -105,7 +128,13 @@ public class Arm {
     public class ReleaseSample implements Action {
 
         @Override public boolean run(@NonNull TelemetryPacket p) {
-            sampleServo.setPosition(0);
+            sampleServo.setPosition(0.25);
+            try {
+                TimeUnit.MILLISECONDS.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            sampleServo.setPosition(0.485);
             return false;
         }
     }
