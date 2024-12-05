@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.Utilities.Auto.Intake;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.PoseUpdate;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.RedTrajectories;
 
-@Config
 @Autonomous
 public class Red extends LinearOpMode {
 

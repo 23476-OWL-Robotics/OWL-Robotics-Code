@@ -15,7 +15,7 @@ public class EncoderCounter extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        motor = hardwareMap.get(DcMotorEx.class, "armMotor");
+        motor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
 
         waitForStart();
         if (opModeIsActive()) {

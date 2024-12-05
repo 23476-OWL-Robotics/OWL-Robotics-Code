@@ -29,30 +29,38 @@ public class RedTrajectories {
             .splineToLinearHeading(new Pose2d(-12, -36, Math.toRadians(90)), Math.toRadians(45))
             .build();
     public Action action2 = drive.actionBuilder(drive.pose)
-            .setTangent(Math.toRadians(180))
-            .splineToLinearHeading(new Pose2d(-48, -48, Math.toRadians(-90)), Math.toRadians(180))
+            .setTangent(Math.toRadians(0))
+            .splineToLinearHeading(new Pose2d(38, -38, Math.toRadians(-135)), Math.toRadians(0))
             .build();
     public Action action3 = drive.actionBuilder(drive.pose)
-            .setTangent(Math.toRadians(-135))
-            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-135))
-            .build();
-    public Action action4 = drive.actionBuilder(drive.pose)
-            .setTangent(Math.toRadians(90))
-            .splineToLinearHeading(new Pose2d(-58, -47, Math.toRadians(-90)), Math.toRadians(90))
-            .build();
-    public Action action5 = drive.actionBuilder(drive.pose)
-            .setTangent(Math.toRadians(-90))
-            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-90))
-            .build();
-    public Action action6 = drive.actionBuilder(drive.pose)
-            .setTangent(Math.toRadians(0))
-            .splineToLinearHeading(new Pose2d(47, -47, Math.toRadians(-90)), Math.toRadians(0))
-            .build();
-    public Action action7 = drive.actionBuilder(drive.pose)
             .setTangent(Math.toRadians(180))
             .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(180))
             .build();
+    public Action action4 = drive.actionBuilder(drive.pose)
+            .setTangent(Math.toRadians(45))
+            .splineToLinearHeading(new Pose2d(-48, -48, Math.toRadians(-90)), Math.toRadians(45))
+            .build();
+    public Action action5 = drive.actionBuilder(drive.pose)
+            .setTangent(Math.toRadians(-135))
+            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-135))
+            .build();
+    public Action action6 = drive.actionBuilder(drive.pose)
+            .setTangent(Math.toRadians(90))
+            .splineToLinearHeading(new Pose2d(-58, -47, Math.toRadians(-90)), Math.toRadians(90))
+            .build();
+    public Action action7 = drive.actionBuilder(drive.pose)
+            .setTangent(Math.toRadians(-90))
+            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-90))
+            .build();
     public Action action8 = drive.actionBuilder(drive.pose)
+            .setTangent(Math.toRadians(90))
+            .splineToLinearHeading(new Pose2d(-54, -40, Math.toRadians(-45)), Math.toRadians(90))
+            .build();
+    public Action action9 = drive.actionBuilder(drive.pose)
+            .setTangent(Math.toRadians(-90))
+            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-90))
+            .build();
+    public Action action10 = drive.actionBuilder(drive.pose)
             .setTangent(Math.toRadians(90))
             .splineToLinearHeading(new Pose2d(-24, 12, Math.toRadians(180)), Math.toRadians(0))
             .build();
@@ -62,8 +70,14 @@ public class RedTrajectories {
             .setTangent(Math.toRadians(45))
             .splineToLinearHeading(new Pose2d(-12, -36, Math.toRadians(90)), Math.toRadians(45))
             .waitSeconds(2)
+            .setTangent(Math.toRadians(0))
+            .splineToLinearHeading(new Pose2d(38, -38, Math.toRadians(-135)), Math.toRadians(0))
+            .waitSeconds(2)
             .setTangent(Math.toRadians(180))
-            .splineToLinearHeading(new Pose2d(-48, -48, Math.toRadians(-90)), Math.toRadians(180))
+            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(180))
+            .waitSeconds(1)
+            .setTangent(Math.toRadians(45))
+            .splineToLinearHeading(new Pose2d(-48, -48, Math.toRadians(-90)), Math.toRadians(45))
             .waitSeconds(2)
             .setTangent(Math.toRadians(-135))
             .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-135))
@@ -74,13 +88,14 @@ public class RedTrajectories {
             .setTangent(Math.toRadians(-90))
             .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-90))
             .waitSeconds(1)
-            .setTangent(Math.toRadians(0))
-            .splineToLinearHeading(new Pose2d(47, -47, Math.toRadians(-90)), Math.toRadians(0))
+            .setTangent(Math.toRadians(90))
+            .splineToLinearHeading(new Pose2d(-54, -40, Math.toRadians(-45)), Math.toRadians(90))
             .waitSeconds(2)
-            .setTangent(Math.toRadians(180))
-            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(180))
+            .setTangent(Math.toRadians(-90))
+            .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-90))
             .waitSeconds(1)
             .setTangent(Math.toRadians(90))
-            .splineToLinearHeading(new Pose2d(-24, 12, Math.toRadians(180)), Math.toRadians(0));
+            .splineToLinearHeading(new Pose2d(-24, 12, Math.toRadians(180)), Math.toRadians(0))
+            .build());
     */
 }

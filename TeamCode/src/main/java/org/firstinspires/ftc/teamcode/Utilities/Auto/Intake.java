@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.IntakeControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
-import org.firstinspires.ftc.teamcode.Utilities.TeleOp.SampleDetection;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +34,6 @@ public class Intake {
     DistanceSensor distanceSensor;
 
     // Variables for Intake
-    int inches;
     boolean sampleDetected = false;
 
     // Create PIDF Controller and Intake Parameters
@@ -48,13 +46,17 @@ public class Intake {
         left = hardwareMap.get(CRServo.class, "left");
         right = hardwareMap.get(CRServo.class, "right");
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "blockDet");
 
         right.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
+        controller.setMaxSpeed(1);
+        controller.setStopOnTargetReached(true);
     }
 
     public void init() {
@@ -68,24 +70,21 @@ public class Intake {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
-                controller.setStopOnTargetReached(true);
-                controller.extendTo(inches);
+                controller.extendTo(19);
                 initialized = true;
             }
 
             double pos = intakeMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (!controller.running) {
+            if (controller.running) {
+                controller.loopController();
                 return true;
             } else {
-                controller.loopController();
                 return false;
             }
         }
     }
-    public Action intakeOut(int inches) {
-        this.inches = inches;
+    public Action intakeOut() {
         return new IntakeOut();
     }
 
@@ -96,24 +95,21 @@ public class Intake {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
-                controller.setStopOnTargetReached(true);
-                controller.retractTo(inches);
+                controller.retractTo(0);
                 initialized = true;
             }
 
             double pos = intakeMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (!controller.running) {
+            if (controller.running) {
+                controller.loopController();
                 return true;
             } else {
-                controller.loopController();
                 return false;
             }
         }
     }
-    public Action intakeIn(int inches) {
-        this.inches = inches;
+    public Action intakeIn() {
         return new IntakeIn();
     }
 
@@ -129,6 +125,7 @@ public class Intake {
                 right.setPower(1);
                 intakeMotor.setPower(0.1);
                 initialized = true;
+                sampleDetected = false;
             }
 
             if (sampleDetected) {
@@ -160,13 +157,18 @@ public class Intake {
                 initialized = true;
             }
             try {
-                TimeUnit.MILLISECONDS.sleep(100);
+                TimeUnit.MILLISECONDS.sleep(350);
             } catch (InterruptedException e) {
                 // Nothing
             }
             left.setPower(0);
             right.setPower(0);
             intakePivot.setPosition(0.5);
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                //Nothing
+            }
             return false;
         }
     }

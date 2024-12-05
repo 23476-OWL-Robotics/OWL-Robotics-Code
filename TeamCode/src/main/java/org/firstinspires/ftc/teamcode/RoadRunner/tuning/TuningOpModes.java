@@ -150,7 +150,7 @@ public final class TuningOpModes {
         } else {
             throw new RuntimeException();
         }
-        /*
+
         manager.register(metaForClass(AngularRampLogger.class), new AngularRampLogger(dvf));
         manager.register(metaForClass(ForwardPushTest.class), new ForwardPushTest(dvf));
         manager.register(metaForClass(ForwardRampLogger.class), new ForwardRampLogger(dvf));
@@ -176,7 +176,5 @@ public final class TuningOpModes {
                 configRoot.putVariable(c.getSimpleName(), ReflectionConfig.createVariableFromClass(c));
             }
         });
-
-        */
     }
 }

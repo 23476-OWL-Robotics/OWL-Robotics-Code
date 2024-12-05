@@ -18,7 +18,7 @@ public class PIDF_Controller{
     double MAX_SPEED;
 
     // Create running boolean
-    public boolean running;
+    public boolean running = true;
     public boolean targetReached = false;
     private boolean stopOnTargetReached;
 
@@ -64,7 +64,7 @@ public class PIDF_Controller{
     // Create runController function
     // Run this in the opModeIsActive while loop
     public void loopController() {
-        if (running && !targetReached) {
+        if (running) {
             PIDF_Calculator();
         }
     }
@@ -108,7 +108,7 @@ public class PIDF_Controller{
 
         motor1.setPower(Math.min(out, MAX_SPEED));
 
-        if (encoderPosition < target + 5 && encoderPosition > target -5) {
+        if (encoderPosition < reference + 5 && encoderPosition > reference -5) {
             motor1.setPower(0);
             targetReached = true;
             if (stopOnTargetReached) {

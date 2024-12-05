@@ -21,19 +21,21 @@ public class Arm {
     Servo sampleServo;
     Servo specimenServo;
 
-    int inches;
-
     ArmControllerParams armControllerParams = new ArmControllerParams();
     PIDF_Controller controller;
 
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         sampleServo = hardwareMap.get(Servo.class, "sampleServo");
-        specimenServo = hardwareMap.get(Servo.class, "specimenServo");
+        specimenServo = hardwareMap.get(Servo.class, "specimenClaw");
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        controller = new PIDF_Controller(armControllerParams.params, armMotor);
+        controller.setMaxSpeed(1);
+        controller.setStopOnTargetReached(true);
     }
 
     public void init() {
@@ -48,24 +50,21 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller = new PIDF_Controller(armControllerParams.params, armMotor);
-                controller.setStopOnTargetReached(true);
-                controller.extendTo(inches);
+                controller.extendTo(37);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (!controller.running) {
-                return false;
-            } else {
+            if (controller.running) {
                 controller.loopController();
                 return true;
+            } else {
+                return false;
             }
         }
     }
-    public Action armUp (int inches) {
-        this.inches = inches;
+    public Action armUp() {
         return new ArmUp();
     }
 
@@ -76,37 +75,35 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller = new PIDF_Controller(armControllerParams.params, armMotor);
-                controller.setStopOnTargetReached(true);
-                controller.retractTo(inches);
+                controller.retractTo(0);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (!controller.running) {
-                return false;
-            } else {
+            if (controller.running) {
                 controller.loopController();
                 return true;
+            } else {
+                return false;
             }
         }
     }
-    public Action armDown(int inches) {
-        this.inches = inches;
+    public Action armDown() {
         return new ArmDown();
     }
 
     public class ReleaseSpecimen implements Action {
         private boolean initialized = false;
 
+        ArmControllerParams armControllerParams = new ArmControllerParams();
+        PIDF_Controller controller;
+
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller = new PIDF_Controller(armControllerParams.params, armMotor);
-                controller.setStopOnTargetReached(true);
-                controller.retractTo(inches - 2);
+                controller.retractTo(20);
                 initialized = true;
             }
 
@@ -130,7 +127,7 @@ public class Arm {
         @Override public boolean run(@NonNull TelemetryPacket p) {
             sampleServo.setPosition(0.25);
             try {
-                TimeUnit.MILLISECONDS.sleep(200);
+                TimeUnit.MILLISECONDS.sleep(850);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

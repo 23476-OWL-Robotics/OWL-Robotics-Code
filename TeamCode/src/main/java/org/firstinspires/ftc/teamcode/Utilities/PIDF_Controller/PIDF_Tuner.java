@@ -17,7 +17,7 @@ public class PIDF_Tuner extends OpMode {
 
     // Conversion Parameters
     double rotPerTick = 0.0;
-    double inPerTick = 0.006317227;
+    double inPerTick = 0.006371562;
     double degPerTick = 0.0;
 
     // PIDF Parameters
@@ -47,7 +47,7 @@ public class PIDF_Tuner extends OpMode {
     public void init() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        motor = hardwareMap.get(DcMotorEx.class, "armMotor");
+        motor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
