@@ -174,38 +174,38 @@ public class FieldCentricUtil extends LinearOpMode {
 
     //provide 360 degree movement from a stick
     public void drive_control(double turning_stick) {
-      if(gamepad1.touchpad_finger_1 && gamepad1.touchpad_finger_2){
+      if(gamepad2.touchpad_finger_1 && gamepad2.touchpad_finger_2){
           if(!touchSet){
               touchSet = true;
-              if(gamepad1.touchpad_finger_1_x > gamepad1.touchpad_finger_2_x){
-                  TFoneRefX = gamepad1.touchpad_finger_1_x;
-                  TFoneRefY = gamepad1.touchpad_finger_1_y;
-                  TFtwoRefX = gamepad1.touchpad_finger_2_x;
-                  TFtwoRefY = gamepad1.touchpad_finger_2_y;
+              if(gamepad2.touchpad_finger_1_x > gamepad2.touchpad_finger_2_x){
+                  TFoneRefX = gamepad2.touchpad_finger_1_x;
+                  TFoneRefY = gamepad2.touchpad_finger_1_y;
+                  TFtwoRefX = gamepad2.touchpad_finger_2_x;
+                  TFtwoRefY = gamepad2.touchpad_finger_2_y;
               }else{
-                  TFtwoRefX = gamepad1.touchpad_finger_1_x;
-                  TFtwoRefY = gamepad1.touchpad_finger_1_y;
-                  TFoneRefX = gamepad1.touchpad_finger_2_x;
-                  TFoneRefY = gamepad1.touchpad_finger_2_y;
+                  TFtwoRefX = gamepad2.touchpad_finger_1_x;
+                  TFtwoRefY = gamepad2.touchpad_finger_1_y;
+                  TFoneRefX = gamepad2.touchpad_finger_2_x;
+                  TFoneRefY = gamepad2.touchpad_finger_2_y;
               }
 
           }
           else{
-              front_left_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
-                      + (gamepad1.touchpad_finger_1_x-TFoneRefX)
-                      + (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+              front_left_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
+                      + (gamepad2.touchpad_finger_1_x-TFoneRefX)
+                      + (gamepad2.touchpad_finger_2_x-TFtwoRefX);
 
-              front_right_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
-                      - (gamepad1.touchpad_finger_1_x-TFoneRefX)
-                      - (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+              front_right_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
+                      - (gamepad2.touchpad_finger_1_x-TFoneRefX)
+                      - (gamepad2.touchpad_finger_2_x-TFtwoRefX);
 
-              back_left_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
-                      - (gamepad1.touchpad_finger_1_x-TFoneRefX)
-                      + (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+              back_left_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
+                      - (gamepad2.touchpad_finger_1_x-TFoneRefX)
+                      + (gamepad2.touchpad_finger_2_x-TFtwoRefX);
 
-              back_right_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
-                      + (gamepad1.touchpad_finger_1_x-TFoneRefX)
-                      - (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+              back_right_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
+                      + (gamepad2.touchpad_finger_1_x-TFoneRefX)
+                      - (gamepad2.touchpad_finger_2_x-TFtwoRefX);
           }
       }else{
           front_left_power = rotY + rotX + turning_stick;
@@ -317,7 +317,7 @@ public class FieldCentricUtil extends LinearOpMode {
             intakeMotor.setPower(-intake_slide_stick);
         } else {
             if(doingIntake){
-                intakeController.extendTo(0);
+                intakeController.extendTo(1);
                 intakeController.loopController();
             }else{
                 intakeMotor.setPower(0);
@@ -418,11 +418,7 @@ public class FieldCentricUtil extends LinearOpMode {
         if (intakeController.targetReached){
             intake_pivot_position = 0.69;
             isUp  = true;
-            if(intakePivot.getPosition() >0.60){
-                intake_pivot_position = 0.69;
-                isUp = true;
-                doingIntake = false;
-            }
+
         }
     }
 
