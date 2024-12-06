@@ -22,9 +22,9 @@ public class MeepMeepAutoSample {
                 .setColorScheme(new ColorSchemeRedDark())
                 .build();
 
-        botBlue.runAction(botBlue.getDrive().actionBuilder(new Pose2d(36, 60, Math.toRadians(-90)))
-                .setTangent(Math.toRadians(-135))
-                .splineToLinearHeading(new Pose2d(12, 36, Math.toRadians(-90)), Math.toRadians(-135))
+        botBlue.runAction(botBlue.getDrive().actionBuilder(new Pose2d(-8.5, 60, Math.toRadians(0)))
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-8.5, 30, Math.toRadians(-90)), Math.toRadians(-90))
                 .waitSeconds(2)
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(-38, 38, Math.toRadians(45)), Math.toRadians(180))
@@ -54,9 +54,9 @@ public class MeepMeepAutoSample {
                 .splineToLinearHeading(new Pose2d(24, -12, Math.toRadians(0)), Math.toRadians(180))
                 .build());
 
-        botRed.runAction(botRed.getDrive().actionBuilder(new Pose2d(-36, -60, Math.toRadians(90)))
-                .setTangent(Math.toRadians(45))
-                .splineToLinearHeading(new Pose2d(-12, -36, Math.toRadians(90)), Math.toRadians(45))
+        botRed.runAction(botRed.getDrive().actionBuilder(new Pose2d(12, -60, Math.toRadians(90)))
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(12, -36, Math.toRadians(90)), Math.toRadians(90))
                 .waitSeconds(2)
                 .setTangent(Math.toRadians(0))
                 .splineToLinearHeading(new Pose2d(38, -38, Math.toRadians(-135)), Math.toRadians(0))

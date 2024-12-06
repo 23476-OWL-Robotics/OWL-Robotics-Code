@@ -465,6 +465,7 @@ public class FieldCentricUtil extends LinearOpMode {
         telemetry.addData("lifter slide power", arm_slide_power);
         telemetry.addData("output trough position", sample_servo_position);
         telemetry.addData("specimen claw position", specimen_servo_position);
+        telemetry.addData("IMU",imu.getRobotYawPitchRollAngles());
         telemetry.update();
     }
 
