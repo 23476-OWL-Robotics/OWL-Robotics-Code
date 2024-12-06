@@ -77,6 +77,14 @@ public class FieldCentricUtil extends LinearOpMode {
     double rotY;
     double speedModifier;
     boolean isUp;
+    boolean doingIntake;
+    boolean touchSet;
+    float TFoneRefX;
+    float TFoneRefY;
+    float TFtwoRefX;
+    float TFtwoRefY;
+
+
 
     // Hardware Maps
     public void hardwareMaps() {
@@ -127,6 +135,8 @@ public class FieldCentricUtil extends LinearOpMode {
         intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        touchSet = false;
     }
 
     // Servo Positions on opModeInInit()
@@ -150,6 +160,7 @@ public class FieldCentricUtil extends LinearOpMode {
         imu.resetYaw();
     }
 
+    //changes stick intake to field centric
     public void rotate_x_and_y(double forward_back_stick, double left_right_stick) {
         YawPitchRollAngles myYawPitchRollAngles;
         double heading;
@@ -161,19 +172,58 @@ public class FieldCentricUtil extends LinearOpMode {
         rotY = left_right_stick * Math.sin(-heading / 180 * Math.PI) + forward_back_stick * Math.cos(-heading / 180 * Math.PI);
     }
 
+    //provide 360 degree movement from a stick
     public void drive_control(double turning_stick) {
-        front_left_power = rotY + rotX + turning_stick;
-        front_right_power = (rotY - rotX) - turning_stick;
-        back_left_power = (rotY - rotX) + turning_stick;
-        back_right_power = (rotY + rotX) - turning_stick;
+      if(gamepad1.touchpad_finger_1 && gamepad1.touchpad_finger_2){
+          if(!touchSet){
+              touchSet = true;
+              if(gamepad1.touchpad_finger_1_x > gamepad1.touchpad_finger_2_x){
+                  TFoneRefX = gamepad1.touchpad_finger_1_x;
+                  TFoneRefY = gamepad1.touchpad_finger_1_y;
+                  TFtwoRefX = gamepad1.touchpad_finger_2_x;
+                  TFtwoRefY = gamepad1.touchpad_finger_2_y;
+              }else{
+                  TFtwoRefX = gamepad1.touchpad_finger_1_x;
+                  TFtwoRefY = gamepad1.touchpad_finger_1_y;
+                  TFoneRefX = gamepad1.touchpad_finger_2_x;
+                  TFoneRefY = gamepad1.touchpad_finger_2_y;
+              }
+
+          }
+          else{
+              front_left_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
+                      + (gamepad1.touchpad_finger_1_x-TFoneRefX)
+                      + (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+
+              front_right_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
+                      - (gamepad1.touchpad_finger_1_x-TFoneRefX)
+                      - (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+
+              back_left_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
+                      - (gamepad1.touchpad_finger_1_x-TFoneRefX)
+                      + (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+
+              back_right_power = (gamepad1.touchpad_finger_1_y-TFoneRefY)
+                      + (gamepad1.touchpad_finger_1_x-TFoneRefX)
+                      - (gamepad1.touchpad_finger_2_x-TFtwoRefX);
+          }
+      }else{
+          front_left_power = rotY + rotX + turning_stick;
+          front_right_power = (rotY - rotX) - turning_stick;
+          back_left_power = (rotY - rotX) + turning_stick;
+          back_right_power = (rotY + rotX) - turning_stick;
+      }
+
     }
 
+    //sets motor power sets
     public void power_sets(boolean slowMode) {
         drive_power_sets(slowMode);
         slide_power_sets();
         servo_power_sets();
     }
 
+    //sets wrist servo to positions set by slide control
     public void sample_control(boolean output_up, boolean output_down) {
         if (output_up) {
             sample_servo_position = 0.25;
@@ -182,6 +232,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
+    //opens and closes specimen claw
     public void specimen_control(boolean grab_specimen, boolean release_specimen) {
         if (grab_specimen) {
             specimen_servo_position = 0.73;
@@ -190,6 +241,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
+    //parameter for assent motors
     LeftAssentControllerParams leftAssentControllerParams = new LeftAssentControllerParams();
     PIDF_Controller leftAssentController;
 
@@ -200,6 +252,7 @@ public class FieldCentricUtil extends LinearOpMode {
     double leftAssentPosition;
     double rightAssentPosition;
 
+    // control the asent motors with pidf
     public void assent_control(boolean ascend_button, boolean descend_button) {
         if (!assentInti) {
             leftAssentController = new PIDF_Controller(leftAssentControllerParams.params, leftAssentMotor);
@@ -222,6 +275,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
+    //paramaters for scoring slides
     ArmControllerParams armControllerParams = new ArmControllerParams();
     PIDF_Controller armController;
 
@@ -232,11 +286,16 @@ public class FieldCentricUtil extends LinearOpMode {
     double armPosition = 0;
     double intakePosition = 0;
 
+    // controls lhe slides for scoring
     public void slide_control(double intake_slide_stick, double lifter_slide_stick, boolean reset, double deadZone) {
         if (!slideInit) {
             armController = new PIDF_Controller(armControllerParams.params, armMotor);
             armController.setMaxSpeed(1);
             armController.setStopOnTargetReached(false);
+
+            intakeController = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
+            intakeController.setMaxSpeed(1);
+            intakeController.setStopOnTargetReached(false);
 
             slideInit = true;
         }
@@ -257,7 +316,12 @@ public class FieldCentricUtil extends LinearOpMode {
         if (Math.abs(intake_slide_stick) > deadZone) {
             intakeMotor.setPower(-intake_slide_stick);
         } else {
-            intakeMotor.setPower(0);
+            if(doingIntake){
+                intakeController.extendTo(0);
+                intakeController.loopController();
+            }else{
+                intakeMotor.setPower(0);
+            }
         }
         armController.extendTo(armPosition);
         armController.loopController();
@@ -271,6 +335,7 @@ public class FieldCentricUtil extends LinearOpMode {
                                    double deadZone) {
         loopSensor();
 
+        //automatic and manual control of intake wheels
         if (!isUp && sensorDistance > 3.5 && sensorDistance < 4.5) {
             intake_wheel_power = -0.3;
         } else if (intake_wheels_out > deadZone) {
@@ -286,6 +351,7 @@ public class FieldCentricUtil extends LinearOpMode {
             intake_wheel_power = 0;
         }
 
+        //puts the intake pivot to is positions based on inputs
         if (intake_pivot_up) {
             intake_pivot_position = 0.69;
             isUp = true;
@@ -298,6 +364,7 @@ public class FieldCentricUtil extends LinearOpMode {
             isUp = true;
         } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow) {
             intake_pivot_position = 0.50;
+            doingIntake = true;
         } else if (!isUp && sensorDistance < 1 && blue) {
             intake_pivot_position = 0.31;
             intake_wheel_power = -1;
@@ -340,9 +407,22 @@ public class FieldCentricUtil extends LinearOpMode {
             isUp = true;
         } else if (!isUp && sensorDistance < 1 && blue || !isUp && sensorDistance < 1 && yellow){
             intake_pivot_position = 0.50;
+            doingIntake = true;
         } else if (!isUp && sensorDistance < 1 && red){
             intake_pivot_position = 0.31;
             intake_wheel_power = -1;
+        }
+    }
+
+    public void Dointake(){
+        if (intakeController.targetReached){
+            intake_pivot_position = 0.69;
+            isUp  = true;
+            if(intakePivot.getPosition() >0.60){
+                intake_pivot_position = 0.69;
+                isUp = true;
+                doingIntake = false;
+            }
         }
     }
 
