@@ -186,7 +186,7 @@ public class FieldCentricUtil extends LinearOpMode {
               touchSet = true;
               if(gamepad2.touchpad_finger_1_x > gamepad2.touchpad_finger_2_x){
                   TFoneRefX = gamepad2.touchpad_finger_1_x;
-                  TFoneRefY = gamepad2.touchpad_finger_1_y;
+                  TFoneRefY = -gamepad2.touchpad_finger_1_y;
                   TFtwoRefX = gamepad2.touchpad_finger_2_x;
                   TFtwoRefY = gamepad2.touchpad_finger_2_y;
                   whichTF = true;
@@ -194,7 +194,7 @@ public class FieldCentricUtil extends LinearOpMode {
                   TFtwoRefX = gamepad2.touchpad_finger_1_x;
                   TFtwoRefY = gamepad2.touchpad_finger_1_y;
                   TFoneRefX = gamepad2.touchpad_finger_2_x;
-                  TFoneRefY = gamepad2.touchpad_finger_2_y;
+                  TFoneRefY = -gamepad2.touchpad_finger_2_y;
                   whichTF = false;
               }
 
@@ -202,14 +202,14 @@ public class FieldCentricUtil extends LinearOpMode {
           else{
               if(whichTF){
                   TFoneX = gamepad2.touchpad_finger_1_x;
-                  TFoneY = gamepad2.touchpad_finger_1_y;
+                  TFoneY = -gamepad2.touchpad_finger_1_y;
                   TFtwoX = gamepad2.touchpad_finger_2_x;
                   TFtwoY = gamepad2.touchpad_finger_2_y;
               }else{
                   TFtwoX = gamepad2.touchpad_finger_1_x;
                   TFtwoY = gamepad2.touchpad_finger_1_y;
                   TFoneX = gamepad2.touchpad_finger_2_x;
-                  TFoneY = gamepad2.touchpad_finger_2_y;
+                  TFoneY = -gamepad2.touchpad_finger_2_y;
               }
               front_left_power = ((TFoneY-TFoneRefY)
                       + (TFoneX-TFoneRefX)
