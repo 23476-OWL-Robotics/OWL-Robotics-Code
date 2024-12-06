@@ -28,8 +28,7 @@ public class PoseUpdate {
             return false;
         }
     }
-    public Action updatePose(MecanumDrive drive) {
-        this.drive = drive;
+    public Action updatePose() {
         return new UpdatePose();
     }
 }

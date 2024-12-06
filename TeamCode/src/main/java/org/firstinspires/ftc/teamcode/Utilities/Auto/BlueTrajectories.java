@@ -16,8 +16,8 @@ public class BlueTrajectories {
     Pose2d startPose = new Pose2d(36, 60, Math.toRadians(-90));
 
     public Action action1 = drive.actionBuilder(startPose)
-            .setTangent(Math.toRadians(-135))
-            .splineToLinearHeading(new Pose2d(12, 36, Math.toRadians(-90)), Math.toRadians(-135))
+            .setTangent(Math.toRadians(-90))
+            .splineToLinearHeading(new Pose2d(-12, 36, Math.toRadians(-90)), Math.toRadians(-135))
             .build();
     public Action action2 = drive.actionBuilder(drive.pose)
             .setTangent(Math.toRadians(180))
