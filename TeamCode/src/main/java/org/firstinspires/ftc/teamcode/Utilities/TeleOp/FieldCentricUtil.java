@@ -84,6 +84,13 @@ public class FieldCentricUtil extends LinearOpMode {
     float TFtwoRefX;
     float TFtwoRefY;
 
+    float TFoneX;
+    float TFoneY;
+    float TFtwoX;
+    float TFtwoY;
+
+    boolean whichTF;
+
 
 
     // Hardware Maps
@@ -182,30 +189,43 @@ public class FieldCentricUtil extends LinearOpMode {
                   TFoneRefY = gamepad2.touchpad_finger_1_y;
                   TFtwoRefX = gamepad2.touchpad_finger_2_x;
                   TFtwoRefY = gamepad2.touchpad_finger_2_y;
+                  whichTF = true;
               }else{
                   TFtwoRefX = gamepad2.touchpad_finger_1_x;
                   TFtwoRefY = gamepad2.touchpad_finger_1_y;
                   TFoneRefX = gamepad2.touchpad_finger_2_x;
                   TFoneRefY = gamepad2.touchpad_finger_2_y;
+                  whichTF = false;
               }
 
           }
           else{
-              front_left_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
-                      + (gamepad2.touchpad_finger_1_x-TFoneRefX)
-                      + (gamepad2.touchpad_finger_2_x-TFtwoRefX);
+              if(whichTF){
+                  TFoneX = gamepad2.touchpad_finger_1_x;
+                  TFoneY = gamepad2.touchpad_finger_1_y;
+                  TFtwoX = gamepad2.touchpad_finger_2_x;
+                  TFtwoY = gamepad2.touchpad_finger_2_y;
+              }else{
+                  TFtwoX = gamepad2.touchpad_finger_1_x;
+                  TFtwoY = gamepad2.touchpad_finger_1_y;
+                  TFoneX = gamepad2.touchpad_finger_2_x;
+                  TFoneY = gamepad2.touchpad_finger_2_y;
+              }
+              front_left_power = ((TFoneY-TFoneRefY)
+                      + (TFoneX-TFoneRefX)
+                      + (TFtwoX-TFtwoRefX))*0.4;
 
-              front_right_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
-                      - (gamepad2.touchpad_finger_1_x-TFoneRefX)
-                      - (gamepad2.touchpad_finger_2_x-TFtwoRefX);
+              front_right_power = ((TFoneY-TFoneRefY)
+                      - (TFoneX-TFoneRefX)
+                      - (TFtwoX-TFtwoRefX))*0.4;
 
-              back_left_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
-                      - (gamepad2.touchpad_finger_1_x-TFoneRefX)
-                      + (gamepad2.touchpad_finger_2_x-TFtwoRefX);
+              back_left_power = ((TFoneY-TFoneRefY)
+                      - (TFoneX-TFoneRefX)
+                      + (TFtwoX-TFtwoRefX))*0.4;
 
-              back_right_power = (gamepad2.touchpad_finger_1_y-TFoneRefY)
-                      + (gamepad2.touchpad_finger_1_x-TFoneRefX)
-                      - (gamepad2.touchpad_finger_2_x-TFtwoRefX);
+              back_right_power = ((TFoneY-TFoneRefY)
+                      + (TFoneX-TFoneRefX)
+                      - (TFtwoX-TFtwoRefX))*0.5;
           }
       }else{
           front_left_power = rotY + rotX + turning_stick;
@@ -316,12 +336,9 @@ public class FieldCentricUtil extends LinearOpMode {
         if (Math.abs(intake_slide_stick) > deadZone) {
             intakeMotor.setPower(-intake_slide_stick);
         } else {
-            if(doingIntake){
-                intakeController.extendTo(1);
-                intakeController.loopController();
-            }else{
+
                 intakeMotor.setPower(0);
-            }
+
         }
         armController.extendTo(armPosition);
         armController.loopController();
