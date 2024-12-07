@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 /*
     This file contains Actions for the robot intake.
     These actions can be called in actions.runBlocking
- */
+*/
 public class Intake {
 
     // Create Motor and Servos
@@ -59,10 +59,13 @@ public class Intake {
         controller.setStopOnTargetReached(true);
     }
 
+    // Create init() for Auto
     public void init() {
         intakePivot.setPosition(0.5);
     }
 
+    // The IntakeOut class & action tell the intake slide to fully extend
+    // The maximum intake extension is 19in
     public class IntakeOut implements Action {
         private boolean initialized = false;
 
@@ -88,6 +91,7 @@ public class Intake {
         return new IntakeOut();
     }
 
+    // The IntakeIn class and action returns the intake slide to the 0 position (0in)
     public class IntakeIn implements Action {
         private boolean initialized = false;
 
@@ -113,6 +117,7 @@ public class Intake {
         return new IntakeIn();
     }
 
+    // Intakes a sample
     public class IntakeSample implements Action {
         private boolean initialized = false;
 
@@ -123,7 +128,7 @@ public class Intake {
                 intakePivot.setPosition(0.12);
                 left.setPower(1);
                 right.setPower(1);
-                intakeMotor.setPower(0.1);
+                intakeMotor.setPower(0.8);
                 initialized = true;
                 sampleDetected = false;
             }
@@ -144,6 +149,7 @@ public class Intake {
         return new IntakeSample();
     }
 
+    // Transfers the sample
     public class TransferSample implements Action {
         private boolean initialized = false;
 
@@ -176,6 +182,7 @@ public class Intake {
         return new TransferSample();
     }
 
+    // Sample detection is required to tell if the robot has a sample
     public void SampleDetection() {
         if (!sampleDetected) {
             if (distanceSensor.getDistance(DistanceUnit.CM) < 1) {

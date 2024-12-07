@@ -30,7 +30,7 @@ public class FieldCentricRed extends FieldCentricUtil {
                 sample_control(gamepad2.y, gamepad2.a);
                 specimen_control(gamepad2.x, gamepad2.b);
                 power_sets(gamepad1.right_bumper);
-                Dointake();
+                doIntake();
                 telemetry();
             }
         }

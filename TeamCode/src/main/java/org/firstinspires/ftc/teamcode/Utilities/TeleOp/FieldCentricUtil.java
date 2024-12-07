@@ -181,69 +181,63 @@ public class FieldCentricUtil extends LinearOpMode {
 
     //provide 360 degree movement from a stick
     public void drive_control(double turning_stick) {
-      if(gamepad2.touchpad_finger_1 && gamepad2.touchpad_finger_2){
-          if(!touchSet){
-              touchSet = true;
-              if(gamepad2.touchpad_finger_1_x > gamepad2.touchpad_finger_2_x){
-                  TFoneRefX = gamepad2.touchpad_finger_1_x;
-                  TFoneRefY = -gamepad2.touchpad_finger_1_y;
-                  TFtwoRefX = gamepad2.touchpad_finger_2_x;
-                  TFtwoRefY = gamepad2.touchpad_finger_2_y;
-                  whichTF = true;
-              }else{
-                  TFtwoRefX = gamepad2.touchpad_finger_1_x;
-                  TFtwoRefY = gamepad2.touchpad_finger_1_y;
-                  TFoneRefX = gamepad2.touchpad_finger_2_x;
-                  TFoneRefY = -gamepad2.touchpad_finger_2_y;
-                  whichTF = false;
-              }
-
-          }
-          else{
-              if(whichTF){
-                  TFoneX = gamepad2.touchpad_finger_1_x;
-                  TFoneY = -gamepad2.touchpad_finger_1_y;
-                  TFtwoX = gamepad2.touchpad_finger_2_x;
-                  TFtwoY = gamepad2.touchpad_finger_2_y;
-              }else{
-                  TFtwoX = gamepad2.touchpad_finger_1_x;
-                  TFtwoY = gamepad2.touchpad_finger_1_y;
-                  TFoneX = gamepad2.touchpad_finger_2_x;
-                  TFoneY = -gamepad2.touchpad_finger_2_y;
-              }
-              front_left_power = ((TFoneY-TFoneRefY)
-                      + (TFoneX-TFoneRefX)
-                      + (TFtwoX-TFtwoRefX))*0.4;
-
-              front_right_power = ((TFoneY-TFoneRefY)
-                      - (TFoneX-TFoneRefX)
-                      - (TFtwoX-TFtwoRefX))*0.4;
-
-              back_left_power = ((TFoneY-TFoneRefY)
-                      - (TFoneX-TFoneRefX)
-                      + (TFtwoX-TFtwoRefX))*0.4;
-
-              back_right_power = ((TFoneY-TFoneRefY)
-                      + (TFoneX-TFoneRefX)
-                      - (TFtwoX-TFtwoRefX))*0.5;
-          }
-      }else{
-          front_left_power = rotY + rotX + turning_stick;
-          front_right_power = (rotY - rotX) - turning_stick;
-          back_left_power = (rotY - rotX) + turning_stick;
-          back_right_power = (rotY + rotX) - turning_stick;
-      }
-
+        if (gamepad2.touchpad_finger_1 && gamepad2.touchpad_finger_2) {
+            if (!touchSet) {
+                touchSet = true;
+                if (gamepad2.touchpad_finger_1_x > gamepad2.touchpad_finger_2_x) {
+                    TFoneRefX = gamepad2.touchpad_finger_1_x;
+                    TFoneRefY = -gamepad2.touchpad_finger_1_y;
+                    TFtwoRefX = gamepad2.touchpad_finger_2_x;
+                    TFtwoRefY = gamepad2.touchpad_finger_2_y;
+                    whichTF = true;
+                } else {
+                    TFtwoRefX = gamepad2.touchpad_finger_1_x;
+                    TFtwoRefY = gamepad2.touchpad_finger_1_y;
+                    TFoneRefX = gamepad2.touchpad_finger_2_x;
+                    TFoneRefY = -gamepad2.touchpad_finger_2_y;
+                    whichTF = false;
+                }
+            } else {
+                if (whichTF) {
+                     TFoneX = gamepad2.touchpad_finger_1_x;
+                     TFoneY = -gamepad2.touchpad_finger_1_y;
+                     TFtwoX = gamepad2.touchpad_finger_2_x;
+                     TFtwoY = gamepad2.touchpad_finger_2_y;
+                } else {
+                     TFtwoX = gamepad2.touchpad_finger_1_x;
+                     TFtwoY = gamepad2.touchpad_finger_1_y;
+                     TFoneX = gamepad2.touchpad_finger_2_x;
+                     TFoneY = -gamepad2.touchpad_finger_2_y;
+                }
+                front_left_power = ((TFoneY-TFoneRefY)
+                         + (TFoneX-TFoneRefX)
+                         + (TFtwoX-TFtwoRefX))*0.4;
+                front_right_power = ((TFoneY-TFoneRefY)
+                         - (TFoneX-TFoneRefX)
+                         - (TFtwoX-TFtwoRefX))*0.4;
+                back_left_power = ((TFoneY-TFoneRefY)
+                         - (TFoneX-TFoneRefX)
+                         + (TFtwoX-TFtwoRefX))*0.4;
+                back_right_power = ((TFoneY-TFoneRefY)
+                         + (TFoneX-TFoneRefX)
+                         - (TFtwoX-TFtwoRefX))*0.5;
+            }
+        } else {
+             front_left_power = rotY + rotX + turning_stick;
+             front_right_power = (rotY - rotX) - turning_stick;
+             back_left_power = (rotY - rotX) + turning_stick;
+             back_right_power = (rotY + rotX) - turning_stick;
+        }
     }
 
-    //sets motor power sets
+    // Sets motor power sets
     public void power_sets(boolean slowMode) {
         drive_power_sets(slowMode);
         slide_power_sets();
         servo_power_sets();
     }
 
-    //sets wrist servo to positions set by slide control
+    // Sets wrist servo to positions set by slide control
     public void sample_control(boolean output_up, boolean output_down) {
         if (output_up) {
             sample_servo_position = 0.25;
@@ -252,7 +246,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    //opens and closes specimen claw
+    // Opens and closes specimen claw
     public void specimen_control(boolean grab_specimen, boolean release_specimen) {
         if (grab_specimen) {
             specimen_servo_position = 0.73;
@@ -261,7 +255,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    //parameter for assent motors
+    // Parameter for assent motors
     LeftAssentControllerParams leftAssentControllerParams = new LeftAssentControllerParams();
     PIDF_Controller leftAssentController;
 
@@ -272,7 +266,7 @@ public class FieldCentricUtil extends LinearOpMode {
     double leftAssentPosition;
     double rightAssentPosition;
 
-    // control the asent motors with pidf
+    // Control the ascent motors with pidf
     public void assent_control(boolean ascend_button, boolean descend_button) {
         if (!assentInti) {
             leftAssentController = new PIDF_Controller(leftAssentControllerParams.params, leftAssentMotor);
@@ -295,7 +289,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    //paramaters for scoring slides
+    // Parameters for scoring slides
     ArmControllerParams armControllerParams = new ArmControllerParams();
     PIDF_Controller armController;
 
@@ -332,6 +326,19 @@ public class FieldCentricUtil extends LinearOpMode {
             armPosition = 0;
         }
 
+        if (gamepad2.a) {
+            armController.runController(false);
+            if (Math.abs(lifter_slide_stick) > deadZone) {
+                armMotor.setPower(lifter_slide_stick);
+            } else {
+                armMotor.setPower(0);
+            }
+        } else {
+            armController.runController(true);
+            armController.extendTo(armPosition);
+            armController.loopController();
+        }
+
         // Intake slide power
         if (Math.abs(intake_slide_stick) > deadZone) {
             intakeMotor.setPower(-intake_slide_stick);
@@ -340,8 +347,6 @@ public class FieldCentricUtil extends LinearOpMode {
                 intakeMotor.setPower(0);
 
         }
-        armController.extendTo(armPosition);
-        armController.loopController();
     }
 
     public void red_intake_control(double intake_wheels_in,
@@ -431,8 +436,8 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    public void Dointake(){
-        if (intakeController.targetReached){
+    public void doIntake(){
+        if (intakeController.targetReached) {
             intake_pivot_position = 0.69;
             isUp  = true;
 
