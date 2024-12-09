@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.TeleOp.Other;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import java.util.concurrent.TimeUnit;
 
 @TeleOp
+@Disabled
 public class RobotCentric extends LinearOpMode {
 
     DcMotorEx frontLeftMotor;

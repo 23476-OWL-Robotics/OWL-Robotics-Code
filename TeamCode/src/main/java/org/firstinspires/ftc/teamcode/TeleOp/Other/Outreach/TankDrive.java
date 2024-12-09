@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp.Other;
+package org.firstinspires.ftc.teamcode.TeleOp.Other.Outreach;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -7,8 +7,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Disabled
+import java.util.concurrent.TimeUnit;
+
 @TeleOp
+@Disabled
 public class TankDrive extends LinearOpMode {
 
     DcMotorEx leftMotor1;
@@ -17,6 +19,7 @@ public class TankDrive extends LinearOpMode {
     DcMotorEx rightMotor2;
 
     double x, y;
+    double speedModifier = 0.3;
 
     @Override
     public void runOpMode() {
@@ -42,31 +45,31 @@ public class TankDrive extends LinearOpMode {
                 y = gamepad1.left_stick_y;
                 x = gamepad1.right_stick_x;
 
-                if (gamepad1.left_trigger > 0.2) {
-
-                    if (y > 0.1 || y < -0.1 || x > 0.1 || x < -0.1) {
-                        leftMotor1.setPower((y - x) * 0.3);
-                        leftMotor2.setPower((y - x) * 0.3);
-                        rightMotor1.setPower((y + x) * 0.3);
-                        rightMotor2.setPower((y + x) * 0.3);
-                    } else {
-                        leftMotor1.setPower(0);
-                        leftMotor2.setPower(0);
-                        rightMotor1.setPower(0);
-                        rightMotor2.setPower(0);
-                    }
+                if (y > 0.1 || y < -0.1 || x > 0.1 || x < -0.1) {
+                    leftMotor1.setPower((y - x) * speedModifier);
+                    leftMotor2.setPower((y - x) * speedModifier);
+                    rightMotor1.setPower((y + x) * speedModifier);
+                    rightMotor2.setPower((y + x) * speedModifier);
                 } else {
+                    leftMotor1.setPower(0);
+                    leftMotor2.setPower(0);
+                    rightMotor1.setPower(0);
+                    rightMotor2.setPower(0);
+                }
 
-                    if (y > 0.1 || y < -0.1 || x > 0.1 || x < -0.1) {
-                        leftMotor1.setPower(y - x);
-                        leftMotor2.setPower(y - x);
-                        rightMotor1.setPower(y + x);
-                        rightMotor2.setPower(y + x);
-                    } else {
-                        leftMotor1.setPower(0);
-                        leftMotor2.setPower(0);
-                        rightMotor1.setPower(0);
-                        rightMotor2.setPower(0);
+                if (gamepad2.dpad_up ) {
+                    speedModifier ++;
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(200);
+                    } catch (InterruptedException e) {
+                        // Nothing
+                    }
+                } else if (gamepad2.dpad_down) {
+                    speedModifier --;
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(200);
+                    } catch (InterruptedException e) {
+                        // Nothing
                     }
                 }
             }

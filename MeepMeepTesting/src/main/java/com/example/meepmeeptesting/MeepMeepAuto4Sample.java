@@ -7,7 +7,7 @@ import com.noahbres.meepmeep.core.colorscheme.scheme.ColorSchemeRedDark;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
-public class MeepMeepAutoSample {
+public class MeepMeepAuto4Sample {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
@@ -29,7 +29,7 @@ public class MeepMeepAutoSample {
                 .setTangent(Math.toRadians(-90))
                 .splineToLinearHeading(new Pose2d(-8.5, 33, Math.toRadians(-90)), Math.toRadians(-90))
                 .waitSeconds(2)
-                .setTangent(Math.toRadians(90))
+                .setTangent(Math.toRadians(135))
                 .splineToLinearHeading(new Pose2d(-38, 38, Math.toRadians(45)), Math.toRadians(180))
                 .waitSeconds(2)
                 .setTangent(Math.toRadians(0))
@@ -62,7 +62,7 @@ public class MeepMeepAutoSample {
                 .setTangent(Math.toRadians(90))
                 .splineToLinearHeading(new Pose2d(8.5, -33, Math.toRadians(90)), Math.toRadians(90))
                 .waitSeconds(2)
-                .setTangent(Math.toRadians(-90))
+                .setTangent(Math.toRadians(-45))
                 .splineToLinearHeading(new Pose2d(38, -38, Math.toRadians(-135)), Math.toRadians(0))
                 .waitSeconds(2)
                 .setTangent(Math.toRadians(180))
