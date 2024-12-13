@@ -17,7 +17,7 @@ public class PIDF_Tuner extends OpMode {
 
     // Conversion Parameters
     double rotPerTick = 0.0;
-    double inPerTick = 0.006371562;
+    double inPerTick = 0.0;
     double degPerTick = 0.0;
 
     // PIDF Parameters

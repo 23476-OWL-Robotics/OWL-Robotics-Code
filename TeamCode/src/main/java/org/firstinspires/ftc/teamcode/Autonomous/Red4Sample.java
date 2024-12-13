@@ -30,7 +30,7 @@ public class Red4Sample extends LinearOpMode {
 
         // Starting Positions for each action
         Pose2d action1Pose = new Pose2d(8.5, -62, Math.toRadians(180));
-        Pose2d action2Pose = new Pose2d(8.5, -33, Math.toRadians(90));
+        Pose2d action2Pose = new Pose2d(8.5, -29, Math.toRadians(90));
         Pose2d action3Pose = new Pose2d(38, -38, Math.toRadians(-135));
         Pose2d action4Pose = new Pose2d(-56, -56, Math.toRadians(-135));
         Pose2d action5Pose = new Pose2d(-48, -44, Math.toRadians(-90));
@@ -43,7 +43,7 @@ public class Red4Sample extends LinearOpMode {
         // Actions for rr
         Action action1 = drive.actionBuilder(action1Pose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(8.5, -33, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(8.5, -29, Math.toRadians(90)), Math.toRadians(90))
                 .build();
         Action action2 = drive.actionBuilder(action2Pose)
                 .setTangent(Math.toRadians(-90))

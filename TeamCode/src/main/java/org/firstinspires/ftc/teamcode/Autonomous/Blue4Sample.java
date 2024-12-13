@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 // RR-specific imports
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -29,8 +30,8 @@ public class Blue4Sample extends LinearOpMode {
         Intake intake = new Intake(hardwareMap);
 
         // Starting Positions for each action
-        Pose2d action1Pose = new Pose2d(-8.5, 62, Math.toRadians(-90));
-        Pose2d action2Pose = new Pose2d(-8.5, 33, Math.toRadians(-90));
+        Pose2d action1Pose = new Pose2d(-8.5, 62, Math.toRadians(0));
+        Pose2d action2Pose = new Pose2d(-8.5, 29, Math.toRadians(-90));
         Pose2d action3Pose = new Pose2d(-38, 38, Math.toRadians(45));
         Pose2d action4Pose = new Pose2d(56, 56, Math.toRadians(45));
         Pose2d action5Pose = new Pose2d(48, 44, Math.toRadians(90));
@@ -43,7 +44,7 @@ public class Blue4Sample extends LinearOpMode {
         // Actions for rr
         Action action1 = drive.actionBuilder(action1Pose)
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(-8.5, 33, Math.toRadians(-90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-8.5, 29, Math.toRadians(-90)), Math.toRadians(-90))
                 .build();
         Action action2 = drive.actionBuilder(action2Pose)
                 .setTangent(Math.toRadians(90))
@@ -90,17 +91,34 @@ public class Blue4Sample extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
             Actions.runBlocking(
-                    new SequentialAction(
-                            action1,
-                            action2,
-                            action3,
-                            action4,
-                            action5,
-                            action6,
-                            action7,
-                            action8,
-                            action9,
-                            action10
+                    new ParallelAction(
+                            arm.runController(),
+                            new SequentialAction(
+                                    new ParallelAction(
+                                            arm.armUpSpecimen(),
+                                            new SequentialAction(
+                                                    arm.waitTme(),
+                                                    action1
+                                            )
+                                    ),
+                                    arm.releaseSpecimen(),
+                                    new ParallelAction(
+                                            arm.armDown(),
+                                            action2
+                                    ),
+                                    intake.intakeSample(),
+                                    new ParallelAction(
+                                            action3,
+                                            new SequentialAction(
+                                                    intake.intakeIn(),
+                                                    intake.transferSample(),
+                                                    arm.armUpHigh()
+                                            )
+                                    ),
+                                    arm.releaseSample(),
+                                    arm.armDown(),
+                                    arm.stopController()
+                            )
                     )
             );
         }

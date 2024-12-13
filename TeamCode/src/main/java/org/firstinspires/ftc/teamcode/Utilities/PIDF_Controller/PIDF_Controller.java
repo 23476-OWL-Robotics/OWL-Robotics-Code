@@ -15,6 +15,8 @@ public class PIDF_Controller{
 
     // Controller target
     double target;
+
+    // Max Speed
     double MAX_SPEED;
 
     // Create running boolean
@@ -40,6 +42,8 @@ public class PIDF_Controller{
         this.motor1 = motor1;
     }
 
+    // Set the max speed of the motor being controlled
+    // Tetrix encoder values are only accurate at a speed of 0.8 or less
     public void setMaxSpeed(double MAX_SPEED) {
         this.MAX_SPEED = MAX_SPEED;
     }
@@ -68,10 +72,15 @@ public class PIDF_Controller{
             PIDF_Calculator();
         }
     }
+
+    // Create setStopOnTargetReached
+    // This will determine if the controller will stop if the desired target is reached
     public void setStopOnTargetReached(boolean stop) {
         this.stopOnTargetReached = stop;
     }
 
+    // Create runController
+    // You can stop/start the controller from running if needed
     public void runController(boolean run) {
         running = run;
     }
@@ -87,8 +96,10 @@ public class PIDF_Controller{
     double out;
     private void PIDF_Calculator() {
 
+        // reset the timer
         timer.reset();
 
+        // get the reference
         reference = target / ConversionUnit;
 
         // obtain the encoder position
@@ -102,10 +113,13 @@ public class PIDF_Controller{
         // sum of all error over time
         integralSum = integralSum + (error * timer.seconds());
 
+        // feedForward
         feedForward = Math.cos(Math.toRadians(reference));
 
+        // calculate the motor power
         out = (p * error) + (i * integralSum) + (d * derivative) + (f * feedForward);
 
+        // set the motor power
         motor1.setPower(Math.min(out, MAX_SPEED));
 
         if (encoderPosition < reference + 5 && encoderPosition > reference -5) {

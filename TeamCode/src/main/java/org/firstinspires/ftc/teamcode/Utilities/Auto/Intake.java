@@ -128,7 +128,7 @@ public class Intake {
                 intakePivot.setPosition(0.12);
                 left.setPower(1);
                 right.setPower(1);
-                intakeMotor.setPower(0.8);
+                intakeMotor.setPower(0.5);
                 initialized = true;
                 sampleDetected = false;
             }
@@ -185,7 +185,7 @@ public class Intake {
     // Sample detection is required to tell if the robot has a sample
     public void SampleDetection() {
         if (!sampleDetected) {
-            if (distanceSensor.getDistance(DistanceUnit.CM) < 1) {
+            if (distanceSensor.getDistance(DistanceUnit.CM) < 4.5) {
                 sampleDetected = true;
             }
         } else {

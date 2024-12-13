@@ -30,6 +30,8 @@ public class Arm {
     ArmControllerParams armControllerParams = new ArmControllerParams();
     PIDF_Controller controller;
 
+    boolean run = true;
+
     // Arm Constructor
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
@@ -42,13 +44,41 @@ public class Arm {
 
         controller = new PIDF_Controller(armControllerParams.params, armMotor);
         controller.setMaxSpeed(1);
-        controller.setStopOnTargetReached(true);
+        controller.setStopOnTargetReached(false);
     }
 
     // Create init() for Auto
     public void init() {
         sampleServo.setPosition(0.485);
-        specimenServo.setPosition(1);
+        specimenServo.setPosition(0.73);
+    }
+
+    public class RunController implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket p) {
+            if (!run) {
+                return false;
+            } else {
+                controller.loopController();
+                return true;
+            }
+        }
+    }
+    public Action runController() {
+        return new RunController();
+    }
+
+    public class StopController implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket p) {
+            run = false;
+            return false;
+        }
+    }
+    public Action stopController() {
+        return new StopController();
     }
 
     // The ArmUp class and action extends the arm slides to the height of the Low Basket
@@ -59,18 +89,13 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.extendTo(25);
+                controller.extendTo(20);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.running) {
-                controller.loopController();
-                return true;
-            } else {
-                return false;
-            }
+            return !controller.targetReached;
         }
     }
     public Action armUp() {
@@ -91,12 +116,7 @@ public class Arm {
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.running) {
-                controller.loopController();
-                return true;
-            } else {
-                return false;
-            }
+            return !controller.targetReached;
         }
     }
     public Action armUpHigh() {
@@ -111,18 +131,13 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.extendTo(22);
+                controller.extendTo(24);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.running) {
-                controller.loopController();
-                return true;
-            } else {
-                return false;
-            }
+            return !controller.targetReached;
         }
     }
     public Action armUpSpecimen() {
@@ -143,12 +158,7 @@ public class Arm {
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.running) {
-                controller.loopController();
-                return true;
-            } else {
-                return false;
-            }
+            return !controller.targetReached;
         }
     }
     public Action armDown() {
@@ -163,17 +173,16 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.retractTo(20);
+                controller.retractTo(18);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.running) {
-                controller.loopController();
+            if (!controller.targetReached) {
                 return true;
             } else {
-                specimenServo.setPosition(0.73);
+                specimenServo.setPosition(1);
                 return false;
             }
         }
@@ -188,7 +197,7 @@ public class Arm {
         @Override public boolean run(@NonNull TelemetryPacket p) {
             sampleServo.setPosition(0.25);
             try {
-                TimeUnit.MILLISECONDS.sleep(850);
+                TimeUnit.MILLISECONDS.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -198,5 +207,21 @@ public class Arm {
     }
     public Action releaseSample() {
         return new ReleaseSample();
+    }
+
+    public class WaitTime implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket p) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(800);
+            } catch (InterruptedException e) {
+                //Nothing
+            }
+            return false;
+        }
+    }
+    public Action waitTme() {
+        return new WaitTime();
     }
 }

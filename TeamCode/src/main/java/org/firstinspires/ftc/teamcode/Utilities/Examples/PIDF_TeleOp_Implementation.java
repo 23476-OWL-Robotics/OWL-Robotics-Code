@@ -55,6 +55,12 @@ public class PIDF_TeleOp_Implementation extends LinearOpMode {
             // This is required for looped motors
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+            // Set the max speed of the motor
+            controller.setMaxSpeed(1);
+
+            // Set the controller to not stop when the motor reaches the desired position
+            controller.setStopOnTargetReached(false);
+
             while (opModeIsActive()) {
 
                 // To run the controller, use either rotateTo, extendTo, or retractTo
