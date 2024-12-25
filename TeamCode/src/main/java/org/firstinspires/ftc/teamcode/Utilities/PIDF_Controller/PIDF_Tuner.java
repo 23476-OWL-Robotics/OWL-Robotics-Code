@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
 @TeleOp
+@Disabled
 public class PIDF_Tuner extends OpMode {
 
     // Conversion Parameters

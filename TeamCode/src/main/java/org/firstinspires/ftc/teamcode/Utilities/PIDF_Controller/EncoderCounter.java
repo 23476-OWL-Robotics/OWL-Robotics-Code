@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
+@Disabled
 public class EncoderCounter extends LinearOpMode {
 
     DcMotorEx motor;

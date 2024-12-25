@@ -108,7 +108,7 @@ public class PIDF_Controller{
         error = reference - encoderPosition;
 
         // rate of change of the error
-        derivative = (error - lastError) / timer.seconds();
+        derivative = (error - lastError); // / timer.seconds();
 
         // sum of all error over time
         integralSum = integralSum + (error * timer.seconds());
@@ -123,7 +123,6 @@ public class PIDF_Controller{
         motor1.setPower(Math.min(out, MAX_SPEED));
 
         if (encoderPosition < reference + 5 && encoderPosition > reference -5) {
-            motor1.setPower(0);
             targetReached = true;
             if (stopOnTargetReached) {
                 motor1.setPower(0);

@@ -12,7 +12,7 @@ public class FieldCentricRed extends FieldCentricUtil {
 
         hardwareMaps();
 
-        initialize_motors();
+        initializeMotors();
         initializeServos();
         servo_power_sets();
         set_up_imu();
@@ -21,6 +21,7 @@ public class FieldCentricRed extends FieldCentricUtil {
             // Put run blocks here.
             initializeServos();
             servo_power_sets();
+            initializeLights();
             while (opModeIsActive()) {
                 rotate_x_and_y(gamepad1.left_stick_y, gamepad1.left_stick_x);
                 drive_control(gamepad1.right_stick_x);

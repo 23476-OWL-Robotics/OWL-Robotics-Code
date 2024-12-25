@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import java.util.concurrent.TimeUnit;
 
 @TeleOp
-@Disabled
 public class TankDrive extends LinearOpMode {
 
     DcMotorEx leftMotor1;
@@ -58,20 +57,23 @@ public class TankDrive extends LinearOpMode {
                 }
 
                 if (gamepad2.dpad_up ) {
-                    speedModifier ++;
+                    speedModifier += 0.1;
                     try {
                         TimeUnit.MILLISECONDS.sleep(200);
                     } catch (InterruptedException e) {
                         // Nothing
                     }
                 } else if (gamepad2.dpad_down) {
-                    speedModifier --;
+                    speedModifier -= 0.1;
                     try {
                         TimeUnit.MILLISECONDS.sleep(200);
                     } catch (InterruptedException e) {
                         // Nothing
                     }
                 }
+
+                telemetry.addData("Speed", speedModifier);
+                telemetry.update();
             }
         }
     }

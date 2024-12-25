@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Utilities.TeleOp;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.ArmControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.IntakeControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.LeftAssentControllerParams;
@@ -50,6 +52,8 @@ public class FieldCentricUtil extends LinearOpMode {
     // Create sensor and imu
     ColorSensor sensor;
     IMU imu;
+
+    RevBlinkinLedDriver revBlinkinLedDriver;
 
     // Drive Motor Powers
     double front_left_power;
@@ -91,8 +95,6 @@ public class FieldCentricUtil extends LinearOpMode {
 
     boolean whichTF;
 
-
-
     // Hardware Maps
     public void hardwareMaps() {
         frontRightMotor = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
@@ -114,14 +116,49 @@ public class FieldCentricUtil extends LinearOpMode {
         right = hardwareMap.get(CRServo.class, "right");
 
         sensor = hardwareMap.get(ColorSensor.class, "blockDet");
+        revBlinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "rev");
 
         imu = hardwareMap.get(IMU.class, "imu");
+    }
 
+    public void Initialize(MecanumDrive drive) {
+
+        frontRightMotor = drive.rightFront;
+        frontLeftMotor = drive.leftFront;
+        backRightMotor = drive.rightBack;
+        backLeftMotor = drive.leftBack;
+
+        imu = drive.lazyImu.get();
+
+        rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftAssentMotor.setDirection(DcMotor.Direction.REVERSE);
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        right.setDirection(CRServo.Direction.REVERSE);
+
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        imu.resetYaw();
+
+        intake_pivot_position = 0.5;
+        sample_servo_position = 0.485;
+        specimen_servo_position = 0.73;
+        isUp = true;
+
+        revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
     }
 
     // Motor Initialization
     // Sets all Motors to Break
-    public void initialize_motors() {
+    public void initializeMotors() {
+
         frontRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -154,6 +191,10 @@ public class FieldCentricUtil extends LinearOpMode {
         isUp = true;
     }
 
+    public void initializeLights() {
+        revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+    }
+
     // IMU Initialization
     public void set_up_imu() {
         // Create a RevHubOrientationOnRobot object for use with an IMU in a REV Robotics Control
@@ -173,7 +214,7 @@ public class FieldCentricUtil extends LinearOpMode {
         double heading;
 
         myYawPitchRollAngles = imu.getRobotYawPitchRollAngles();
-        heading = myYawPitchRollAngles.getYaw(AngleUnit.DEGREES);
+        heading = myYawPitchRollAngles.getYaw(AngleUnit.DEGREES) - 90;
         left_right_stick = -left_right_stick;
         rotX = left_right_stick * Math.cos(-heading / 180 * Math.PI) - forward_back_stick * Math.sin(-heading / 180 * Math.PI);
         rotY = left_right_stick * Math.sin(-heading / 180 * Math.PI) + forward_back_stick * Math.cos(-heading / 180 * Math.PI);
@@ -253,6 +294,10 @@ public class FieldCentricUtil extends LinearOpMode {
         } else if (release_specimen) {
             specimen_servo_position = 1;
         }
+
+        if (gamepad1.left_bumper) {
+            specimen_servo_position = 0.73;
+        }
     }
 
     // Parameter for assent motors
@@ -315,9 +360,9 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         if (gamepad2.dpad_up) {
-            armPosition = 23;
+            armPosition = 24;
         } else if (gamepad2.dpad_down) {
-            armPosition = 20;
+            armPosition = 18;
         }
 
         if (lifter_slide_stick > deadZone) {
@@ -332,6 +377,9 @@ public class FieldCentricUtil extends LinearOpMode {
                 armMotor.setPower(lifter_slide_stick);
             } else {
                 armMotor.setPower(0);
+            }
+            if (gamepad2.dpad_down) {
+                armPosition = 7;
             }
         } else {
             armController.runController(true);

@@ -89,7 +89,7 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.extendTo(20);
+                controller.extendTo(23);
                 initialized = true;
             }
 
@@ -116,7 +116,13 @@ public class Arm {
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            return !controller.targetReached;
+            if (controller.targetReached) {
+                armMotor.setPower(0.001);
+                return false;
+            } else {
+                controller.loopController();
+                return true;
+            }
         }
     }
     public Action armUpHigh() {
@@ -137,7 +143,12 @@ public class Arm {
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            return !controller.targetReached;
+            if (controller.targetReached) {
+                return false;
+            } else {
+                controller.loopController();
+                return true;
+            }
         }
     }
     public Action armUpSpecimen() {
@@ -158,7 +169,12 @@ public class Arm {
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            return !controller.targetReached;
+            if (controller.targetReached) {
+                return false;
+            } else {
+                controller.loopController();
+                return true;
+            }
         }
     }
     public Action armDown() {
@@ -180,6 +196,7 @@ public class Arm {
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
             if (!controller.targetReached) {
+                controller.loopController();
                 return true;
             } else {
                 specimenServo.setPosition(1);
@@ -195,9 +212,15 @@ public class Arm {
     public class ReleaseSample implements Action {
 
         @Override public boolean run(@NonNull TelemetryPacket p) {
+            sampleServo.setPosition(0.20);
+            try {
+                TimeUnit.MILLISECONDS.sleep(300);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             sampleServo.setPosition(0.25);
             try {
-                TimeUnit.MILLISECONDS.sleep(1000);
+                TimeUnit.MILLISECONDS.sleep(700);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
