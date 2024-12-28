@@ -15,18 +15,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.ExampleControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
 
 @TeleOp
 @Disabled
 public class PIDF_TeleOp_Implementation extends LinearOpMode {
-
-    // Drive Motors
-    DcMotorEx frontLeftMotor;
-    DcMotorEx frontRightMotor;
-    DcMotorEx backLeftMotor;
-    DcMotorEx backRightMotor;
 
     // Rotation / Extension Motor
     DcMotorEx motor;
@@ -34,11 +27,7 @@ public class PIDF_TeleOp_Implementation extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        // Set motor names
-        frontLeftMotor = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
-        frontRightMotor = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
-        backLeftMotor = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
-        backRightMotor = hardwareMap.get(DcMotorEx.class, "backRightMotor");
+        // Set the motor name
         motor = hardwareMap.get(DcMotorEx.class, "motor");
 
         // Add ExampleControllerParams as controllerParams
@@ -46,20 +35,20 @@ public class PIDF_TeleOp_Implementation extends LinearOpMode {
 
         // Add PIDF_Controller as controller
         // Add the controller parameters and motor you want to loop.
-        PIDF_Controller controller = new PIDF_Controller(controllerParams.params, motor);
+        // Set the maxSpeed and if you want the controller to stopOnTargetReached
+        PIDF_Controller controller = new PIDF_Controller.Builder()
+                .setControllerMotor(motor)
+                .setControllerParams(controllerParams.params)
+                .setMaxSpeed(1)
+                .setStopOnTargetReached(false)
+                .build();
 
         waitForStart();
         if (opModeIsActive()) {
 
             // Tell the motor to use the encoder
-            // This is required for looped motors
+            // This is required for the controller
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            // Set the max speed of the motor
-            controller.setMaxSpeed(1);
-
-            // Set the controller to not stop when the motor reaches the desired position
-            controller.setStopOnTargetReached(false);
 
             while (opModeIsActive()) {
 

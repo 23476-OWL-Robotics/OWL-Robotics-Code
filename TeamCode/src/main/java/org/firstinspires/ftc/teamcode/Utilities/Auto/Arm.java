@@ -42,9 +42,12 @@ public class Arm {
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        controller = new PIDF_Controller(armControllerParams.params, armMotor);
-        controller.setMaxSpeed(1);
-        controller.setStopOnTargetReached(false);
+        controller = new PIDF_Controller.Builder()
+                .setControllerMotor(armMotor)
+                .setControllerParams(armControllerParams.params)
+                .setMaxSpeed(1)
+                .setStopOnTargetReached(false)
+                .build();
     }
 
     // Create init() for Auto

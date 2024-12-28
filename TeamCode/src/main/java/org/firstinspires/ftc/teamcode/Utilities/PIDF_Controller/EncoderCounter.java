@@ -16,6 +16,7 @@ public class EncoderCounter extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        // ToDo: Set the motor name to the motor you want to use
         motor = hardwareMap.get(DcMotorEx.class, "motor");
 
         waitForStart();
@@ -24,7 +25,7 @@ public class EncoderCounter extends LinearOpMode {
             motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
             // ToDo: Set motor direction if needed
-            motor.setDirection(DcMotorSimple.Direction.REVERSE);
+            // motor.setDirection(DcMotorSimple.Direction.REVERSE);
             while (opModeIsActive()) {
 
                 if (gamepad1.dpad_up) {
@@ -35,6 +36,11 @@ public class EncoderCounter extends LinearOpMode {
                     motor.setPower(0);
                 }
 
+                // ToDo:
+                //  To calculate the conversion unit, divide the distance traveled by the encoder position
+                //  inPerTick = inches traveled / encoder position
+                //  rotPerTick = rotations traveled / encoder position
+                //  degPErTick = degrees traveled / encoder position
                 telemetry.addData("Encoder Position: ", motor.getCurrentPosition());
                 telemetry.update();
             }

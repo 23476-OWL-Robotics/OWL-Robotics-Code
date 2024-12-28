@@ -17,12 +17,15 @@ public class PIDF_Controller{
     double target;
 
     // Max Speed
-    double MAX_SPEED;
+    double maxSpeed;
 
     // Create running boolean
     public boolean running = true;
     public boolean targetReached = false;
     private boolean stopOnTargetReached;
+
+    // Create oldEncoderPosition
+    double oldEncoderPosition;
 
     // create ElapsedTime
     ElapsedTime timer = new ElapsedTime();
@@ -30,22 +33,73 @@ public class PIDF_Controller{
     // Create Motors
     DcMotorEx motor1;
 
-    // PIDF_Controller
-    public PIDF_Controller(ControllerParams params, DcMotorEx motor1) {
-        this.ConversionUnit = params.ConversionUnit;
+    // Create PIDF_Controller constructor with Builder parameters
+    private PIDF_Controller(Builder builder) {
 
-        this.p = params.p;
-        this.i = params.i;
-        this.d = params.d;
-        this.f = params.f;
+        this.motor1 = builder.motor1;
 
-        this.motor1 = motor1;
+        this.ConversionUnit = builder.params.ConversionUnit;
+
+        this.p = builder.params.p;
+        this.d = builder.params.d;
+        this.i = builder.params.i;
+        this.f = builder.params.f;
+
+        this.maxSpeed = builder.MAX_SPEED;
+        this.oldEncoderPosition = builder.oldEncoderPosition;
+        this.stopOnTargetReached = builder.stopOnTargetReached;
+    }
+
+    // Create builder
+    public static class Builder {
+        DcMotorEx motor1;
+        ControllerParams params;
+        double MAX_SPEED;
+        boolean stopOnTargetReached;
+        double oldEncoderPosition;
+
+        public Builder setControllerMotor(DcMotorEx motor1) {
+            this.motor1 = motor1;
+            return this;
+        }
+        public Builder setControllerParams(ControllerParams params) {
+            this.params = params;
+            return this;
+        }
+        public Builder setMaxSpeed(double MAX_SPEED) {
+            this.MAX_SPEED = MAX_SPEED;
+            return this;
+        }
+        public Builder setEncoderPosition(double oldEncoderPosition) {
+            this.oldEncoderPosition = oldEncoderPosition;
+            return this;
+        }
+        public Builder setStopOnTargetReached(boolean stop) {
+            this.stopOnTargetReached = stop;
+            return this;
+        }
+
+        public PIDF_Controller build() {
+            return new PIDF_Controller(this);
+        }
     }
 
     // Set the max speed of the motor being controlled
     // Tetrix encoder values are only accurate at a speed of 0.8 or less
     public void setMaxSpeed(double MAX_SPEED) {
-        this.MAX_SPEED = MAX_SPEED;
+        this.maxSpeed = MAX_SPEED;
+    }
+
+    // Create setStopOnTargetReached
+    // This will determine if the controller will stop if the desired target is reached
+    public void setStopOnTargetReached(boolean stop) {
+        this.stopOnTargetReached = stop;
+    }
+
+    // Create runController
+    // You can stop/start the controller from running if needed
+    public void runController(boolean run) {
+        running = run;
     }
 
     // Create rotateTo, extendTo, and retractTo functions
@@ -73,18 +127,6 @@ public class PIDF_Controller{
         }
     }
 
-    // Create setStopOnTargetReached
-    // This will determine if the controller will stop if the desired target is reached
-    public void setStopOnTargetReached(boolean stop) {
-        this.stopOnTargetReached = stop;
-    }
-
-    // Create runController
-    // You can stop/start the controller from running if needed
-    public void runController(boolean run) {
-        running = run;
-    }
-
     // Create calculator variables and calculator function
     double reference;
     double integralSum = 0.0;
@@ -103,7 +145,11 @@ public class PIDF_Controller{
         reference = target / ConversionUnit;
 
         // obtain the encoder position
-        encoderPosition = motor1.getCurrentPosition();
+        if (motor1.getCurrentPosition() == 0) {
+            encoderPosition = motor1.getCurrentPosition() + oldEncoderPosition;
+        } else {
+            encoderPosition = motor1.getCurrentPosition();
+        }
         // calculate the error
         error = reference - encoderPosition;
 
@@ -120,7 +166,7 @@ public class PIDF_Controller{
         out = (p * error) + (i * integralSum) + (d * derivative) + (f * feedForward);
 
         // set the motor power
-        motor1.setPower(Math.min(out, MAX_SPEED));
+        motor1.setPower(Math.min(out, maxSpeed));
 
         if (encoderPosition < reference + 5 && encoderPosition > reference -5) {
             targetReached = true;

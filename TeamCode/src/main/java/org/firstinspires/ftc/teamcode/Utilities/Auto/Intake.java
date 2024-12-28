@@ -54,9 +54,12 @@ public class Intake {
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        controller = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
-        controller.setMaxSpeed(1);
-        controller.setStopOnTargetReached(true);
+        controller = new PIDF_Controller.Builder()
+                .setControllerMotor(intakeMotor)
+                .setControllerParams(intakeControllerParams.params)
+                .setMaxSpeed(1)
+                .setStopOnTargetReached(false)
+                .build();
     }
 
     // Create init() for Auto

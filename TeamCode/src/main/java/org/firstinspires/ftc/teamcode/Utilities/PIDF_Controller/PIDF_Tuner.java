@@ -17,9 +17,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class PIDF_Tuner extends OpMode {
 
     // Conversion Parameters
-    double rotPerTick = 0.0;
-    double inPerTick = 0.0;
-    double degPerTick = 0.0;
+    // ToDo: Set the conversionUnit to one of the following
+    //  inPerTick, rotPerTick, degPerTick
+    double conversionUnit = 0.0;
 
     // PIDF Parameters
     public static double Kp = 0.0;
@@ -48,17 +48,20 @@ public class PIDF_Tuner extends OpMode {
     public void init() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
+        // ToDo: Set motor name to motor being used
         motor = hardwareMap.get(DcMotorEx.class, "motor");
         motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // ToDo: Set motor direction if needed
+        // motor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     @Override
     public void loop() {
 
         // Get encoder reference
-        reference = target / inPerTick;
+        reference = target / conversionUnit;
         // Get encoder position
         encoderPosition = motor.getCurrentPosition();
 

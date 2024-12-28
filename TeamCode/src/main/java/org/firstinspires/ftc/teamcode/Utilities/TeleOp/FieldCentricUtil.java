@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Utilities.TeleOp;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -21,6 +22,10 @@ import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.LeftAssentControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.RightAssentControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
+import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FileWriter.FileReadWriter;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class FieldCentricUtil extends LinearOpMode {
 
@@ -44,7 +49,6 @@ public class FieldCentricUtil extends LinearOpMode {
     Servo sampleServo;
     Servo specimenServo;
 
-
     // Create All CR Servos
     CRServo left;
     CRServo right;
@@ -53,6 +57,7 @@ public class FieldCentricUtil extends LinearOpMode {
     ColorSensor sensor;
     IMU imu;
 
+    // Create revBlinkinLedDriver for Led Strip Lights
     RevBlinkinLedDriver revBlinkinLedDriver;
 
     // Drive Motor Powers
@@ -83,17 +88,31 @@ public class FieldCentricUtil extends LinearOpMode {
     boolean isUp;
     boolean doingIntake;
     boolean touchSet;
-    float TFoneRefX;
-    float TFoneRefY;
-    float TFtwoRefX;
-    float TFtwoRefY;
-
-    float TFoneX;
-    float TFoneY;
-    float TFtwoX;
-    float TFtwoY;
-
     boolean whichTF;
+
+    // Values for Touchpad
+    double TFOneRefX;
+    double TFOneRefY;
+    double TFTwoRefX;
+    double TFTwoRefY;
+    double TFOneX;
+    double TFOneY;
+    double TFTwoX;
+    double TFTwoY;
+
+    double armEncoderPosition;
+    double intakeEncoderPosition;
+    double leftAssentEncoderPosition;
+    double rightAssentEncoderPosition;
+
+    double robotPoseX;
+    double robotPoseY;
+    double robotHeading;
+
+    FileReadWriter fileReadWriter;
+    MecanumDrive drive;
+
+    Pose2d startPose;
 
     // Hardware Maps
     public void hardwareMaps() {
@@ -121,7 +140,24 @@ public class FieldCentricUtil extends LinearOpMode {
         imu = hardwareMap.get(IMU.class, "imu");
     }
 
-    public void Initialize(MecanumDrive drive) {
+    public void Initialize() {
+        try {
+            fileReadWriter = new FileReadWriter();
+            fileReadWriter.readFile();
+        } catch (IOException e) {
+            // Nothing
+        }
+
+        armEncoderPosition = fileReadWriter.read[1];
+        intakeEncoderPosition = fileReadWriter.read[2];
+        leftAssentEncoderPosition = fileReadWriter.read[3];
+        rightAssentEncoderPosition = fileReadWriter.read[4];
+        robotPoseX = fileReadWriter.read[5];
+        robotPoseY = fileReadWriter.read[6];
+        robotHeading = fileReadWriter.read[7];
+
+        startPose = new Pose2d(robotPoseX, robotPoseY, Math.toRadians(robotHeading));
+        drive = new MecanumDrive(hardwareMap, startPose);
 
         frontRightMotor = drive.rightFront;
         frontLeftMotor = drive.leftFront;
@@ -148,8 +184,8 @@ public class FieldCentricUtil extends LinearOpMode {
         imu.resetYaw();
 
         intake_pivot_position = 0.5;
-        sample_servo_position = 0.485;
-        specimen_servo_position = 0.73;
+        sample_servo_position = 0.8;
+        specimen_servo_position = 0.7;
         isUp = true;
 
         revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -186,8 +222,8 @@ public class FieldCentricUtil extends LinearOpMode {
     // Servo Positions on opModeInInit()
     public void initializeServos() {
         intake_pivot_position = 0.5;
-        sample_servo_position = 0.485;
-        specimen_servo_position = 0.73;
+        sample_servo_position = 0.8;
+        specimen_servo_position = 0.7;
         isUp = true;
     }
 
@@ -214,7 +250,7 @@ public class FieldCentricUtil extends LinearOpMode {
         double heading;
 
         myYawPitchRollAngles = imu.getRobotYawPitchRollAngles();
-        heading = myYawPitchRollAngles.getYaw(AngleUnit.DEGREES) - 90;
+        heading = myYawPitchRollAngles.getYaw(AngleUnit.DEGREES) + 90;
         left_right_stick = -left_right_stick;
         rotX = left_right_stick * Math.cos(-heading / 180 * Math.PI) - forward_back_stick * Math.sin(-heading / 180 * Math.PI);
         rotY = left_right_stick * Math.sin(-heading / 180 * Math.PI) + forward_back_stick * Math.cos(-heading / 180 * Math.PI);
@@ -226,42 +262,42 @@ public class FieldCentricUtil extends LinearOpMode {
             if (!touchSet) {
                 touchSet = true;
                 if (gamepad2.touchpad_finger_1_x > gamepad2.touchpad_finger_2_x) {
-                    TFoneRefX = gamepad2.touchpad_finger_1_x;
-                    TFoneRefY = -gamepad2.touchpad_finger_1_y;
-                    TFtwoRefX = gamepad2.touchpad_finger_2_x;
-                    TFtwoRefY = gamepad2.touchpad_finger_2_y;
+                    TFOneRefX = gamepad2.touchpad_finger_1_x;
+                    TFOneRefY = -gamepad2.touchpad_finger_1_y;
+                    TFTwoRefX = gamepad2.touchpad_finger_2_x;
+                    TFTwoRefY = gamepad2.touchpad_finger_2_y;
                     whichTF = true;
                 } else {
-                    TFtwoRefX = gamepad2.touchpad_finger_1_x;
-                    TFtwoRefY = gamepad2.touchpad_finger_1_y;
-                    TFoneRefX = gamepad2.touchpad_finger_2_x;
-                    TFoneRefY = -gamepad2.touchpad_finger_2_y;
+                    TFTwoRefX = gamepad2.touchpad_finger_1_x;
+                    TFTwoRefY = gamepad2.touchpad_finger_1_y;
+                    TFOneRefX = gamepad2.touchpad_finger_2_x;
+                    TFOneRefY = -gamepad2.touchpad_finger_2_y;
                     whichTF = false;
                 }
             } else {
                 if (whichTF) {
-                     TFoneX = gamepad2.touchpad_finger_1_x;
-                     TFoneY = -gamepad2.touchpad_finger_1_y;
-                     TFtwoX = gamepad2.touchpad_finger_2_x;
-                     TFtwoY = gamepad2.touchpad_finger_2_y;
+                     TFOneX = gamepad2.touchpad_finger_1_x;
+                     TFOneY = -gamepad2.touchpad_finger_1_y;
+                     TFTwoX = gamepad2.touchpad_finger_2_x;
+                     TFTwoY = gamepad2.touchpad_finger_2_y;
                 } else {
-                     TFtwoX = gamepad2.touchpad_finger_1_x;
-                     TFtwoY = gamepad2.touchpad_finger_1_y;
-                     TFoneX = gamepad2.touchpad_finger_2_x;
-                     TFoneY = -gamepad2.touchpad_finger_2_y;
+                     TFTwoX = gamepad2.touchpad_finger_1_x;
+                     TFTwoY = gamepad2.touchpad_finger_1_y;
+                     TFOneX = gamepad2.touchpad_finger_2_x;
+                     TFOneY = -gamepad2.touchpad_finger_2_y;
                 }
-                front_left_power = ((TFoneY-TFoneRefY)
-                         + (TFoneX-TFoneRefX)
-                         + (TFtwoX-TFtwoRefX))*0.4;
-                front_right_power = ((TFoneY-TFoneRefY)
-                         - (TFoneX-TFoneRefX)
-                         - (TFtwoX-TFtwoRefX))*0.4;
-                back_left_power = ((TFoneY-TFoneRefY)
-                         - (TFoneX-TFoneRefX)
-                         + (TFtwoX-TFtwoRefX))*0.4;
-                back_right_power = ((TFoneY-TFoneRefY)
-                         + (TFoneX-TFoneRefX)
-                         - (TFtwoX-TFtwoRefX))*0.5;
+                front_left_power = ((TFOneY - TFOneRefY)
+                         + (TFOneX - TFOneRefX)
+                         + (TFTwoX - TFTwoRefX))*0.4;
+                front_right_power = ((TFOneY - TFOneRefY)
+                         - (TFOneX - TFOneRefX)
+                         - (TFTwoX - TFTwoRefX))*0.4;
+                back_left_power = ((TFOneY - TFOneRefY)
+                         - (TFOneX - TFOneRefX)
+                         + (TFTwoX - TFTwoRefX))*0.4;
+                back_right_power = ((TFOneY - TFOneRefY)
+                         + (TFOneX - TFOneRefX)
+                         - (TFTwoX - TFTwoRefX))*0.5;
             }
         } else {
              front_left_power = rotY + rotX + turning_stick;
@@ -280,19 +316,26 @@ public class FieldCentricUtil extends LinearOpMode {
 
     // Sets wrist servo to positions set by slide control
     public void sample_control(boolean output_up, boolean output_down) {
-        if (output_up) {
-            sample_servo_position = 0.25;
-        } else if (output_down) {
-            sample_servo_position = 0.485;
+        try {
+            if (output_up) {
+                sampleServo.setPosition(0.1);
+                sample_servo_position = 0.1;
+                TimeUnit.MILLISECONDS.sleep(900);
+                specimen_servo_position = 0.7;
+            } else if (output_down) {
+                sample_servo_position = 0.8;
+            }
+        } catch (InterruptedException e) {
+            // Nothing
         }
     }
 
     // Opens and closes specimen claw
     public void specimen_control(boolean grab_specimen, boolean release_specimen) {
         if (grab_specimen) {
-            specimen_servo_position = 0.73;
+            specimen_servo_position = 0.5;
         } else if (release_specimen) {
-            specimen_servo_position = 1;
+            specimen_servo_position = 0.7;
         }
 
         if (gamepad1.left_bumper) {
@@ -314,13 +357,21 @@ public class FieldCentricUtil extends LinearOpMode {
     // Control the ascent motors with pidf
     public void assent_control(boolean ascend_button, boolean descend_button) {
         if (!assentInti) {
-            leftAssentController = new PIDF_Controller(leftAssentControllerParams.params, leftAssentMotor);
-            leftAssentController.setMaxSpeed(1);
-            leftAssentController.setStopOnTargetReached(false);
+            leftAssentController = new PIDF_Controller.Builder()
+                    .setControllerMotor(leftAssentMotor)
+                    .setControllerParams(leftAssentControllerParams.params)
+                    .setMaxSpeed(1)
+                    .setEncoderPosition(leftAssentEncoderPosition)
+                    .setStopOnTargetReached(false)
+                    .build();
 
-            rightAssentController = new PIDF_Controller(rightAssentControllerParams.params, rightAssentMotor);
-            rightAssentController.setMaxSpeed(1);
-            rightAssentController.setStopOnTargetReached(false);
+            rightAssentController = new PIDF_Controller.Builder()
+                    .setControllerMotor(rightAssentMotor)
+                    .setControllerParams(rightAssentControllerParams.params)
+                    .setMaxSpeed(1)
+                    .setEncoderPosition(rightAssentEncoderPosition)
+                    .setStopOnTargetReached(false)
+                    .build();
 
             assentInti = true;
         }
@@ -347,14 +398,23 @@ public class FieldCentricUtil extends LinearOpMode {
 
     // controls lhe slides for scoring
     public void slide_control(double intake_slide_stick, double lifter_slide_stick, boolean reset, double deadZone) {
-        if (!slideInit) {
-            armController = new PIDF_Controller(armControllerParams.params, armMotor);
-            armController.setMaxSpeed(1);
-            armController.setStopOnTargetReached(false);
 
-            intakeController = new PIDF_Controller(intakeControllerParams.params, intakeMotor);
-            intakeController.setMaxSpeed(1);
-            intakeController.setStopOnTargetReached(false);
+        if (!slideInit) {
+            armController = new PIDF_Controller.Builder()
+                    .setControllerMotor(armMotor)
+                    .setControllerParams(armControllerParams.params)
+                    .setMaxSpeed(1)
+                    .setEncoderPosition(armEncoderPosition)
+                    .setStopOnTargetReached(false)
+                    .build();
+
+            intakeController = new PIDF_Controller.Builder()
+                    .setControllerMotor(intakeMotor)
+                    .setControllerParams(intakeControllerParams.params)
+                    .setMaxSpeed(1)
+                    .setEncoderPosition(intakeEncoderPosition)
+                    .setStopOnTargetReached(false)
+                    .build();
 
             slideInit = true;
         }
@@ -391,9 +451,7 @@ public class FieldCentricUtil extends LinearOpMode {
         if (Math.abs(intake_slide_stick) > deadZone) {
             intakeMotor.setPower(-intake_slide_stick);
         } else {
-
-                intakeMotor.setPower(0);
-
+            intakeMotor.setPower(0);
         }
     }
 
@@ -458,29 +516,42 @@ public class FieldCentricUtil extends LinearOpMode {
             intake_wheel_power = -1;
         } else if (intake_pivot_position < 0.3) {
             intake_wheel_power = 1;
-        }else if (intakePivot.getPosition() > 0.60){
-            intake_wheel_power = -1;
-            intake_pivot_position = 0.5;
         } else {
             intake_wheel_power = 0;
         }
 
-        if (intake_pivot_up) {
-            intake_pivot_position = 0.69;
-            isUp  = true;
-        } else if (intake_pivot_down) {
-            intake_pivot_position = 0.12;
-            intake_wheel_power = 1;
-            isUp = false;
-        } else if (intake_pivot_reset) {
-            intake_pivot_position = 0.5;
-            isUp = true;
-        } else if (!isUp && sensorDistance < 1 && blue || !isUp && sensorDistance < 1 && yellow){
-            intake_pivot_position = 0.50;
-            doingIntake = true;
-        } else if (!isUp && sensorDistance < 1 && red){
-            intake_pivot_position = 0.31;
-            intake_wheel_power = -1;
+        try {
+            if (intake_pivot_up) {
+                specimenServo.setPosition(0.7);
+                intakePivot.setPosition(0.69);
+                TimeUnit.MILLISECONDS.sleep(300);
+                left.setPower(-0.5);
+                right.setPower(-0.5);
+                TimeUnit.MILLISECONDS.sleep(300);
+                specimenServo.setPosition(0.5);
+                specimen_servo_position = 0.5;
+                TimeUnit.MILLISECONDS.sleep(100);
+                left.setPower(0);
+                right.setPower(0);
+                TimeUnit.MILLISECONDS.sleep(100);
+                intakePivot.setPosition(0.5);
+                isUp  = true;
+            } else if (intake_pivot_down) {
+                intake_pivot_position = 0.12;
+                intake_wheel_power = 1;
+                isUp = false;
+            } else if (intake_pivot_reset) {
+                intake_pivot_position = 0.5;
+                isUp = true;
+            } else if (!isUp && sensorDistance < 1 && blue || !isUp && sensorDistance < 1 && yellow){
+                intake_pivot_position = 0.50;
+                doingIntake = true;
+            } else if (!isUp && sensorDistance < 1 && red){
+                intake_pivot_position = 0.31;
+                intake_wheel_power = -1;
+            }
+        } catch (InterruptedException e) {
+            // Nothing
         }
     }
 
@@ -514,8 +585,35 @@ public class FieldCentricUtil extends LinearOpMode {
         frontRightMotor.setPower(front_right_power * speedModifier);
     }
 
+    public void writeRobotInfo() {
+        drive.updatePoseEstimate();
+
+        armEncoderPosition = armMotor.getCurrentPosition();
+        intakeEncoderPosition = intakeMotor.getCurrentPosition();
+        leftAssentEncoderPosition = leftAssentMotor.getCurrentPosition();
+        rightAssentEncoderPosition = rightAssentMotor.getCurrentPosition();
+        robotPoseX = drive.pose.position.x;
+        robotPoseY = drive.pose.position.y;
+        robotHeading = Math.toDegrees(drive.pose.heading.toDouble());
+
+        try {
+            fileReadWriter.writeFile(
+                    armEncoderPosition,
+                    intakeEncoderPosition,
+                    leftAssentEncoderPosition,
+                    rightAssentEncoderPosition,
+                    robotPoseX,
+                    robotPoseY,
+                    robotHeading
+            );
+        } catch (IOException e) {
+            // Nothing
+        }
+    }
+
     // Telemetry for Debugging
     public void telemetry() {
+        drive.updatePoseEstimate();
         telemetry.addLine("-----color distance sensor-----");
         telemetry.addData("distance", ((DistanceSensor) sensor).getDistance(DistanceUnit.CM));
         telemetry.addData("red", sensor.red());
@@ -536,6 +634,9 @@ public class FieldCentricUtil extends LinearOpMode {
         telemetry.addData("output trough position", sample_servo_position);
         telemetry.addData("specimen claw position", specimen_servo_position);
         telemetry.addData("IMU",imu.getRobotYawPitchRollAngles());
+        telemetry.addData("Robot Pose X", drive.pose.position.x);
+        telemetry.addData("Robot Pose Y", drive.pose.position.y);
+        telemetry.addData("Robot Pose Heading", Math.toDegrees(drive.pose.heading.toDouble()));
         telemetry.update();
     }
 

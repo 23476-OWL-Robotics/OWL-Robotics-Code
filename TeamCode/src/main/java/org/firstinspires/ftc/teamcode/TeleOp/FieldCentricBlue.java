@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentricUtil;
 
 @TeleOp
@@ -12,10 +14,11 @@ public class FieldCentricBlue extends FieldCentricUtil {
 
         hardwareMaps();
 
-        initializeMotors();
-        initializeServos();
-        servo_power_sets();
-        set_up_imu();
+        //initializeMotors();
+        //initializeServos();
+        //servo_power_sets();
+        //set_up_imu();
+        Initialize();
         waitForStart();
         if (opModeIsActive()) {
             // Put run blocks here.
@@ -32,6 +35,7 @@ public class FieldCentricBlue extends FieldCentricUtil {
                 specimen_control(gamepad2.x, gamepad2.b);
                 power_sets(gamepad1.right_bumper);
                 doIntake();
+                writeRobotInfo();
                 telemetry();
             }
         }

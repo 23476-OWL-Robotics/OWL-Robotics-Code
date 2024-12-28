@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.Utilities.TeleOp.FileWriter;
 
+import android.annotation.SuppressLint;
+import android.os.Environment;
+
 import java.io.*;
+import java.util.Arrays;
 
 public class FileReadWriter {
 
@@ -11,26 +15,14 @@ public class FileReadWriter {
     BufferedReader reader;
 
     File file;
-    String fileName = "./TeamCode/src/main/java/org/firstinspires/ftc/teamcode/Utilities/TeleOp/FileWriter/numbers.txt";
+    String fileName = Environment.getExternalStorageDirectory().getPath() + "/FIRST/data/numbers.txt";
 
-    int[] write;
-    int[] read;
+    public double[] write;
+    public double[] read;
 
-    public FileReadWriter() {
-        try {
-            file = new File(fileName);
-
-            fileWriter = new FileWriter(file);
-            writer = new BufferedWriter(fileWriter);
-
-            fileReader = new FileReader(file);
-            reader = new BufferedReader(fileReader);
-
-            write = new int[8];
-            read = new int[8];
-        } catch (IOException e) {
-            // Nothing
-        }
+    public FileReadWriter() throws IOException {
+        write = new double[8];
+        read = new double[8];
     }
 
     public void writeFile(double armEncoderPosition,
@@ -39,41 +31,60 @@ public class FileReadWriter {
                           double rightAssentEncoderPosition,
                           double robotPoseX,
                           double robotPoseY,
-                          double robotHeading) {
+                          double robotHeading) throws IOException{
 
-        try {
-            write[1] = Integer.parseInt(String.valueOf(armEncoderPosition));
-            write[2] = Integer.parseInt(String.valueOf(intakeEncoderPosition));
-            write[3] = Integer.parseInt(String.valueOf(leftAssentEncoderPosition));
-            write[4] = Integer.parseInt(String.valueOf(rightAssentEncoderPosition));
-            write[5] = Integer.parseInt(String.valueOf(robotPoseX));
-            write[6] = Integer.parseInt(String.valueOf(robotPoseY));
-            write[7] = Integer.parseInt(String.valueOf(robotHeading));
+        file = new File(fileName);
+        fileWriter = new FileWriter(file);
+        writer = new BufferedWriter(fileWriter);
 
-            for (int i = 1; i < 8; i++) {
-                writer.write(write[i]);
-                writer.newLine();
-            }
-            writer.flush();
-        } catch (IOException e) {
-            // Nothing
+        write[1] = armEncoderPosition;
+        write[2] = intakeEncoderPosition;
+        write[3] = leftAssentEncoderPosition;
+        write[4] = rightAssentEncoderPosition;
+        write[5] = robotPoseX;
+        write[6] = robotPoseY;
+        write[7] = robotHeading;
+
+        for (int i = 1; i <= 7; i++) {
+            writer.write(Double.toString(write[i]));
+            writer.newLine();
         }
+        writer.close();
     }
 
-    public void readFile() {
+    public void readFile() throws IOException {
 
-        try {
-            read[1] = Integer.parseInt(reader.readLine());
-            read[2] = Integer.parseInt(reader.readLine());
-            read[3] = Integer.parseInt(reader.readLine());
-            read[4] = Integer.parseInt(reader.readLine());
-            read[5] = Integer.parseInt(reader.readLine());
-            read[6] = Integer.parseInt(reader.readLine());
-            read[7] = Integer.parseInt(reader.readLine());
+        file = new File(fileName);
+        fileReader = new FileReader(file);
+        reader = new BufferedReader(fileReader);
 
-            reader.close();
-        } catch (IOException e) {
-            // Nothing
+        read[1] = Double.parseDouble(reader.readLine());
+        read[2] = Double.parseDouble(reader.readLine());
+        read[3] = Double.parseDouble(reader.readLine());
+        read[4] = Double.parseDouble(reader.readLine());
+        read[5] = Double.parseDouble(reader.readLine());
+        read[6] = Double.parseDouble(reader.readLine());
+        read[7] = Double.parseDouble(reader.readLine());
+
+        reader.close();
+    }
+
+    public void clearFile() throws IOException {
+
+        writer = new BufferedWriter(fileWriter);
+
+        write[1] = 0;
+        write[2] = 0;
+        write[3] = 0;
+        write[4] = 0;
+        write[5] = 0;
+        write[6] = 0;
+        write[7] = 0;
+
+        for (int i = 1; i <= 7; i++) {
+            writer.write(Double.toString(write[i]));
+            writer.newLine();
         }
+        writer.close();
     }
 }
