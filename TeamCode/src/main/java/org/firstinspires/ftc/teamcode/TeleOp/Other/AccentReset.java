@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 @TeleOp
 public class AccentReset extends LinearOpMode {
 
@@ -24,24 +26,27 @@ public class AccentReset extends LinearOpMode {
             leftAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             rightAssentMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-            rightAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+            leftAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightAssentMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            leftAssentMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
             while (opModeIsActive()) {
-                if (gamepad2.dpad_up) {
-                    leftAssentMotor.setPower(1);
-                } else if (gamepad2.dpad_down) {
-                    leftAssentMotor.setPower(-1);
+                if (Math.abs(gamepad1.left_stick_y) > 0.1) {
+                    leftAssentMotor.setPower(gamepad1.left_stick_y);
                 } else {
                     leftAssentMotor.setPower(0);
                 }
 
-                if (gamepad2.y) {
-                    rightAssentMotor.setPower(1);
-                } else if (gamepad2.a) {
-                    rightAssentMotor.setPower(-1);
+                if (Math.abs(gamepad1.right_stick_y) > 0.1) {
+                    rightAssentMotor.setPower(gamepad1.right_stick_y);
                 } else {
                     rightAssentMotor.setPower(0);
                 }
+
+                telemetry.addData("Left", leftAssentMotor.getCurrentPosition());
+                telemetry.addData("Right", rightAssentMotor.getCurrentPosition());
+                telemetry.update();
             }
         }
     }

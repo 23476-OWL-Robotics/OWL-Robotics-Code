@@ -6,7 +6,6 @@ import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentricUtil;
 @TeleOp
 public class FieldCentricRed extends FieldCentricUtil {
 
-
     @Override
     public void runOpMode() {
 
@@ -15,6 +14,7 @@ public class FieldCentricRed extends FieldCentricUtil {
         Initialize();
         waitForStart();
         if (opModeIsActive()) {
+            resetRuntime();
             // Put run blocks here.
             initializeServos();
             servo_power_sets();
@@ -28,6 +28,7 @@ public class FieldCentricRed extends FieldCentricUtil {
                 specimen_control(gamepad2.x, gamepad2.b);
                 power_sets();
                 doIntake();
+                writeRobotInfo();
                 telemetry();
             }
         }

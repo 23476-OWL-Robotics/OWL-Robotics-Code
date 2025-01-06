@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.Utilities.TeleOp.FileWriter;
 
-import android.annotation.SuppressLint;
 import android.os.Environment;
 
 import java.io.*;

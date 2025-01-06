@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParam
 
 public class RightAssentControllerParams {
 
-    double inPerTick = 0.0;
+    double inPerTick = 0.000888945;
 
-    double p = 0.0;
+    double p = 0.0065;
     double i = 0.0;
     double d = 0.0;
     double f = 0.0;

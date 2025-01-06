@@ -158,7 +158,7 @@ public class FieldCentricUtil extends LinearOpMode {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftAssentMotor.setDirection(DcMotor.Direction.REVERSE);
+        rightAssentMotor.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         right.setDirection(CRServo.Direction.REVERSE);
@@ -226,16 +226,16 @@ public class FieldCentricUtil extends LinearOpMode {
                 }
                 front_left_power = ((TFOneY - TFOneRefY)
                         + (TFOneX - TFOneRefX)
-                        + (TFTwoX - TFTwoRefX))*0.4;
+                        + (TFTwoX - TFTwoRefX)) * 0.4;
                 front_right_power = ((TFOneY - TFOneRefY)
                         - (TFOneX - TFOneRefX)
-                        - (TFTwoX - TFTwoRefX))*0.4;
+                        - (TFTwoX - TFTwoRefX)) * 0.4;
                 back_left_power = ((TFOneY - TFOneRefY)
                         - (TFOneX - TFOneRefX)
-                        + (TFTwoX - TFTwoRefX))*0.4;
+                        + (TFTwoX - TFTwoRefX)) * 0.4;
                 back_right_power = ((TFOneY - TFOneRefY)
                         + (TFOneX - TFOneRefX)
-                        - (TFTwoX - TFTwoRefX))*0.5;
+                        - (TFTwoX - TFTwoRefX)) * 0.5;
             }
         } else {
             front_left_power = rotY + rotX + turnStick;
@@ -276,7 +276,7 @@ public class FieldCentricUtil extends LinearOpMode {
     // Opens and closes specimen claw
     public void specimen_control(boolean grab_specimen, boolean release_specimen) {
         if (grab_specimen) {
-            sampleServo.setPosition(0.65);
+            sampleServo.setPosition(0.71);
         } else if (release_specimen) {
             sampleServo.setPosition(0.65);
         }
@@ -316,15 +316,18 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         if (ascend_button) {
-            leftAssentMotor.setPower(1);
-            rightAssentMotor.setPower(1);
+            leftAssentPosition = 14;
+            rightAssentPosition = 14;
         } else if (descend_button) {
-            leftAssentMotor.setPower(-1);
-            rightAssentMotor.setPower(-1);
-        } else {
-            leftAssentMotor.setPower(0);
-            rightAssentMotor.setPower(0);
+            leftAssentPosition = 0;
+            rightAssentPosition = 0;
         }
+
+        leftAssentController.extendTo(leftAssentPosition);
+        rightAssentController.extendTo(rightAssentPosition);
+
+        leftAssentController.loopController();
+        rightAssentController.loopController();
     }
 
     // Parameters for scoring slides
@@ -405,7 +408,6 @@ public class FieldCentricUtil extends LinearOpMode {
                                    double deadZone) {
         loopSensor();
 
-        //automatic and manual control of intake wheels
         if (!isUp && sensorDistance > 3.5 && sensorDistance < 4.5) {
             intake_wheel_power = -0.3;
         } else if (intake_wheels_out > deadZone) {
@@ -414,30 +416,40 @@ public class FieldCentricUtil extends LinearOpMode {
             intake_wheel_power = -1;
         } else if (intakePivot.getPosition() < 0.3) {
             intake_wheel_power = 1;
-        }else if (intakePivot.getPosition() > 0.60){
-            intake_wheel_power = -1;
-            intakePivot.setPosition(0.5);
         } else {
             intake_wheel_power = 0;
         }
 
-        //puts the intake pivot to is positions based on inputs
-        if (intake_pivot_up) {
-            intakePivot.setPosition(0.71);
-            isUp = true;
-        } else if (intake_pivot_down) {
-            intakePivot.setPosition(0.12);
-            intake_wheel_power = 1;
-            isUp = false;
-        } else if (intake_pivot_reset) {
-            intakePivot.setPosition(0.5);
-            isUp = true;
-        } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow) {
-            intakePivot.setPosition(0.5);
-            doingIntake = true;
-        } else if (!isUp && sensorDistance < 1 && blue) {
-            intakePivot.setPosition(0.31);
-            intake_wheel_power = -1;
+        try {
+            if (intake_pivot_up) {
+                sampleServo.setPosition(0.65);
+                intakePivot.setPosition(0.73);
+                TimeUnit.MILLISECONDS.sleep(500);
+                left.setPower(-0.3);
+                right.setPower(-0.3);
+                TimeUnit.MILLISECONDS.sleep(300);
+                sampleServo.setPosition(0.71);
+                left.setPower(0);
+                right.setPower(0);
+                TimeUnit.MILLISECONDS.sleep(100);
+                intakePivot.setPosition(0.5);
+                isUp  = true;
+            } else if (intake_pivot_down) {
+                intakePivot.setPosition(0.12);
+                intake_wheel_power = 1;
+                isUp = false;
+            } else if (intake_pivot_reset) {
+                intakePivot.setPosition(0.5);
+                isUp = true;
+            } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow){
+                intakePivot.setPosition(0.5);
+                doingIntake = true;
+            } else if (!isUp && sensorDistance < 1 && blue){
+                intakePivot.setPosition(0.31);
+                intake_wheel_power = -1;
+            }
+        } catch (InterruptedException e) {
+            // Nothing
         }
     }
 
@@ -465,13 +477,12 @@ public class FieldCentricUtil extends LinearOpMode {
         try {
             if (intake_pivot_up) {
                 sampleServo.setPosition(0.65);
-                intakePivot.setPosition(0.71);
-                TimeUnit.MILLISECONDS.sleep(300);
-                left.setPower(-0.5);
-                right.setPower(-0.5);
+                intakePivot.setPosition(0.73);
+                TimeUnit.MILLISECONDS.sleep(500);
+                left.setPower(-0.3);
+                right.setPower(-0.3);
                 TimeUnit.MILLISECONDS.sleep(300);
                 sampleServo.setPosition(0.71);
-                TimeUnit.MILLISECONDS.sleep(100);
                 left.setPower(0);
                 right.setPower(0);
                 TimeUnit.MILLISECONDS.sleep(100);
