@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -46,6 +47,7 @@ public class FieldCentricUtil extends LinearOpMode {
     Servo intakePivot;
     Servo armPivot;
     Servo sampleServo;
+    Servo plowServo;
 
     // Create All CR Servos
     CRServo left;
@@ -98,6 +100,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
     FileReadWriter fileReadWriter;
     MecanumDrive drive;
+    ElapsedTime time;
 
     Pose2d startPose;
 
@@ -117,6 +120,7 @@ public class FieldCentricUtil extends LinearOpMode {
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
         armPivot = hardwareMap.get(Servo.class, "sampleServo");
         sampleServo = hardwareMap.get(Servo.class, "specimenClaw");
+        plowServo = hardwareMap.get(Servo.class, "plowServo");
 
         left = hardwareMap.get(CRServo.class, "left");
         right = hardwareMap.get(CRServo.class, "right");
@@ -134,6 +138,8 @@ public class FieldCentricUtil extends LinearOpMode {
         } catch (IOException e) {
             // Nothing
         }
+
+        time = new ElapsedTime();
 
         armEncoderPosition = fileReadWriter.read[1];
         intakeEncoderPosition = fileReadWriter.read[2];
@@ -173,6 +179,7 @@ public class FieldCentricUtil extends LinearOpMode {
         intakePivot.setPosition(0.5);
         armPivot.setPosition(0.8);
         sampleServo.setPosition(0.71);
+        plowServo.setPosition(0);
         isUp = true;
 
         revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -279,6 +286,18 @@ public class FieldCentricUtil extends LinearOpMode {
             sampleServo.setPosition(0.71);
         } else if (release_specimen) {
             sampleServo.setPosition(0.65);
+        }
+    }
+
+    public void plowControl(boolean runPlow) {
+        if (runPlow) {
+            try {
+                plowServo.setPosition(1);
+                TimeUnit.MILLISECONDS.sleep(1000);
+                plowServo.setPosition(0);
+            } catch (InterruptedException e) {
+                // Nothing
+            }
         }
     }
 
@@ -562,6 +581,7 @@ public class FieldCentricUtil extends LinearOpMode {
         telemetry.addData("intake slide position", intakeMotor.getCurrentPosition());
         telemetry.addData("intake wheel power", intake_wheel_power);
         telemetry.addData("intake wrist position", intakePivot.getPosition());
+        telemetry.addData("plow position", plowServo.getPosition());
         telemetry.addData("IsUp", isUp);
         telemetry.addLine("-----lifter assembly-----");
         telemetry.addData("lifter slide position", armMotor.getCurrentPosition());
@@ -571,7 +591,9 @@ public class FieldCentricUtil extends LinearOpMode {
         telemetry.addData("Robot Pose X", drive.pose.position.x);
         telemetry.addData("Robot Pose Y", drive.pose.position.y);
         telemetry.addData("Robot Pose Heading", Math.toDegrees(drive.pose.heading.toDouble()));
+        telemetry.addData("loop time", time.milliseconds());
         telemetry.update();
+        time.reset();
     }
 
     // Sensor Utilities

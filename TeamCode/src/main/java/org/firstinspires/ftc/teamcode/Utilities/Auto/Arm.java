@@ -23,8 +23,8 @@ public class Arm {
 
     // Create motor and servos
     DcMotorEx armMotor;
+    Servo armPivot;
     Servo sampleServo;
-    Servo specimenServo;
 
     // Create PIDF Controller and Arm Parameters
     ArmControllerParams armControllerParams = new ArmControllerParams();
@@ -35,8 +35,8 @@ public class Arm {
     // Arm Constructor
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
-        sampleServo = hardwareMap.get(Servo.class, "sampleServo");
-        specimenServo = hardwareMap.get(Servo.class, "specimenClaw");
+        armPivot = hardwareMap.get(Servo.class, "sampleServo");
+        sampleServo = hardwareMap.get(Servo.class, "specimenClaw");
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -52,8 +52,8 @@ public class Arm {
 
     // Create init() for Auto
     public void init() {
-        sampleServo.setPosition(0.485);
-        specimenServo.setPosition(0.73);
+        armPivot.setPosition(0.8);
+        sampleServo.setPosition(0.71);
     }
 
     public class RunController implements Action {
@@ -185,54 +185,34 @@ public class Arm {
     }
 
     // Releases the Specimen
-    public class ReleaseSpecimen implements Action {
-        private boolean initialized = false;
+    public class Release implements Action {
 
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
 
-            if (!initialized) {
-                controller.retractTo(18);
-                initialized = true;
-            }
-
-            double pos = armMotor.getCurrentPosition();
-            p.put("Motor Position: ", pos);
-            if (!controller.targetReached) {
-                controller.loopController();
-                return true;
-            } else {
-                specimenServo.setPosition(1);
-                return false;
-            }
-        }
-    }
-    public Action releaseSpecimen() {
-        return new ReleaseSpecimen();
-    }
-
-    // Releases the Sample
-    public class ReleaseSample implements Action {
-
-        @Override public boolean run(@NonNull TelemetryPacket p) {
-            sampleServo.setPosition(0.20);
-            try {
-                TimeUnit.MILLISECONDS.sleep(300);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            sampleServo.setPosition(0.25);
-            try {
-                TimeUnit.MILLISECONDS.sleep(700);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            sampleServo.setPosition(0.485);
+            sampleServo.setPosition(0.65);
             return false;
         }
     }
-    public Action releaseSample() {
-        return new ReleaseSample();
+    public Action release() {
+        return new Release();
+    }
+
+    public class PivotArm implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket p) {
+
+            if (armPivot.getPosition() == 0.8) {
+                armPivot.setPosition(0.1);
+            } else if (armPivot.getPosition() == 0.1) {
+                armPivot.setPosition(0.8);
+            }
+            return false;
+        }
+    }
+    public Action pivotArm() {
+        return new PivotArm();
     }
 
     public class WaitTime implements Action {

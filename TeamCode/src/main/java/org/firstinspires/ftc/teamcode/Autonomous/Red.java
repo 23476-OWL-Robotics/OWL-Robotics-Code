@@ -80,11 +80,13 @@ public class Red extends LinearOpMode {
                     new SequentialAction(
                             new ParallelAction(
                                     arm.armUpSpecimen(),
+                                    arm.pivotArm(),
                                     action1
                             ),
-                            arm.releaseSpecimen(),
+                            arm.release(),
                             new ParallelAction(
                                     arm.armDown(),
+                                    arm.pivotArm(),
                                     action2
                             ),
                             intake.intakeSample(),
@@ -93,13 +95,17 @@ public class Red extends LinearOpMode {
                                     new SequentialAction(
                                             intake.intakeIn(),
                                             intake.transferSample(),
-                                            arm.armUpHigh()
+                                            arm.armUpHigh(),
+                                            arm.pivotArm()
                                     )
                             ),
                             basketAction,
-                            arm.releaseSample(),
+                            arm.release(),
                             new ParallelAction(
-                                    arm.armDown(),
+                                    new SequentialAction(
+                                            arm.armDown(),
+                                            arm.pivotArm()
+                                    ),
                                     new SequentialAction(
                                             action4,
                                             intake.intakeSample()
@@ -110,14 +116,18 @@ public class Red extends LinearOpMode {
                                     new SequentialAction(
                                             intake.intakeIn(),
                                             intake.transferSample(),
-                                            arm.armUpHigh()
+                                            arm.armUpHigh(),
+                                            arm.pivotArm()
                                     )
                             ),
                             basketAction2,
-                            arm.releaseSample(),
+                            arm.release(),
                             new ParallelAction(
                                     action6,
-                                    arm.armDown()
+                                    new SequentialAction(
+                                            arm.armDown(),
+                                            arm.pivotArm()
+                                    )
                             )
                     )
             );

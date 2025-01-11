@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.IntakeControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
 
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 /*
@@ -29,6 +30,7 @@ public class Intake {
     CRServo left;
     CRServo right;
     Servo intakePivot;
+    Servo sampleServo;
 
     // Create distanceSensor
     DistanceSensor distanceSensor;
@@ -46,6 +48,7 @@ public class Intake {
         left = hardwareMap.get(CRServo.class, "left");
         right = hardwareMap.get(CRServo.class, "right");
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
+        sampleServo = hardwareMap.get(Servo.class, "specimenClaw");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "blockDet");
 
         right.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -154,29 +157,24 @@ public class Intake {
 
     // Transfers the sample
     public class TransferSample implements Action {
-        private boolean initialized = false;
 
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
 
-            if (!initialized) {
-                intakePivot.setPosition(0.69);
-                left.setPower(-1);
-                right.setPower(-1);
-                initialized = true;
-            }
             try {
-                TimeUnit.MILLISECONDS.sleep(600);
+                sampleServo.setPosition(0.65);
+                intakePivot.setPosition(0.73);
+                TimeUnit.MILLISECONDS.sleep(500);
+                left.setPower(-0.3);
+                right.setPower(-0.3);
+                TimeUnit.MILLISECONDS.sleep(300);
+                sampleServo.setPosition(0.71);
+                left.setPower(0);
+                right.setPower(0);
+                TimeUnit.MILLISECONDS.sleep(100);
+                intakePivot.setPosition(0.5);
             } catch (InterruptedException e) {
                 // Nothing
-            }
-            left.setPower(0);
-            right.setPower(0);
-            intakePivot.setPosition(0.5);
-            try {
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
-                //Nothing
             }
             return false;
         }
