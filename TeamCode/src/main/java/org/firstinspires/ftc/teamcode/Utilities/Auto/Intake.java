@@ -111,11 +111,11 @@ public class Intake {
 
             double pos = intakeMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
-            if (controller.running) {
+            if (controller.targetReached) {
+                return false;
+            } else {
                 controller.loopController();
                 return true;
-            } else {
-                return false;
             }
         }
     }

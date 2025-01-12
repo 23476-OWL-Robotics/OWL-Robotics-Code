@@ -20,7 +20,7 @@ public class FieldCentricRed extends FieldCentricUtil {
             servo_power_sets();
             initializeLights();
             while (opModeIsActive()) {
-                FieldCentric(gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.right_bumper);
+                FieldCentric(-gamepad1.left_stick_y, -gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.right_bumper);
                 assent_control(gamepad2.left_bumper, gamepad2.right_bumper);
                 slide_control(gamepad2.right_stick_y, -gamepad2.left_stick_y, 0.1);
                 red_intake_control(gamepad2.right_trigger, gamepad2.left_trigger, gamepad2.dpad_left, gamepad2.dpad_right, gamepad2.touchpad, 0.1);
