@@ -140,7 +140,7 @@ public class Controller{
     double error;
     double derivative;
     double feedForward;
-    double out;
+    public double out;
     private void PIDF_Calculator() {
 
         // reset the timer

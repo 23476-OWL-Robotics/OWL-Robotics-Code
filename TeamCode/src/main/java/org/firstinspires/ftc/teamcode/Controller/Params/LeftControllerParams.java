@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode.Controller.Params;
 
 public class LeftControllerParams {
 
-    double degPerTick = 0.0;
+    double degPerTick = 0.3;
 
-    double p = 0.0;
+    double p = 0.002;
     double i = 0.0;
     double d = 0.0;
     double f = 0.0;

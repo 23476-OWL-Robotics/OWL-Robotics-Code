@@ -18,7 +18,7 @@ public class MecanumDrive extends LinearOpMode {
     DcMotorEx backRightMotor;
 
     double x, y, ls, rs;
-    double speedModifier = 0.3;
+    double speedModifier = 0.5;
 
     @Override
     public void runOpMode() {
@@ -41,16 +41,11 @@ public class MecanumDrive extends LinearOpMode {
                 ls = gamepad1.left_trigger;
                 rs = gamepad1.right_trigger;
 
-                if (y > 0.05 || y < -0.05 || x > 0.05 || x < 0.05) {
-                    frontLeftMotor.setPower((y + x) * speedModifier);
-                    frontRightMotor.setPower((y - x) * speedModifier);
-                    backLeftMotor.setPower((y + x) * speedModifier);
-                    backRightMotor.setPower((y - x) * speedModifier);
-                } else if (ls > 0.05 || rs > 0.05) {
-                    frontLeftMotor.setPower((ls - rs) * speedModifier);
-                    frontRightMotor.setPower((-ls + rs) * speedModifier);
-                    backLeftMotor.setPower((-ls + rs) * speedModifier);
-                    backRightMotor.setPower((ls - rs) * speedModifier);
+                if (y > 0.1 || y < -0.1 || x > 0.1 || x < 0.1) {
+                    frontLeftMotor.setPower((y - x) * speedModifier);
+                    frontRightMotor.setPower((y + x) * speedModifier);
+                    backLeftMotor.setPower((y - x) * speedModifier);
+                    backRightMotor.setPower((y + x) * speedModifier);
                 } else {
                     frontLeftMotor.setPower(0);
                     frontRightMotor.setPower(0);
@@ -58,15 +53,22 @@ public class MecanumDrive extends LinearOpMode {
                     backRightMotor.setPower(0);
                 }
 
+                if (ls > 0.1 || rs > 0.1) {
+                    frontLeftMotor.setPower((ls - rs) * speedModifier);
+                    frontRightMotor.setPower((-ls + rs) * speedModifier);
+                    backLeftMotor.setPower((-ls + rs) * speedModifier);
+                    backRightMotor.setPower((ls - rs) * speedModifier);
+                }
+
                 if (gamepad2.dpad_up ) {
-                    speedModifier ++;
+                    speedModifier += 0.1;
                     try {
                         TimeUnit.MILLISECONDS.sleep(200);
                     } catch (InterruptedException e) {
                         // Nothing
                     }
                 } else if (gamepad2.dpad_down) {
-                    speedModifier --;
+                    speedModifier -= 0.1;
                     try {
                         TimeUnit.MILLISECONDS.sleep(200);
                     } catch (InterruptedException e) {
@@ -75,6 +77,8 @@ public class MecanumDrive extends LinearOpMode {
                 }
 
                 telemetry.addData("Speed", speedModifier);
+                telemetry.addData("Left", ls);
+                telemetry.addData("Right", rs);
                 telemetry.update();
             }
         }

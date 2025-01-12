@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Controller.Controller;
 import org.firstinspires.ftc.teamcode.Controller.Params.LeftControllerParams;
@@ -14,7 +15,6 @@ import org.firstinspires.ftc.teamcode.Controller.Params.RightControllerParams;
 import java.util.concurrent.TimeUnit;
 
 @TeleOp(name = "Drive")
-@Disabled
 public class TankDrive extends LinearOpMode {
 
     DcMotorEx leftMotor1;
@@ -25,8 +25,11 @@ public class TankDrive extends LinearOpMode {
     DcMotorEx leftBarMotor;
     DcMotorEx rightBarMotor;
 
+    Servo left;
+    Servo right;
+
     double x, y;
-    double speedModifier = 0.3;
+    double speedModifier = 0.5;
 
     @Override
     public void runOpMode() {
@@ -38,6 +41,9 @@ public class TankDrive extends LinearOpMode {
 
         leftBarMotor = hardwareMap.get(DcMotorEx.class, "leftMotor");
         rightBarMotor = hardwareMap.get(DcMotorEx.class, "rightMotor");
+
+        left = hardwareMap.get(Servo.class, "left");
+        right = hardwareMap.get(Servo.class, "right");
 
         waitForStart();
         if (opModeIsActive()) {
@@ -56,20 +62,12 @@ public class TankDrive extends LinearOpMode {
             leftBarMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             rightBarMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            LeftControllerParams leftControllerParams = new LeftControllerParams();
             RightControllerParams rightControllerParams = new RightControllerParams();
 
-            Controller leftController = new Controller.Builder()
-                    .setControllerMotor(leftBarMotor)
-                    .setControllerParams(leftControllerParams.params)
-                    .setMaxSpeed(0.8)
-                    .setStopOnTargetReached(false)
-                    .build();
-
             Controller rightController = new Controller.Builder()
-                    .setControllerMotor(leftBarMotor)
+                    .setControllerMotor(rightBarMotor)
                     .setControllerParams(rightControllerParams.params)
-                    .setMaxSpeed(0.8)
+                    .setMaxSpeed(0.2)
                     .setStopOnTargetReached(false)
                     .build();
 
@@ -90,12 +88,18 @@ public class TankDrive extends LinearOpMode {
                     rightMotor2.setPower(0);
                 }
 
-                if (gamepad1.dpad_left) {
-                    leftController.rotateTo(0);
+                if (gamepad1.a) {
+                    left.setPosition(0.8);
+                    right.setPosition(0.2);
+                } else if (gamepad1.y) {
+                    left.setPosition(0.6);
+                    right.setPosition(0.4);
+                }
+
+                if (gamepad1.dpad_up) {
                     rightController.rotateTo(0);
-                } else if (gamepad1.dpad_right) {
-                    leftController.rotateTo(100);
-                    rightController.rotateTo(100);
+                } else if (gamepad1.dpad_down) {
+                    rightController.rotateTo(60);
                 }
 
                 if (gamepad2.dpad_up ) {
@@ -114,10 +118,15 @@ public class TankDrive extends LinearOpMode {
                     }
                 }
 
-                leftController.loopController();
                 rightController.loopController();
+                leftBarMotor.setPower(rightController.out);
 
                 telemetry.addData("Speed", speedModifier);
+                telemetry.addData("Left Position", leftBarMotor.getCurrentPosition());
+                telemetry.addData("Right Position", rightBarMotor.getCurrentPosition());
+                telemetry.addLine();
+                telemetry.addData("Left Power", rightController.out);
+                telemetry.addData("Right Power", rightController.out);
                 telemetry.update();
             }
         }
