@@ -167,8 +167,8 @@ public class Intake {
                 TimeUnit.MILLISECONDS.sleep(500);
                 left.setPower(-0.3);
                 right.setPower(-0.3);
-                TimeUnit.MILLISECONDS.sleep(300);
-                sampleServo.setPosition(0.71);
+                TimeUnit.MILLISECONDS.sleep(150);
+                sampleServo.setPosition(0.78);
                 left.setPower(0);
                 right.setPower(0);
                 TimeUnit.MILLISECONDS.sleep(100);
