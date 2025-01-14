@@ -2,7 +2,10 @@ package org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParam
 
 public class ArmControllerParams {
 
-    double inPerTick = 0.006317227; // inPerTick
+    //double inPerTick = 0.006317227;  inPerTick
+
+    double inPerTick = 0.012351863;  //inPerTick
+
 
     double p = 0.004;
     double i = 0.0;

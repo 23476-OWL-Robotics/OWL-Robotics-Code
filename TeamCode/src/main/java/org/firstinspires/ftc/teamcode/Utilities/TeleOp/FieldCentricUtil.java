@@ -603,10 +603,10 @@ public class FieldCentricUtil extends LinearOpMode {
                 sampleServo.setPosition(0.65);
                 intakePivot.setPosition(0.73);
                 TimeUnit.MILLISECONDS.sleep(500);
-                left.setPower(-0.05);
-                right.setPower(-0.05);
-                TimeUnit.MILLISECONDS.sleep(100);
-                sampleServo.setPosition(0.71);
+                left.setPower(-0.3);
+                right.setPower(-0.3);
+                TimeUnit.MILLISECONDS.sleep(150);
+                sampleServo.setPosition(0.78);
                 left.setPower(0);
                 right.setPower(0);
                 TimeUnit.MILLISECONDS.sleep(100);
