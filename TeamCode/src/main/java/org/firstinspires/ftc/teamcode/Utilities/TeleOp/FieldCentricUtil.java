@@ -74,6 +74,7 @@ public class FieldCentricUtil extends LinearOpMode {
     double rotY;
     double speedModifier;
     boolean isUp;
+    boolean transfer;
     boolean doingIntake;
     boolean touchSet;
     boolean whichTF;
@@ -267,16 +268,13 @@ public class FieldCentricUtil extends LinearOpMode {
 
     // Sets wrist servo to positions set by slide control
     public void sample_control(boolean output_up, boolean output_down) {
-        try {
-            if (output_up) {
-                armPivot.setPosition(0.1);
-                TimeUnit.MILLISECONDS.sleep(900);
-                sampleServo.setPosition(0.65);
-            } else if (output_down) {
-                armPivot.setPosition(0.8);
-            }
-        } catch (InterruptedException e) {
-            // Nothing
+        if (output_up) {
+            OutputSample outputSample = new OutputSample();
+            Thread outputThread = new Thread(outputSample);
+
+            outputThread.start();
+        } else if (output_down) {
+            armPivot.setPosition(0.8);
         }
     }
 
@@ -291,13 +289,10 @@ public class FieldCentricUtil extends LinearOpMode {
 
     public void plowControl(boolean runPlow) {
         if (runPlow) {
-            try {
-                plowServo.setPosition(1);
-                TimeUnit.MILLISECONDS.sleep(1000);
-                plowServo.setPosition(0);
-            } catch (InterruptedException e) {
-                // Nothing
-            }
+            PlowSamples plowSamples = new PlowSamples();
+            Thread plowThread = new Thread(plowSamples);
+
+            plowThread.start();
         }
     }
 
@@ -439,36 +434,25 @@ public class FieldCentricUtil extends LinearOpMode {
             intake_wheel_power = 0;
         }
 
-        try {
-            if (intake_pivot_up) {
-                sampleServo.setPosition(0.65);
-                intakePivot.setPosition(0.73);
-                TimeUnit.MILLISECONDS.sleep(500);
-                left.setPower(-0.3);
-                right.setPower(-0.3);
-                TimeUnit.MILLISECONDS.sleep(300);
-                sampleServo.setPosition(0.71);
-                left.setPower(0);
-                right.setPower(0);
-                TimeUnit.MILLISECONDS.sleep(100);
-                intakePivot.setPosition(0.5);
-                isUp  = true;
-            } else if (intake_pivot_down) {
-                intakePivot.setPosition(0.12);
-                intake_wheel_power = 1;
-                isUp = false;
-            } else if (intake_pivot_reset) {
-                intakePivot.setPosition(0.5);
-                isUp = true;
-            } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow){
-                intakePivot.setPosition(0.5);
-                doingIntake = true;
-            } else if (!isUp && sensorDistance < 1 && blue){
-                intakePivot.setPosition(0.31);
-                intake_wheel_power = -1;
-            }
-        } catch (InterruptedException e) {
-            // Nothing
+        if (intake_pivot_up) {
+            TransferSample transferSample = new TransferSample();
+            Thread transferThread = new Thread(transferSample);
+
+            transferThread.start();
+        } else if (intake_pivot_down) {
+            intakePivot.setPosition(0.12);
+            intake_wheel_power = 1;
+            isUp = false;
+        } else if (intake_pivot_reset) {
+            intakePivot.setPosition(0.5);
+            isUp = true;
+        } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow) {
+            intakePivot.setPosition(0.5);
+            doingIntake = true;
+            isUp = true;
+        } else if (!isUp && sensorDistance < 1 && blue) {
+            intakePivot.setPosition(0.31);
+            intake_wheel_power = -1;
         }
     }
 
@@ -493,51 +477,42 @@ public class FieldCentricUtil extends LinearOpMode {
             intake_wheel_power = 0;
         }
 
-        try {
-            if (intake_pivot_up) {
-                sampleServo.setPosition(0.65);
-                intakePivot.setPosition(0.73);
-                TimeUnit.MILLISECONDS.sleep(500);
-                left.setPower(-0.3);
-                right.setPower(-0.3);
-                TimeUnit.MILLISECONDS.sleep(300);
-                sampleServo.setPosition(0.71);
-                left.setPower(0);
-                right.setPower(0);
-                TimeUnit.MILLISECONDS.sleep(100);
-                intakePivot.setPosition(0.5);
-                isUp  = true;
-            } else if (intake_pivot_down) {
-                intakePivot.setPosition(0.12);
-                intake_wheel_power = 1;
-                isUp = false;
-            } else if (intake_pivot_reset) {
-                intakePivot.setPosition(0.5);
-                isUp = true;
-            } else if (!isUp && sensorDistance < 1 && blue || !isUp && sensorDistance < 1 && yellow){
-                intakePivot.setPosition(0.5);
-                doingIntake = true;
-            } else if (!isUp && sensorDistance < 1 && red){
-                intakePivot.setPosition(0.31);
-                intake_wheel_power = -1;
-            }
-        } catch (InterruptedException e) {
-            // Nothing
+        if (intake_pivot_up) {
+            TransferSample transferSample = new TransferSample();
+            Thread transferThread = new Thread(transferSample);
+
+            transferThread.start();
+        } else if (intake_pivot_down) {
+            intakePivot.setPosition(0.12);
+            intake_wheel_power = 1;
+            isUp = false;
+        } else if (intake_pivot_reset) {
+            intakePivot.setPosition(0.5);
+            isUp = true;
+        } else if (!isUp && sensorDistance < 1 && blue || !isUp && sensorDistance < 1 && yellow) {
+            intakePivot.setPosition(0.5);
+            doingIntake = true;
+            isUp = true;
+        } else if (!isUp && sensorDistance < 1 && red) {
+            intakePivot.setPosition(0.31);
+            intake_wheel_power = -1;
         }
     }
 
-    public void doIntake(){
+    public void doIntake() {
         if (intakeController.targetReached) {
             intakePivot.setPosition(0.71);
-            isUp  = true;
+            isUp = true;
 
         }
     }
 
     // Power Sets
     public void servo_power_sets() {
-        left.setPower(intake_wheel_power);
-        right.setPower(intake_wheel_power);
+        if (!transfer) {
+            left.setPower(intake_wheel_power);
+            right.setPower(intake_wheel_power);
+        }
     }
 
     public void writeRobotInfo() {
@@ -587,7 +562,7 @@ public class FieldCentricUtil extends LinearOpMode {
         telemetry.addData("lifter slide position", armMotor.getCurrentPosition());
         telemetry.addData("output trough position", armPivot.getPosition());
         telemetry.addData("specimen claw position", sampleServo.getPosition());
-        telemetry.addData("IMU",imu.getRobotYawPitchRollAngles());
+        telemetry.addData("IMU", imu.getRobotYawPitchRollAngles());
         telemetry.addData("Robot Pose X", drive.pose.position.x);
         telemetry.addData("Robot Pose Y", drive.pose.position.y);
         telemetry.addData("Robot Pose Heading", Math.toDegrees(drive.pose.heading.toDouble()));
@@ -616,6 +591,59 @@ public class FieldCentricUtil extends LinearOpMode {
             red = false;
             yellow = false;
             blue = false;
+        }
+    }
+
+    class TransferSample implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                transfer = true;
+                sampleServo.setPosition(0.65);
+                intakePivot.setPosition(0.73);
+                TimeUnit.MILLISECONDS.sleep(500);
+                left.setPower(-0.1);
+                right.setPower(-0.1);
+                TimeUnit.MILLISECONDS.sleep(400);
+                sampleServo.setPosition(0.71);
+                left.setPower(0);
+                right.setPower(0);
+                TimeUnit.MILLISECONDS.sleep(100);
+                intakePivot.setPosition(0.5);
+                transfer = false;
+                isUp = true;
+            } catch (InterruptedException e) {
+                // Nothing
+            }
+        }
+    }
+    class OutputSample implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                armPivot.setPosition(0.1);
+                TimeUnit.MILLISECONDS.sleep(900);
+                sampleServo.setPosition(0.65);
+                TimeUnit.MILLISECONDS.sleep(300);
+                armPivot.setPosition(0.8);
+            } catch (InterruptedException e) {
+
+            }
+        }
+    }
+    class PlowSamples implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                plowServo.setPosition(1);
+                TimeUnit.MILLISECONDS.sleep(1000);
+                plowServo.setPosition(0);
+            } catch (InterruptedException e) {
+                // Nothing
+            }
         }
     }
 }
