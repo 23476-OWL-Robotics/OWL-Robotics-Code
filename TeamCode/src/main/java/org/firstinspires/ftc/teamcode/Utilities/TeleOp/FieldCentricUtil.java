@@ -182,7 +182,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
         intakePivot.setPosition(0.5);
         armPivot.setPosition(0.8);
-        sampleServo.setPosition(0.71);
+        sampleServo.setPosition(0.78);
         plowServo.setPosition(0.8);
         plowUp = true;
         isUp = true;
@@ -279,14 +279,14 @@ public class FieldCentricUtil extends LinearOpMode {
 
             outputThread.start();
         } else if (output_down) {
-            armPivot.setPosition(0.8);
+            armPivot.setPosition(0.1);
         }
     }
 
     // Opens and closes specimen claw
     public void specimen_control(boolean grab_specimen, boolean release_specimen) {
         if (grab_specimen) {
-            sampleServo.setPosition(0.71);
+            sampleServo.setPosition(0.78);
         } else if (release_specimen) {
             sampleServo.setPosition(0.65);
         }
@@ -395,9 +395,13 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         if (gamepad2.dpad_up) {
-            armPosition = 24;
+            armPosition = 16;
+            armPivot.setPosition(0.1);
         } else if (gamepad2.dpad_down) {
-            armPosition = 18;
+            sampleServo.setPosition(0.85);
+            armPosition = 10;
+
+
         }
 
         if (lifter_slide_stick > deadZone) {
@@ -451,10 +455,19 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         if (intake_pivot_up) {
-            TransferSample transferSample = new TransferSample();
-            Thread transferThread = new Thread(transferSample);
+            if(armPosition <1 && armPivot.getPosition() == 0.8 ){
+                TransferSample transferSample = new TransferSample();
+                Thread transferThread = new Thread(transferSample);
 
-            transferThread.start();
+                transferThread.start();
+
+            }
+            else{
+                armPosition = 0;
+                sampleServo.setPosition(0.65);
+                armPivot.setPosition(0.8);
+            }
+
         } else if (intake_pivot_down) {
             intakePivot.setPosition(0.12);
             intake_wheel_power = 1;
@@ -616,6 +629,8 @@ public class FieldCentricUtil extends LinearOpMode {
         public void run() {
             try {
                 transfer = true;
+                armPivot.setPosition(0.8);
+                TimeUnit.MILLISECONDS.sleep(500);
                 sampleServo.setPosition(0.65);
                 intakePivot.setPosition(0.73);
                 TimeUnit.MILLISECONDS.sleep(500);
@@ -649,6 +664,8 @@ public class FieldCentricUtil extends LinearOpMode {
                 armPivot.setPosition(0.8);
                 TimeUnit.MILLISECONDS.sleep(900);
                 armPosition = 0;
+                sampleServo.setPosition(0.65);
+                armPivot.setPosition(0.8);
             } catch (InterruptedException e) {
 
             }

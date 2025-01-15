@@ -52,8 +52,8 @@ public class Arm {
 
     // Create init() for Auto
     public void init() {
-        armPivot.setPosition(0.8);
-        sampleServo.setPosition(0.71);
+        armPivot.setPosition(0.1);
+        sampleServo.setPosition(0.78);
     }
 
     public class RunController implements Action {
@@ -140,7 +140,7 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.extendTo(24);
+                controller.extendTo(13.6);
                 initialized = true;
             }
 
