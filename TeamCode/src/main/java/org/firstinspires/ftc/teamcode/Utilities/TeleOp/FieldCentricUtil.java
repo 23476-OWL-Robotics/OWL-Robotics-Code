@@ -79,6 +79,7 @@ public class FieldCentricUtil extends LinearOpMode {
     boolean touchSet;
     boolean whichTF;
     double heading;
+    boolean plowUp;
 
     // Values for Touchpad
     double TFOneRefX;
@@ -180,7 +181,8 @@ public class FieldCentricUtil extends LinearOpMode {
         intakePivot.setPosition(0.5);
         armPivot.setPosition(0.8);
         sampleServo.setPosition(0.71);
-        plowServo.setPosition(0);
+        plowServo.setPosition(0.8);
+        plowUp = true;
         isUp = true;
 
         revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -288,12 +290,17 @@ public class FieldCentricUtil extends LinearOpMode {
     }
 
     public void plowControl(boolean runPlow) {
-        if (runPlow) {
+        if (runPlow && intakeEncoderPosition > 950) {
             PlowSamples plowSamples = new PlowSamples();
             Thread plowThread = new Thread(plowSamples);
 
             plowThread.start();
         }
+        else if(intakeEncoderPosition < 950) {
+            plowUp = true;
+            plowServo.setPosition(0.82);
+        }
+
     }
 
     // Parameter for assent motors
@@ -613,6 +620,9 @@ public class FieldCentricUtil extends LinearOpMode {
                 intakePivot.setPosition(0.5);
                 transfer = false;
                 isUp = true;
+                TimeUnit.MILLISECONDS.sleep(500);
+                armPosition = 37;
+
             } catch (InterruptedException e) {
                 // Nothing
             }
@@ -628,6 +638,8 @@ public class FieldCentricUtil extends LinearOpMode {
                 sampleServo.setPosition(0.65);
                 TimeUnit.MILLISECONDS.sleep(300);
                 armPivot.setPosition(0.8);
+                TimeUnit.MILLISECONDS.sleep(900);
+                armPosition = 0;
             } catch (InterruptedException e) {
 
             }
@@ -638,9 +650,17 @@ public class FieldCentricUtil extends LinearOpMode {
         @Override
         public void run() {
             try {
-                plowServo.setPosition(1);
-                TimeUnit.MILLISECONDS.sleep(1000);
-                plowServo.setPosition(0);
+
+                    if (plowUp) {
+                        plowUp = false;
+                        plowServo.setPosition(0.2);
+                        TimeUnit.MILLISECONDS.sleep(900);
+                    } else {
+                        plowUp = true;
+                        plowServo.setPosition(0.82);
+                        TimeUnit.MILLISECONDS.sleep(900);
+                    }
+
             } catch (InterruptedException e) {
                 // Nothing
             }
