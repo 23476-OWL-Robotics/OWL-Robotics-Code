@@ -91,6 +91,8 @@ public class FieldCentricUtil extends LinearOpMode {
     double TFTwoX;
     double TFTwoY;
 
+    boolean oldTouch;
+
     double armEncoderPosition;
     double intakeEncoderPosition;
     double leftAssentEncoderPosition;
@@ -184,6 +186,7 @@ public class FieldCentricUtil extends LinearOpMode {
         plowServo.setPosition(0.8);
         plowUp = true;
         isUp = true;
+        oldTouch = false;
 
         revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
     }
@@ -290,7 +293,7 @@ public class FieldCentricUtil extends LinearOpMode {
     }
 
     public void plowControl(boolean runPlow) {
-        if (runPlow && intakeEncoderPosition > 950) {
+        if (runPlow && intakeEncoderPosition > 950 &&oldTouch == false) {
             PlowSamples plowSamples = new PlowSamples();
             Thread plowThread = new Thread(plowSamples);
 
@@ -299,6 +302,12 @@ public class FieldCentricUtil extends LinearOpMode {
         else if(intakeEncoderPosition < 950) {
             plowUp = true;
             plowServo.setPosition(0.82);
+        }
+        if (runPlow) {
+            oldTouch = true;
+        }
+        else{
+            oldTouch = false;
         }
 
     }
@@ -645,8 +654,8 @@ public class FieldCentricUtil extends LinearOpMode {
             }
         }
     }
-    class PlowSamples implements Runnable {
 
+        class PlowSamples implements Runnable {
         @Override
         public void run() {
             try {
@@ -654,11 +663,11 @@ public class FieldCentricUtil extends LinearOpMode {
                     if (plowUp) {
                         plowUp = false;
                         plowServo.setPosition(0.2);
-                        TimeUnit.MILLISECONDS.sleep(900);
+                        TimeUnit.MILLISECONDS.sleep(50);
                     } else {
                         plowUp = true;
                         plowServo.setPosition(0.82);
-                        TimeUnit.MILLISECONDS.sleep(900);
+                        TimeUnit.MILLISECONDS.sleep(50);
                     }
 
             } catch (InterruptedException e) {
