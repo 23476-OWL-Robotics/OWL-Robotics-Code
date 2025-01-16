@@ -477,7 +477,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
         if (intake_pivot_up) {//transfer
             if(transfer == false) {
-                if (armPosition < 1 && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
+                if (armPosition < 1 &&  armController.targetReached && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
                     isIntakeSlideAuto = false;
                     TransferSample transferSample = new TransferSample();
                     Thread transferThread = new Thread(transferSample);
@@ -536,7 +536,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
         if (intake_pivot_up) {
             if(transfer == false) {
-                if (armPosition < 1 && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
+                if (armPosition < 1 && armController.targetReached && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
                     isIntakeSlideAuto = false;
                     TransferSample transferSample = new TransferSample();
                     Thread transferThread = new Thread(transferSample);
