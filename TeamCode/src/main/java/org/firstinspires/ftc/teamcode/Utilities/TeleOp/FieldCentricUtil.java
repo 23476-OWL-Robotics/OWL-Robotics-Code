@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Utilities.TeleOp;
 
+import static java.lang.Math.abs;
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -80,6 +82,7 @@ public class FieldCentricUtil extends LinearOpMode {
     boolean whichTF;
     double heading;
     boolean plowUp;
+    boolean isIntakeSlideAuto;
 
     // Values for Touchpad
     double TFOneRefX;
@@ -92,6 +95,7 @@ public class FieldCentricUtil extends LinearOpMode {
     double TFTwoY;
 
     boolean oldTouch;
+    boolean oldInSlide;
 
     double armEncoderPosition;
     double intakeEncoderPosition;
@@ -187,6 +191,7 @@ public class FieldCentricUtil extends LinearOpMode {
         plowUp = true;
         isUp = true;
         oldTouch = false;
+        isIntakeSlideAuto = false;
 
         revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
     }
@@ -293,7 +298,7 @@ public class FieldCentricUtil extends LinearOpMode {
     }
 
     public void plowControl(boolean runPlow) {
-        if (runPlow && intakeEncoderPosition > 950 &&oldTouch == false) {
+        if (runPlow && intakeEncoderPosition > 950 && oldTouch == false) {
             PlowSamples plowSamples = new PlowSamples();
             Thread plowThread = new Thread(plowSamples);
 
@@ -412,7 +417,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
         if (gamepad2.a) {
             armController.runController(false);
-            if (Math.abs(lifter_slide_stick) > deadZone) {
+            if (abs(lifter_slide_stick) > deadZone) {
                 armMotor.setPower(lifter_slide_stick);
             } else {
                 armMotor.setPower(0);
@@ -424,13 +429,29 @@ public class FieldCentricUtil extends LinearOpMode {
             armController.runController(true);
             armController.extendTo(armPosition);
             armController.loopController();
+            if(isIntakeSlideAuto == true){
+                intakeController.runController(true);
+                intakeController.extendTo(armPosition);
+                intakeController.loopController();
+            }
+            else{
+                intakeController.runController(false);
+            }
         }
 
         // Intake slide power
-        if (Math.abs(intake_slide_stick) > deadZone) {
-            intakeMotor.setPower(-intake_slide_stick);
-        } else {
+        if (abs(intake_slide_stick) > deadZone) {
+            if(isIntakeSlideAuto == false){
+                intakeMotor.setPower(-intake_slide_stick);
+            }
+
+            if (oldInSlide = false) {
+                isIntakeSlideAuto = false;
+            }
+            oldInSlide = true;
+        } else if(isIntakeSlideAuto == false) {
             intakeMotor.setPower(0);
+            oldInSlide = false;
         }
     }
 
@@ -454,18 +475,23 @@ public class FieldCentricUtil extends LinearOpMode {
             intake_wheel_power = 0;
         }
 
-        if (intake_pivot_up) {
-            if(armPosition <1 && armPivot.getPosition() == 0.8 ){
-                TransferSample transferSample = new TransferSample();
-                Thread transferThread = new Thread(transferSample);
+        if (intake_pivot_up) {//transfer
+            if(transfer == false) {
+                if (armPosition < 1 && armPivot.getPosition() == 0.8 && (intakePosition <= 0.5|| isIntakeSlideAuto == false)  ) {
+                    isIntakeSlideAuto = false;
+                    TransferSample transferSample = new TransferSample();
+                    Thread transferThread = new Thread(transferSample);
 
-                transferThread.start();
+                    transferThread.start();
 
-            }
-            else{
-                armPosition = 0;
-                sampleServo.setPosition(0.65);
-                armPivot.setPosition(0.8);
+
+                } else {
+                    armPosition = 0;
+                    sampleServo.setPosition(0.65);
+                    armPivot.setPosition(0.8);
+                    isIntakeSlideAuto = true;
+                    intakePosition = 0;
+                }
             }
 
         } else if (intake_pivot_down) {
@@ -479,6 +505,8 @@ public class FieldCentricUtil extends LinearOpMode {
             intakePivot.setPosition(0.5);
             doingIntake = true;
             isUp = true;
+            isIntakeSlideAuto = true;
+            intakePosition = 0;
         } else if (!isUp && sensorDistance < 1 && blue) {
             intakePivot.setPosition(0.31);
             intake_wheel_power = -1;
@@ -528,7 +556,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    public void doIntake() {
+    public void doIntake() {//might break
         if (intakeController.targetReached) {
             intakePivot.setPosition(0.71);
             isUp = true;
@@ -573,6 +601,11 @@ public class FieldCentricUtil extends LinearOpMode {
     // Telemetry for Debugging
     public void telemetry() {
         drive.updatePoseEstimate();
+        telemetry.addLine("-----intake slide-----");
+        telemetry.addData("intake postion", intakePosition);
+        telemetry.addData("intake slide position", intakeMotor.getCurrentPosition());
+        telemetry.addData("intake slide power", intakeMotor.getPower());
+        telemetry.addData("intake slide auto", isIntakeSlideAuto);
         telemetry.addLine("-----color distance sensor-----");
         telemetry.addData("distance", ((DistanceSensor) sensor).getDistance(DistanceUnit.CM));
         telemetry.addData("red", sensor.red());
