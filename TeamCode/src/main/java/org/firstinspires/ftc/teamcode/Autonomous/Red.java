@@ -76,6 +76,7 @@ public class Red extends LinearOpMode {
         }
         waitForStart();
         if (opModeIsActive()) {
+            /*
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
@@ -129,6 +130,20 @@ public class Red extends LinearOpMode {
                                             arm.pivotArm()
                                     )
                             )
+                    )
+            );
+
+             */
+            Actions.runBlocking(
+                    new SequentialAction(
+                            action1,
+                            action2,
+                            action3,
+                            basketAction,
+                            action4,
+                            action5,
+                            basketAction2,
+                            action6
                     )
             );
         }

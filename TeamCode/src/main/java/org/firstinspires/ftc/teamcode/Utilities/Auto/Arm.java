@@ -52,7 +52,7 @@ public class Arm {
 
     // Create init() for Auto
     public void init() {
-        armPivot.setPosition(0.1);
+        armPivot.setPosition(0.8);
         sampleServo.setPosition(0.78);
     }
 
