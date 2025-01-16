@@ -431,7 +431,7 @@ public class FieldCentricUtil extends LinearOpMode {
             armController.loopController();
             if(isIntakeSlideAuto == true){
                 intakeController.runController(true);
-                intakeController.extendTo(armPosition);
+                intakeController.extendTo(intakePosition);
                 intakeController.loopController();
             }
             else{
@@ -445,7 +445,7 @@ public class FieldCentricUtil extends LinearOpMode {
                 intakeMotor.setPower(-intake_slide_stick);
             }
 
-            if (oldInSlide = false) {
+            if (oldInSlide == false) {
                 isIntakeSlideAuto = false;
             }
             oldInSlide = true;
@@ -477,7 +477,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
         if (intake_pivot_up) {//transfer
             if(transfer == false) {
-                if (armPosition < 1 && armPivot.getPosition() == 0.8 && (intakePosition <= 0.5|| isIntakeSlideAuto == false)  ) {
+                if (armPosition < 1 && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
                     isIntakeSlideAuto = false;
                     TransferSample transferSample = new TransferSample();
                     Thread transferThread = new Thread(transferSample);
@@ -535,10 +535,23 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         if (intake_pivot_up) {
-            TransferSample transferSample = new TransferSample();
-            Thread transferThread = new Thread(transferSample);
+            if(transfer == false) {
+                if (armPosition < 1 && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
+                    isIntakeSlideAuto = false;
+                    TransferSample transferSample = new TransferSample();
+                    Thread transferThread = new Thread(transferSample);
 
-            transferThread.start();
+                    transferThread.start();
+
+
+                } else {
+                    armPosition = 0;
+                    sampleServo.setPosition(0.65);
+                    armPivot.setPosition(0.8);
+                    isIntakeSlideAuto = true;
+                    intakePosition = 0;
+                }
+            }
         } else if (intake_pivot_down) {
             intakePivot.setPosition(0.12);
             intake_wheel_power = 1;
@@ -550,6 +563,8 @@ public class FieldCentricUtil extends LinearOpMode {
             intakePivot.setPosition(0.5);
             doingIntake = true;
             isUp = true;
+            isIntakeSlideAuto = true;
+            intakePosition = 0;
         } else if (!isUp && sensorDistance < 1 && red) {
             intakePivot.setPosition(0.31);
             intake_wheel_power = -1;
