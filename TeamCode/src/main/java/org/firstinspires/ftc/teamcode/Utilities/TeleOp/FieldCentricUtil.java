@@ -491,8 +491,10 @@ public class FieldCentricUtil extends LinearOpMode {
                     armPivot.setPosition(0.8);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
+                    flashRed();
                 }
             }
+
 
         } else if (intake_pivot_down) {
             intakePivot.setPosition(0.12);
@@ -556,6 +558,7 @@ public class FieldCentricUtil extends LinearOpMode {
                     armPivot.setPosition(0.8);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
+                    flashRed();
                 }
             }
         } else if (intake_pivot_down) {
