@@ -28,7 +28,7 @@ public class FieldCentricRed extends FieldCentricUtil {
                 specimen_control(gamepad2.x, gamepad2.b);
                 plowControl(gamepad2.touchpad);
                 power_sets();
-                doIntake();
+                //doIntake();
                 writeRobotInfo();
                 telemetry();
             }

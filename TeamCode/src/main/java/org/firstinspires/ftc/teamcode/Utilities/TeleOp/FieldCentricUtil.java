@@ -498,9 +498,13 @@ public class FieldCentricUtil extends LinearOpMode {
             intakePivot.setPosition(0.12);
             intake_wheel_power = 1;
             isUp = false;
+            transfer = false;
+            isIntakeSlideAuto  = false;
         } else if (intake_pivot_reset) {
             intakePivot.setPosition(0.5);
             isUp = true;
+            transfer = false;
+            isIntakeSlideAuto  = false;
         } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow) {
             intakePivot.setPosition(0.5);
             doingIntake = true;
@@ -556,9 +560,13 @@ public class FieldCentricUtil extends LinearOpMode {
             intakePivot.setPosition(0.12);
             intake_wheel_power = 1;
             isUp = false;
+            transfer = false;
+            isIntakeSlideAuto  = false;
         } else if (intake_pivot_reset) {
             intakePivot.setPosition(0.5);
             isUp = true;
+            transfer = false;
+            isIntakeSlideAuto  = false;
         } else if (!isUp && sensorDistance < 1 && blue || !isUp && sensorDistance < 1 && yellow) {
             intakePivot.setPosition(0.5);
             doingIntake = true;
@@ -571,7 +579,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    public void doIntake() {//might break
+    public void doIntake() {//depreciated
         if (intakeController.targetReached) {
             intakePivot.setPosition(0.71);
             isUp = true;
