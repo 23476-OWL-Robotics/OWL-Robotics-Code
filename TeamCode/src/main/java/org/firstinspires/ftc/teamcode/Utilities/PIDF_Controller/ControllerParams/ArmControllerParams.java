@@ -7,7 +7,7 @@ public class ArmControllerParams {
     double inPerTick = 0.012351863;  //inPerTick
 
 
-    double p = 0.004;
+    double p = 0.0034;
     double i = 0.0;
     double d = 0.0;
     double f = 0.0;

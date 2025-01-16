@@ -719,7 +719,6 @@ public class FieldCentricUtil extends LinearOpMode {
                 TimeUnit.MILLISECONDS.sleep(300);
                 armPivot.setPosition(0.8);
                 TimeUnit.MILLISECONDS.sleep(900);
-                armPosition = 0;
                 sampleServo.setPosition(0.65);
                 armPivot.setPosition(0.8);
             } catch (InterruptedException e) {
