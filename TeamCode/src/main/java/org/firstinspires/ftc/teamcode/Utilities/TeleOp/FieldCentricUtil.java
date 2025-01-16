@@ -491,8 +491,10 @@ public class FieldCentricUtil extends LinearOpMode {
                     armPivot.setPosition(0.8);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
+                    flashRed();
                 }
             }
+
 
         } else if (intake_pivot_down) {
             intakePivot.setPosition(0.12);
@@ -511,9 +513,11 @@ public class FieldCentricUtil extends LinearOpMode {
             isUp = true;
             isIntakeSlideAuto = true;
             intakePosition = 0;
+            blinkGreen();
         } else if (!isUp && sensorDistance < 1 && blue) {
             intakePivot.setPosition(0.31);
             intake_wheel_power = -1;
+            flashRed();
         }
     }
 
@@ -554,6 +558,7 @@ public class FieldCentricUtil extends LinearOpMode {
                     armPivot.setPosition(0.8);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
+                    flashRed();
                 }
             }
         } else if (intake_pivot_down) {
@@ -573,9 +578,13 @@ public class FieldCentricUtil extends LinearOpMode {
             isUp = true;
             isIntakeSlideAuto = true;
             intakePosition = 0;
+            blinkGreen();
         } else if (!isUp && sensorDistance < 1 && red) {
+
             intakePivot.setPosition(0.31);
             intake_wheel_power = -1;
+            flashRed();
+
         }
     }
 
@@ -719,6 +728,7 @@ public class FieldCentricUtil extends LinearOpMode {
                 TimeUnit.MILLISECONDS.sleep(300);
                 armPivot.setPosition(0.8);
                 TimeUnit.MILLISECONDS.sleep(900);
+                blinkGreen();
                 sampleServo.setPosition(0.65);
                 armPivot.setPosition(0.8);
             } catch (InterruptedException e) {
@@ -746,5 +756,45 @@ public class FieldCentricUtil extends LinearOpMode {
                 // Nothing
             }
         }
+    }
+    class FlashRed implements Runnable {
+        @Override
+        public void run() {
+            try {
+                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+                TimeUnit.MILLISECONDS.sleep(750);
+                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+
+
+            } catch (InterruptedException e) {
+                // Nothing
+            }
+        }
+    }
+    public void flashRed(){
+        FlashRed flashred = new FlashRed();
+        Thread redThread = new Thread(flashred);
+
+        redThread.start();
+    }
+    class BlinkGreen implements Runnable {
+        @Override
+        public void run() {
+            try {
+                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+                TimeUnit.MILLISECONDS.sleep(3000);
+                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+
+
+            } catch (InterruptedException e) {
+                // Nothing
+            }
+        }
+    }
+    public void blinkGreen(){
+        BlinkGreen blinkgreen = new BlinkGreen();
+        Thread greenThread = new Thread(blinkgreen);
+
+        greenThread.start();
     }
 }
