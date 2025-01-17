@@ -24,8 +24,9 @@ public class Red extends LinearOpMode {
         Intake intake = new Intake(hardwareMap);
 
         // Starting Positions for each action
-        Pose2d action1Pose = new Pose2d(-16.5, -62, Math.toRadians(180));
-        Pose2d action2Pose = new Pose2d(-10.5, -29, Math.toRadians(90));
+        Pose2d action0Pose = new Pose2d(-16.5, -62, Math.toRadians(180));
+        Pose2d action1Pose = new Pose2d(-10.5, -40, Math.toRadians(90));
+        Pose2d action2Pose = new Pose2d(-10.5, -30, Math.toRadians(90));
         Pose2d action3Pose = new Pose2d(-49, -44, Math.toRadians(-90));
         Pose2d action4Pose = new Pose2d(-58, -58, Math.toRadians(-135));
         Pose2d action5Pose = new Pose2d(-58, -44, Math.toRadians(-90));
@@ -34,10 +35,13 @@ public class Red extends LinearOpMode {
         Pose2d basketActionPose = new Pose2d(-55, -55, Math.toRadians(-135));
 
         // Actions for rr
-        Action action1 = drive.actionBuilder(action1Pose)
-                .waitSeconds(0.5)
+        Action action0 = drive.actionBuilder(action0Pose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-10.5, -29, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-10.5, -40, Math.toRadians(90)), Math.toRadians(90))
+                .build();
+        Action action1 = drive.actionBuilder(action1Pose)
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-10.5, -30, Math.toRadians(90)), Math.toRadians(90))
                 .build();
         Action action2 = drive.actionBuilder(action2Pose)
                 .setTangent(Math.toRadians(-135))
@@ -76,36 +80,48 @@ public class Red extends LinearOpMode {
         }
         waitForStart();
         if (opModeIsActive()) {
-            /*
+
             Actions.runBlocking(
+                    new ParallelAction(
+                    arm.runController(),
                     new SequentialAction(
-                            new ParallelAction(
+                            new ParallelAction(//drive near bar, bring up arm
+                                    action0,
                                     arm.armUpSpecimen(),
-                                    arm.pivotArm(),
+                                    arm.pivotArm()
+
+                            ),
+
+                            new ParallelAction(//clip onto bar
                                     action1
                             ),
                             arm.release(),
-                            new ParallelAction(
+                            new ParallelAction(//bring arm down, drive to intake frst sammple
+                                    action2,
                                     arm.armDown(),
-                                    arm.pivotArm(),
-                                    action2
+                                    arm.pivotArm()
+
                             ),
-                            intake.intakeSample(),
-                            new ParallelAction(
+                            intake.intakeSample(),//intake the sample
+                            new ParallelAction(//drive to basket
                                     action3,
+                                    intake.intakeIn()
+
+                            ),
+                            intake.transferSample(),
+                            arm.armUpHigh(),
+                            new ParallelAction(
+                                    basketAction,
                                     new SequentialAction(
-                                            intake.intakeIn(),
-                                            intake.transferSample(),
-                                            arm.armUpHigh(),
                                             arm.pivotArm()
                                     )
                             ),
-                            basketAction,
                             arm.release(),
                             new ParallelAction(
                                     new SequentialAction(
-                                            arm.armDown(),
-                                            arm.pivotArm()
+                                            arm.pivotArm(),
+                                            arm.armDown()
+
                                     ),
                                     new SequentialAction(
                                             action4,
@@ -126,14 +142,16 @@ public class Red extends LinearOpMode {
                             new ParallelAction(
                                     action6,
                                     new SequentialAction(
-                                            arm.armDown(),
-                                            arm.pivotArm()
+                                            arm.pivotArm(),
+                                            arm.armDown()
+
                                     )
                             )
                     )
+                )
             );
 
-             */
+             /*
             Actions.runBlocking(
                     new SequentialAction(
                             action1,
@@ -145,7 +163,7 @@ public class Red extends LinearOpMode {
                             basketAction2,
                             action6
                     )
-            );
+            );*/
         }
     }
 }

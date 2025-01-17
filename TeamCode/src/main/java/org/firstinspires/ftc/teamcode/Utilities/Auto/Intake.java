@@ -105,16 +105,20 @@ public class Intake {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.retractTo(0);
+                controller.retractTo(0.2);
                 initialized = true;
+
             }
 
             double pos = intakeMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
             if (controller.targetReached) {
+                sampleServo.setPosition(0.65);
                 return false;
+
             } else {
                 controller.loopController();
+                intakePivot.setPosition(0.73);
                 return true;
             }
         }
@@ -129,6 +133,7 @@ public class Intake {
 
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
+
 
             if (!initialized) {
                 intakePivot.setPosition(0.12);
@@ -167,11 +172,11 @@ public class Intake {
                 TimeUnit.MILLISECONDS.sleep(500);
                 left.setPower(-0.3);
                 right.setPower(-0.3);
-                TimeUnit.MILLISECONDS.sleep(150);
+                TimeUnit.MILLISECONDS.sleep(250);
                 sampleServo.setPosition(0.78);
                 left.setPower(0);
                 right.setPower(0);
-                TimeUnit.MILLISECONDS.sleep(100);
+                TimeUnit.MILLISECONDS.sleep(300);
                 intakePivot.setPosition(0.5);
             } catch (InterruptedException e) {
                 // Nothing

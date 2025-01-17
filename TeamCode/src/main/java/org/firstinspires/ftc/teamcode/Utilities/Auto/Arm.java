@@ -31,6 +31,7 @@ public class Arm {
     PIDF_Controller controller;
 
     boolean run = true;
+    double armPosition = 0;
 
     // Arm Constructor
     public Arm(HardwareMap hardwareMap) {
@@ -52,8 +53,8 @@ public class Arm {
 
     // Create init() for Auto
     public void init() {
-        armPivot.setPosition(0.8);
-        sampleServo.setPosition(0.78);
+        armPivot.setPosition(0.6);
+        sampleServo.setPosition(0.81);
     }
 
     public class RunController implements Action {
@@ -64,6 +65,7 @@ public class Arm {
                 return false;
             } else {
                 controller.loopController();
+                controller.runController(true);
                 return true;
             }
         }
@@ -92,7 +94,8 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.extendTo(23);
+                armPosition = 23;
+                controller.extendTo(armPosition);
                 initialized = true;
             }
 
@@ -113,14 +116,14 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.extendTo(37);
+                armPosition = 37;
+                controller.extendTo(armPosition);
                 initialized = true;
             }
 
             double pos = armMotor.getCurrentPosition();
             p.put("Motor Position: ", pos);
             if (controller.targetReached) {
-                armMotor.setPower(0.001);
                 return false;
             } else {
                 controller.loopController();
@@ -140,7 +143,8 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.extendTo(13.6);
+                armPosition = 13.3;
+                controller.extendTo(armPosition);
                 initialized = true;
             }
 
@@ -166,7 +170,8 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                controller.retractTo(0);
+                armPosition = 0;
+                controller.extendTo(armPosition);
                 initialized = true;
             }
 
@@ -203,10 +208,14 @@ public class Arm {
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
 
-            if (armPivot.getPosition() == 0.8) {
+            if (armPivot.getPosition() >= 0.5) {
                 armPivot.setPosition(0.1);
-            } else if (armPivot.getPosition() == 0.1) {
+            } else if (armPivot.getPosition() < 0.5) {
                 armPivot.setPosition(0.8);
+            }
+            try{TimeUnit.MILLISECONDS.sleep(500);}
+            catch (InterruptedException e){
+                //nothing
             }
             return false;
         }
@@ -230,4 +239,5 @@ public class Arm {
     public Action waitTme() {
         return new WaitTime();
     }
+
 }

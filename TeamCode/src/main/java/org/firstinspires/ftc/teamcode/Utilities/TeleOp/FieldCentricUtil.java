@@ -701,11 +701,11 @@ public class FieldCentricUtil extends LinearOpMode {
                 TimeUnit.MILLISECONDS.sleep(500);
                 left.setPower(-0.3);
                 right.setPower(-0.3);
-                TimeUnit.MILLISECONDS.sleep(150);
+                TimeUnit.MILLISECONDS.sleep(250);
                 sampleServo.setPosition(0.78);
                 left.setPower(0);
                 right.setPower(0);
-                TimeUnit.MILLISECONDS.sleep(100);
+                TimeUnit.MILLISECONDS.sleep(300);
                 intakePivot.setPosition(0.5);
                 transfer = false;
                 isUp = true;
