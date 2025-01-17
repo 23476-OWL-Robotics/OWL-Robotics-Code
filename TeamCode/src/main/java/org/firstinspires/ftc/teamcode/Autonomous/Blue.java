@@ -130,15 +130,17 @@ public class Blue extends LinearOpMode {
                                     ),
                                     new ParallelAction(
                                             action5,
-                                            new SequentialAction(
-                                                    intake.intakeIn(),
-                                                    intake.transferSample(),
-                                                    arm.armUpHigh(),
-                                                    arm.pivotArm()
-                                            )
+                                            intake.intakeIn()
+
                                     ),
-                                    basketAction2,
+                                    intake.transferSample(),
+                                    arm.armUpHigh(),
+                                    new ParallelAction(
+                                            arm.pivotArm(),
+                                            basketAction2
+                                    ),
                                     arm.release(),
+                                    arm.waitTme(),
                                     new ParallelAction(
                                             action6,
                                             new SequentialAction(
