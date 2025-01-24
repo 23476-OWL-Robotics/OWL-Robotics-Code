@@ -27,6 +27,8 @@ public class PIDF_Controller{
     // Create oldEncoderPosition
     double oldEncoderPosition;
 
+    int endPositionError = 5;
+
     // create ElapsedTime
     ElapsedTime timer = new ElapsedTime();
 
@@ -48,6 +50,7 @@ public class PIDF_Controller{
         this.maxSpeed = builder.MAX_SPEED;
         this.oldEncoderPosition = builder.oldEncoderPosition;
         this.stopOnTargetReached = builder.stopOnTargetReached;
+        this.endPositionError = builder.endPositionError;
     }
 
     // Create builder
@@ -57,6 +60,7 @@ public class PIDF_Controller{
         double MAX_SPEED;
         boolean stopOnTargetReached;
         double oldEncoderPosition;
+        int endPositionError;
 
         public Builder setControllerMotor(DcMotorEx motor1) {
             this.motor1 = motor1;
@@ -76,6 +80,10 @@ public class PIDF_Controller{
         }
         public Builder setStopOnTargetReached(boolean stop) {
             this.stopOnTargetReached = stop;
+            return this;
+        }
+        public Builder setEndPositionError(int endPositionError) {
+            this.endPositionError = endPositionError;
             return this;
         }
 
@@ -168,7 +176,7 @@ public class PIDF_Controller{
         // set the motor power
         motor1.setPower(Math.min(out, maxSpeed));
 
-        if (encoderPosition < reference + 5 && encoderPosition > reference -5) {
+        if (encoderPosition < reference + endPositionError && encoderPosition > reference -endPositionError) {
             targetReached = true;
             if (stopOnTargetReached) {
                 motor1.setPower(0);

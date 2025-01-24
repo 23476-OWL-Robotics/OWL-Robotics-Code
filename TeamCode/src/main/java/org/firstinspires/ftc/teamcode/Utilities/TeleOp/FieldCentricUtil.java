@@ -126,8 +126,8 @@ public class FieldCentricUtil extends LinearOpMode {
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
 
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
-        armPivot = hardwareMap.get(Servo.class, "sampleServo");
-        sampleServo = hardwareMap.get(Servo.class, "specimenClaw");
+        armPivot = hardwareMap.get(Servo.class, "armPivot");
+        sampleServo = hardwareMap.get(Servo.class, "sampleServo");
         plowServo = hardwareMap.get(Servo.class, "plowServo");
 
         left = hardwareMap.get(CRServo.class, "left");
@@ -172,7 +172,7 @@ public class FieldCentricUtil extends LinearOpMode {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        rightAssentMotor.setDirection(DcMotor.Direction.REVERSE);
+        leftAssentMotor.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         right.setDirection(CRServo.Direction.REVERSE);
@@ -185,8 +185,8 @@ public class FieldCentricUtil extends LinearOpMode {
         imu.resetYaw();
 
         intakePivot.setPosition(0.5);
-        armPivot.setPosition(0.8);
-        sampleServo.setPosition(0.78);
+        armPivot.setPosition(0.81);
+        sampleServo.setPosition(0.770);
         plowServo.setPosition(0.8);
         plowUp = true;
         isUp = true;
@@ -199,8 +199,8 @@ public class FieldCentricUtil extends LinearOpMode {
     // Servo Positions on opModeInInit()
     public void initializeServos() {
         intakePivot.setPosition(0.5);
-        armPivot.setPosition(0.8);
-        sampleServo.setPosition(0.71);
+        armPivot.setPosition(0.81);
+        sampleServo.setPosition(0.770);
         isUp = true;
     }
 
@@ -283,6 +283,7 @@ public class FieldCentricUtil extends LinearOpMode {
             Thread outputThread = new Thread(outputSample);
 
             outputThread.start();
+            blinkGreenWait();
         } else if (output_down) {
             armPivot.setPosition(0.1);
         }
@@ -291,14 +292,14 @@ public class FieldCentricUtil extends LinearOpMode {
     // Opens and closes specimen claw
     public void specimen_control(boolean grab_specimen, boolean release_specimen) {
         if (grab_specimen) {
-            sampleServo.setPosition(0.78);
+            sampleServo.setPosition(0.770);
         } else if (release_specimen) {
-            sampleServo.setPosition(0.65);
+            sampleServo.setPosition(0.7);
         }
     }
 
     public void plowControl(boolean runPlow) {
-        if (runPlow && intakeEncoderPosition > 950 && oldTouch == false) {
+        if (runPlow && intakeEncoderPosition > 650 && !oldTouch) {
             PlowSamples plowSamples = new PlowSamples();
             Thread plowThread = new Thread(plowSamples);
 
@@ -308,12 +309,7 @@ public class FieldCentricUtil extends LinearOpMode {
             plowUp = true;
             plowServo.setPosition(0.82);
         }
-        if (runPlow) {
-            oldTouch = true;
-        }
-        else{
-            oldTouch = false;
-        }
+        oldTouch = runPlow;
 
     }
 
@@ -325,11 +321,12 @@ public class FieldCentricUtil extends LinearOpMode {
     PIDF_Controller rightAssentController;
 
     boolean assentInti = false;
+    boolean runAssent = false;
     double leftAssentPosition;
     double rightAssentPosition;
 
     // Control the ascent motors with pidf
-    public void assent_control(boolean ascend_button, boolean descend_button) {
+    public void assent_control(boolean assentUp, boolean assentDown) {
         if (!assentInti) {
             leftAssentController = new PIDF_Controller.Builder()
                     .setControllerMotor(leftAssentMotor)
@@ -337,6 +334,7 @@ public class FieldCentricUtil extends LinearOpMode {
                     .setMaxSpeed(1)
                     .setEncoderPosition(leftAssentEncoderPosition)
                     .setStopOnTargetReached(false)
+                    .setEndPositionError(5)
                     .build();
 
             rightAssentController = new PIDF_Controller.Builder()
@@ -345,24 +343,32 @@ public class FieldCentricUtil extends LinearOpMode {
                     .setMaxSpeed(1)
                     .setEncoderPosition(rightAssentEncoderPosition)
                     .setStopOnTargetReached(false)
+                    .setEndPositionError(5)
                     .build();
 
             assentInti = true;
         }
 
-        if (ascend_button) {
+        if (assentUp) {
             leftAssentPosition = 14;
             rightAssentPosition = 14;
-        } else if (descend_button) {
+            runAssent = true;
+        } else if (assentDown) {
             leftAssentPosition = 0;
             rightAssentPosition = 0;
         }
 
-        leftAssentController.extendTo(leftAssentPosition);
-        rightAssentController.extendTo(rightAssentPosition);
+        if (runAssent) {
+            intakePivot.setPosition(0.3);
+            leftAssentController.extendTo(leftAssentPosition);
+            rightAssentController.extendTo(rightAssentPosition);
 
-        leftAssentController.loopController();
-        rightAssentController.loopController();
+            leftAssentController.loopController();
+            rightAssentController.loopController();
+        } else {
+            leftAssentMotor.setPower(0);
+            rightAssentMotor.setPower(0);
+        }
     }
 
     // Parameters for scoring slides
@@ -403,7 +409,7 @@ public class FieldCentricUtil extends LinearOpMode {
             armPosition = 16;
             armPivot.setPosition(0.1);
         } else if (gamepad2.dpad_down) {
-            sampleServo.setPosition(0.85);
+            sampleServo.setPosition(0.770);
             armPosition = 10;
 
 
@@ -429,7 +435,7 @@ public class FieldCentricUtil extends LinearOpMode {
             armController.runController(true);
             armController.extendTo(armPosition);
             armController.loopController();
-            if(isIntakeSlideAuto == true){
+            if(isIntakeSlideAuto){
                 intakeController.runController(true);
                 intakeController.extendTo(intakePosition);
                 intakeController.loopController();
@@ -440,16 +446,16 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         // Intake slide power
-        if (abs(intake_slide_stick) > deadZone) {
-            if(isIntakeSlideAuto == false){
+        if (abs(intake_slide_stick) > deadZone && intakeMotor.getCurrentPosition() < 2000) {
+            if(!isIntakeSlideAuto){
                 intakeMotor.setPower(-intake_slide_stick);
             }
 
-            if (oldInSlide == false) {
+            if (!oldInSlide) {
                 isIntakeSlideAuto = false;
             }
             oldInSlide = true;
-        } else if(isIntakeSlideAuto == false) {
+        } else if(!isIntakeSlideAuto) {
             intakeMotor.setPower(0);
             oldInSlide = false;
         }
@@ -476,8 +482,8 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         if (intake_pivot_up) {//transfer
-            if(transfer == false) {
-                if (armPosition < 1 &&  armController.targetReached && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
+            if(!transfer) {
+                if (armMotor.getCurrentPosition() < 5 &&  intakeMotor.getCurrentPosition() < 5) {
                     isIntakeSlideAuto = false;
                     TransferSample transferSample = new TransferSample();
                     Thread transferThread = new Thread(transferSample);
@@ -487,8 +493,8 @@ public class FieldCentricUtil extends LinearOpMode {
 
                 } else {
                     armPosition = 0;
-                    sampleServo.setPosition(0.65);
-                    armPivot.setPosition(0.8);
+                    sampleServo.setPosition(0.7);
+                    armPivot.setPosition(0.81);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
                     flashRed();
@@ -543,8 +549,8 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         if (intake_pivot_up) {
-            if(transfer == false) {
-                if (armPosition < 1 && armController.targetReached && armPivot.getPosition() == 0.8 && intakePosition <= 0.5 && isIntakeSlideAuto == true  ) {
+            if(!transfer) {
+                if (armMotor.getCurrentPosition() < 5 &&  intakeMotor.getCurrentPosition() < 5) {
                     isIntakeSlideAuto = false;
                     TransferSample transferSample = new TransferSample();
                     Thread transferThread = new Thread(transferSample);
@@ -554,8 +560,8 @@ public class FieldCentricUtil extends LinearOpMode {
 
                 } else {
                     armPosition = 0;
-                    sampleServo.setPosition(0.65);
-                    armPivot.setPosition(0.8);
+                    sampleServo.setPosition(0.7);
+                    armPivot.setPosition(0.81);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
                     flashRed();
@@ -694,15 +700,15 @@ public class FieldCentricUtil extends LinearOpMode {
         public void run() {
             try {
                 transfer = true;
-                armPivot.setPosition(0.8);
+                armPivot.setPosition(0.81);
                 TimeUnit.MILLISECONDS.sleep(500);
-                sampleServo.setPosition(0.65);
-                intakePivot.setPosition(0.73);
+                sampleServo.setPosition(0.7);
+                intakePivot.setPosition(0.71);
                 TimeUnit.MILLISECONDS.sleep(500);
                 left.setPower(-0.3);
                 right.setPower(-0.3);
-                TimeUnit.MILLISECONDS.sleep(250);
-                sampleServo.setPosition(0.78);
+                TimeUnit.MILLISECONDS.sleep(200);
+                sampleServo.setPosition(0.770);
                 left.setPower(0);
                 right.setPower(0);
                 TimeUnit.MILLISECONDS.sleep(300);
@@ -724,20 +730,19 @@ public class FieldCentricUtil extends LinearOpMode {
             try {
                 armPivot.setPosition(0.1);
                 TimeUnit.MILLISECONDS.sleep(900);
-                sampleServo.setPosition(0.65);
+                sampleServo.setPosition(0.7);
                 TimeUnit.MILLISECONDS.sleep(300);
-                armPivot.setPosition(0.8);
+                armPivot.setPosition(0.81);
                 TimeUnit.MILLISECONDS.sleep(900);
-                blinkGreen();
-                sampleServo.setPosition(0.65);
-                armPivot.setPosition(0.8);
+                sampleServo.setPosition(0.7);
+                armPivot.setPosition(0.81);
             } catch (InterruptedException e) {
-
+                //Nothing
             }
         }
     }
 
-        class PlowSamples implements Runnable {
+    class PlowSamples implements Runnable {
         @Override
         public void run() {
             try {
@@ -792,6 +797,27 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
     public void blinkGreen(){
+        BlinkGreen blinkgreen = new BlinkGreen();
+        Thread greenThread = new Thread(blinkgreen);
+
+        greenThread.start();
+    }
+    class BlinkGreenWait implements Runnable {
+        @Override
+        public void run() {
+            try {
+                TimeUnit.MILLISECONDS.sleep(1000);
+                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+                TimeUnit.MILLISECONDS.sleep(3000);
+                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+
+
+            } catch (InterruptedException e) {
+                // Nothing
+            }
+        }
+    }
+    public void blinkGreenWait(){
         BlinkGreen blinkgreen = new BlinkGreen();
         Thread greenThread = new Thread(blinkgreen);
 

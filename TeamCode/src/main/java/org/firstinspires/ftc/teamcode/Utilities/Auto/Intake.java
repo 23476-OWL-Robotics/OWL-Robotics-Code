@@ -48,7 +48,7 @@ public class Intake {
         left = hardwareMap.get(CRServo.class, "left");
         right = hardwareMap.get(CRServo.class, "right");
         intakePivot = hardwareMap.get(Servo.class, "intakePivot");
-        sampleServo = hardwareMap.get(Servo.class, "specimenClaw");
+        sampleServo = hardwareMap.get(Servo.class, "sampleServo");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "blockDet");
 
         right.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -61,7 +61,8 @@ public class Intake {
                 .setControllerMotor(intakeMotor)
                 .setControllerParams(intakeControllerParams.params)
                 .setMaxSpeed(1)
-                .setStopOnTargetReached(false)
+                .setStopOnTargetReached(true)
+                .setEndPositionError(15)
                 .build();
     }
 

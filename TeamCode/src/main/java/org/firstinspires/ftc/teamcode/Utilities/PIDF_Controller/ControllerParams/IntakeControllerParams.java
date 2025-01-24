@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParam
 
 public class IntakeControllerParams {
 
-    double inPerTick = 0.006371562;
+    double inPerTick = 0.0088702147525677;
 
-    double p = 0.002;
+    double p = 0.0025;
     double i = 0.0;
     double d = 0.0;
     double f = 0.0;

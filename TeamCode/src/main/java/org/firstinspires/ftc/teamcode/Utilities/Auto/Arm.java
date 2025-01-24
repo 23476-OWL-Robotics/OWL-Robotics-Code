@@ -36,8 +36,8 @@ public class Arm {
     // Arm Constructor
     public Arm(HardwareMap hardwareMap) {
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
-        armPivot = hardwareMap.get(Servo.class, "sampleServo");
-        sampleServo = hardwareMap.get(Servo.class, "specimenClaw");
+        armPivot = hardwareMap.get(Servo.class, "armPivot");
+        sampleServo = hardwareMap.get(Servo.class, "sampleServo");
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -48,6 +48,7 @@ public class Arm {
                 .setControllerParams(armControllerParams.params)
                 .setMaxSpeed(1)
                 .setStopOnTargetReached(false)
+                .setEndPositionError(5)
                 .build();
     }
 
