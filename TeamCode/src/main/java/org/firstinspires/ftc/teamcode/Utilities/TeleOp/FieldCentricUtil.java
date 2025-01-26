@@ -392,6 +392,7 @@ public class FieldCentricUtil extends LinearOpMode {
                     .setMaxSpeed(1)
                     .setEncoderPosition(armEncoderPosition)
                     .setStopOnTargetReached(false)
+                    .setStopOnZero(true)
                     .build();
 
             intakeController = new PIDF_Controller.Builder()
@@ -494,7 +495,7 @@ public class FieldCentricUtil extends LinearOpMode {
                 } else {
                     armPosition = 0;
                     sampleServo.setPosition(0.7);
-                    armPivot.setPosition(0.81);
+                    armPivot.setPosition(0.5);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
                     flashRed();
@@ -561,7 +562,7 @@ public class FieldCentricUtil extends LinearOpMode {
                 } else {
                     armPosition = 0;
                     sampleServo.setPosition(0.7);
-                    armPivot.setPosition(0.81);
+                    armPivot.setPosition(0.5);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
                     flashRed();
@@ -732,10 +733,9 @@ public class FieldCentricUtil extends LinearOpMode {
                 TimeUnit.MILLISECONDS.sleep(900);
                 sampleServo.setPosition(0.7);
                 TimeUnit.MILLISECONDS.sleep(300);
-                armPivot.setPosition(0.81);
+                armPivot.setPosition(0.5);
                 TimeUnit.MILLISECONDS.sleep(900);
                 sampleServo.setPosition(0.7);
-                armPivot.setPosition(0.81);
             } catch (InterruptedException e) {
                 //Nothing
             }

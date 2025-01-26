@@ -23,6 +23,7 @@ public class PIDF_Controller{
     public boolean running = true;
     public boolean targetReached = false;
     private boolean stopOnTargetReached;
+    private boolean stopOnZero;
 
     // Create oldEncoderPosition
     double oldEncoderPosition;
@@ -51,6 +52,7 @@ public class PIDF_Controller{
         this.oldEncoderPosition = builder.oldEncoderPosition;
         this.stopOnTargetReached = builder.stopOnTargetReached;
         this.endPositionError = builder.endPositionError;
+        this.stopOnZero = builder.stopOnZero;
     }
 
     // Create builder
@@ -59,6 +61,7 @@ public class PIDF_Controller{
         ControllerParams params;
         double MAX_SPEED;
         boolean stopOnTargetReached;
+        boolean stopOnZero;
         double oldEncoderPosition;
         int endPositionError;
 
@@ -84,6 +87,10 @@ public class PIDF_Controller{
         }
         public Builder setEndPositionError(int endPositionError) {
             this.endPositionError = endPositionError;
+            return this;
+        }
+        public Builder setStopOnZero(boolean stopOnZero) {
+            this.stopOnZero = stopOnZero;
             return this;
         }
 
@@ -181,6 +188,9 @@ public class PIDF_Controller{
             if (stopOnTargetReached) {
                 motor1.setPower(0);
                 running = false;
+            }
+            if (stopOnZero && reference == 0) {
+                motor1.setPower(0);
             }
         }
 
