@@ -524,6 +524,10 @@ public class FieldCentricUtil extends LinearOpMode {
                 isIntakeSlideAuto = true;
                 intakePosition = 0;
                 blinkGreen();
+                autoTransferSample autotransferSample = new autoTransferSample();
+                Thread autotransferThread = new Thread(autotransferSample);
+
+                autotransferThread.start();
             } else if (!isUp && sensorDistance < 1 && blue) {
                 intakePivot.setPosition(0.31);
                 intake_wheel_power = -1;
@@ -703,6 +707,7 @@ public class FieldCentricUtil extends LinearOpMode {
         @Override
         public void run() {
             try {
+
                 transfer = true;
                 armPivot.setPosition(0.81);
                 TimeUnit.MILLISECONDS.sleep(500);
@@ -727,6 +732,47 @@ public class FieldCentricUtil extends LinearOpMode {
             }
         }
     }
+    class autoTransferSample implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                TimeUnit.MILLISECONDS.sleep(1500);
+                if(armMotor.getCurrentPosition() < 20 &&  intakeMotor.getCurrentPosition() < 20){
+                    transfer = true;
+                    armPivot.setPosition(0.81);
+                    TimeUnit.MILLISECONDS.sleep(500);
+                    sampleServo.setPosition(0.7);
+                    intakePivot.setPosition(0.71);
+                    TimeUnit.MILLISECONDS.sleep(500);
+                    left.setPower(-0.3);
+                    right.setPower(-0.3);
+                    TimeUnit.MILLISECONDS.sleep(200);
+                    sampleServo.setPosition(0.770);
+                    left.setPower(0);
+                    right.setPower(0);
+                    TimeUnit.MILLISECONDS.sleep(300);
+                    intakePivot.setPosition(0.5);
+                    transfer = false;
+                    isUp = true;
+                    TimeUnit.MILLISECONDS.sleep(500);
+                    armPosition = 37;
+                }
+                else{
+                    armPosition = 0;
+                    sampleServo.setPosition(0.7);
+                    armPivot.setPosition(0.5);
+                    isIntakeSlideAuto = true;
+                    intakePosition = 0;
+                    flashRed();
+                }
+
+
+            } catch (InterruptedException e) {
+                // Nothing
+            }
+        }
+    }
     class OutputSample implements Runnable {
 
         @Override
@@ -745,7 +791,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-   
+
     public void flashRed(){
         revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         redLightTime = time.milliseconds();
