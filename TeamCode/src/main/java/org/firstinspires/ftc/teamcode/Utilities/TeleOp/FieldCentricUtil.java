@@ -300,10 +300,13 @@ public class FieldCentricUtil extends LinearOpMode {
 
     public void plowControl(boolean runPlow) {
         if (runPlow && intakeEncoderPosition > 650 && !oldTouch) {
-            PlowSamples plowSamples = new PlowSamples();
-            Thread plowThread = new Thread(plowSamples);
-
-            plowThread.start();
+            if (plowUp) {
+                plowUp = false;
+                plowServo.setPosition(0.2);
+            } else {
+                plowUp = true;
+                plowServo.setPosition(0.82);
+            }
         }
         else if(intakeEncoderPosition < 950) {
             plowUp = true;
@@ -468,64 +471,64 @@ public class FieldCentricUtil extends LinearOpMode {
                                    boolean intake_pivot_down,
                                    boolean intake_pivot_reset,
                                    double deadZone) {
-        loopSensor();
+            loopSensor();
 
-        if (!isUp && sensorDistance > 3.5 && sensorDistance < 4.5) {
-            intake_wheel_power = -0.3;
-        } else if (intake_wheels_out > deadZone) {
-            intake_wheel_power = 1;
-        } else if (intake_wheels_in > deadZone) {
-            intake_wheel_power = -1;
-        } else if (intakePivot.getPosition() < 0.3) {
-            intake_wheel_power = 1;
-        } else {
-            intake_wheel_power = 0;
-        }
-
-        if (intake_pivot_up) {//transfer
-            if(!transfer) {
-                if (armMotor.getCurrentPosition() < 5 &&  intakeMotor.getCurrentPosition() < 5) {
-                    isIntakeSlideAuto = false;
-                    TransferSample transferSample = new TransferSample();
-                    Thread transferThread = new Thread(transferSample);
-
-                    transferThread.start();
-
-
-                } else {
-                    armPosition = 0;
-                    sampleServo.setPosition(0.7);
-                    armPivot.setPosition(0.5);
-                    isIntakeSlideAuto = true;
-                    intakePosition = 0;
-                    flashRed();
-                }
+            if (!isUp && sensorDistance > 3.5 && sensorDistance < 4.5) {
+                intake_wheel_power = -0.3;
+            } else if (intake_wheels_out > deadZone) {
+                intake_wheel_power = 1;
+            } else if (intake_wheels_in > deadZone) {
+                intake_wheel_power = -1;
+            } else if (intakePivot.getPosition() < 0.3) {
+                intake_wheel_power = 1;
+            } else {
+                intake_wheel_power = 0;
             }
 
+            if (intake_pivot_up) {//transfer
+                if(!transfer) {
+                    if (armMotor.getCurrentPosition() < 20 &&  intakeMotor.getCurrentPosition() < 20) {
+                        isIntakeSlideAuto = false;
+                        TransferSample transferSample = new TransferSample();
+                        Thread transferThread = new Thread(transferSample);
 
-        } else if (intake_pivot_down) {
-            intakePivot.setPosition(0.12);
-            intake_wheel_power = 1;
-            isUp = false;
-            transfer = false;
-            isIntakeSlideAuto  = false;
-        } else if (intake_pivot_reset) {
-            intakePivot.setPosition(0.5);
-            isUp = true;
-            transfer = false;
-            isIntakeSlideAuto  = false;
-        } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow) {
-            intakePivot.setPosition(0.5);
-            doingIntake = true;
-            isUp = true;
-            isIntakeSlideAuto = true;
-            intakePosition = 0;
-            blinkGreen();
-        } else if (!isUp && sensorDistance < 1 && blue) {
-            intakePivot.setPosition(0.31);
-            intake_wheel_power = -1;
-            flashRed();
-        }
+                        transferThread.start();
+
+
+                    } else {
+                        armPosition = 0;
+                        sampleServo.setPosition(0.7);
+                        armPivot.setPosition(0.5);
+                        isIntakeSlideAuto = true;
+                        intakePosition = 0;
+                        flashRed();
+                    }
+                }
+
+
+            } else if (intake_pivot_down) {
+                intakePivot.setPosition(0.12);
+                intake_wheel_power = 1;
+                isUp = false;
+                transfer = false;
+                isIntakeSlideAuto  = false;
+            } else if (intake_pivot_reset) {
+                intakePivot.setPosition(0.5);
+                isUp = true;
+                transfer = false;
+                isIntakeSlideAuto  = false;
+            } else if (!isUp && sensorDistance < 1 && red || !isUp && sensorDistance < 1 && yellow) {
+                intakePivot.setPosition(0.5);
+                doingIntake = true;
+                isUp = true;
+                isIntakeSlideAuto = true;
+                intakePosition = 0;
+                blinkGreen();
+            } else if (!isUp && sensorDistance < 1 && blue) {
+                intakePivot.setPosition(0.31);
+                intake_wheel_power = -1;
+                flashRed();
+            }
     }
 
     public void blue_intake_control(double intake_wheels_in,
@@ -551,7 +554,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
         if (intake_pivot_up) {
             if(!transfer) {
-                if (armMotor.getCurrentPosition() < 5 &&  intakeMotor.getCurrentPosition() < 5) {
+                if (armMotor.getCurrentPosition() < 20 &&  intakeMotor.getCurrentPosition() < 20) {
                     isIntakeSlideAuto = false;
                     TransferSample transferSample = new TransferSample();
                     Thread transferThread = new Thread(transferSample);
@@ -742,85 +745,31 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    class PlowSamples implements Runnable {
-        @Override
-        public void run() {
-            try {
-
-                    if (plowUp) {
-                        plowUp = false;
-                        plowServo.setPosition(0.2);
-                        TimeUnit.MILLISECONDS.sleep(50);
-                    } else {
-                        plowUp = true;
-                        plowServo.setPosition(0.82);
-                        TimeUnit.MILLISECONDS.sleep(50);
-                    }
-
-            } catch (InterruptedException e) {
-                // Nothing
-            }
-        }
-    }
-    class FlashRed implements Runnable {
-        @Override
-        public void run() {
-            try {
-                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-                TimeUnit.MILLISECONDS.sleep(750);
-                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-
-
-            } catch (InterruptedException e) {
-                // Nothing
-            }
-        }
-    }
+   
     public void flashRed(){
-        FlashRed flashred = new FlashRed();
-        Thread redThread = new Thread(flashred);
-
-        redThread.start();
+        revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+        redLightTime = time.milliseconds();
+        lightColor = 1;
     }
-    class BlinkGreen implements Runnable {
-        @Override
-        public void run() {
-            try {
-                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                TimeUnit.MILLISECONDS.sleep(3000);
-                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 
-
-            } catch (InterruptedException e) {
-                // Nothing
-            }
-        }
-    }
     public void blinkGreen(){
-        BlinkGreen blinkgreen = new BlinkGreen();
-        Thread greenThread = new Thread(blinkgreen);
+        revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+        greenLightTime = time.milliseconds();
+        lightColor = 2;
 
-        greenThread.start();
     }
-    class BlinkGreenWait implements Runnable {
-        @Override
-        public void run() {
-            try {
-                TimeUnit.MILLISECONDS.sleep(1000);
-                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                TimeUnit.MILLISECONDS.sleep(3000);
-                revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
 
-
-            } catch (InterruptedException e) {
-                // Nothing
-            }
+    public double redLightTime;
+    public double greenLightTime;
+    public int lightColor;// zero is purple, 1 is red, 2 is green
+    public void stateChecker(){
+        if(time.milliseconds()> redLightTime+ 750&& lightColor == 1){
+            revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            lightColor = 0;
         }
-    }
-    public void blinkGreenWait(){
-        BlinkGreen blinkgreen = new BlinkGreen();
-        Thread greenThread = new Thread(blinkgreen);
-
-        greenThread.start();
+        if(time.milliseconds()> greenLightTime+ 3000&& lightColor == 2){
+            revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            lightColor = 0;
+        }
     }
 }
