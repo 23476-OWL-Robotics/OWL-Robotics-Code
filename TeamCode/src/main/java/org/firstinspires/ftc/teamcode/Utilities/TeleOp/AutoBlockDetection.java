@@ -52,8 +52,8 @@ public class AutoBlockDetection {
     Servo armRotate;
     Servo armGrab;
 
-    double xInchesPerPixel = 0.0;
-    double yInchesPerPixel = 0.0;
+    double xInchesPerPixel = 0.023828125;
+    double yInchesPerPixel = 0.033333333;
     double servoMultiplier = 0.00333;
 
     public double angle;
@@ -78,6 +78,7 @@ public class AutoBlockDetection {
     ArrayList<MatOfPoint> contours = new ArrayList<>();
     // File names
     String srcFileName = Environment.getExternalStorageDirectory().getPath() + "/VisionPortal-Frame.png";
+    String resultFileName = Environment.getExternalStorageDirectory().getPath() + "/gray.png";
     // Color Range for blocks
     ColorRange colorRange;
 
@@ -183,11 +184,14 @@ public class AutoBlockDetection {
         Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new org.opencv.core.Size(2, 2));
         Imgproc.dilate(edges, edges, kernel);
 
+        Imgcodecs.imwrite(resultFileName, edges);
+        edges = Imgcodecs.imread(resultFileName);
+
         // Add the edges to the original image
         Core.subtract(srcFrame, edges, result);
 
         // Change the roi for blob detection
-        roi = roiImg.asOpenCvRect(1280, 720);
+        roi = roiImg.asOpenCvRect(640, 480);
         roiMat = result.submat(roi);
         roiMat_userColorSpace = roiMat.clone();
 
@@ -249,15 +253,15 @@ public class AutoBlockDetection {
         }
 
         // Set values for the robot to move to
-        robotPosX = blockPosX / xInchesPerPixel;
-        robotPosY = blockPosY / yInchesPerPixel;
-        angle = Math.abs(blockAngle - 180) / servoMultiplier;
+        robotPosX = blockPosX * xInchesPerPixel;
+        robotPosY = (blockPosY * yInchesPerPixel) - 3;
+        angle = Math.abs(blockAngle - 180) * servoMultiplier;
     }
 
     public void grabSample(MecanumDrive drive) {
         drive.updatePoseEstimate();
         Action xMove = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(drive.pose.position.x + robotPosX, drive.pose.position.y))
+                .strafeTo(new Vector2d((drive.pose.position.x + robotPosX), drive.pose.position.y))
                 .build();
 
         Actions.runBlocking(

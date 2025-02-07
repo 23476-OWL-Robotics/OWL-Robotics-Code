@@ -23,9 +23,7 @@ import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.LeftAssentControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.ControllerParams.RightAssentControllerParams;
 import org.firstinspires.ftc.teamcode.Utilities.PIDF_Controller.PIDF_Controller;
-import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FileWriter.FileReadWriter;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class FieldCentricUtil extends LinearOpMode {
@@ -106,7 +104,6 @@ public class FieldCentricUtil extends LinearOpMode {
     double robotPoseY;
     double robotHeading;
 
-    FileReadWriter fileReadWriter;
     MecanumDrive drive;
     ElapsedTime time;
 
@@ -140,22 +137,16 @@ public class FieldCentricUtil extends LinearOpMode {
     }
 
     public void Initialize() {
-        try {
-            fileReadWriter = new FileReadWriter();
-            fileReadWriter.readFile();
-        } catch (IOException e) {
-            // Nothing
-        }
 
         time = new ElapsedTime();
 
-        armEncoderPosition = fileReadWriter.read[1];
-        intakeEncoderPosition = fileReadWriter.read[2];
-        leftAssentEncoderPosition = fileReadWriter.read[3];
-        rightAssentEncoderPosition = fileReadWriter.read[4];
-        robotPoseX = fileReadWriter.read[5];
-        robotPoseY = fileReadWriter.read[6];
-        robotHeading = fileReadWriter.read[7];
+        armEncoderPosition = 0;
+        intakeEncoderPosition = 0;
+        leftAssentEncoderPosition = 0;
+        rightAssentEncoderPosition = 0;
+        robotPoseX = 0;
+        robotPoseY = 0;
+        robotHeading = 0;
 
         startPose = new Pose2d(robotPoseX, robotPoseY, Math.toRadians(robotHeading));
         drive = new MecanumDrive(hardwareMap, startPose);
@@ -184,8 +175,8 @@ public class FieldCentricUtil extends LinearOpMode {
 
         imu.resetYaw();
 
-        intakePivot.setPosition(0.5);
-        armPivot.setPosition(0.81);
+        intakePivot.setPosition(0.71);
+        armPivot.setPosition(0.45);
         sampleServo.setPosition(0.770);
         plowServo.setPosition(0.8);
         plowUp = true;
@@ -198,8 +189,8 @@ public class FieldCentricUtil extends LinearOpMode {
 
     // Servo Positions on opModeInInit()
     public void initializeServos() {
-        intakePivot.setPosition(0.5);
-        armPivot.setPosition(0.81);
+        intakePivot.setPosition(0.71);
+        armPivot.setPosition(0.45);
         sampleServo.setPosition(0.770);
         isUp = true;
     }
@@ -283,7 +274,6 @@ public class FieldCentricUtil extends LinearOpMode {
             Thread outputThread = new Thread(outputSample);
 
             outputThread.start();
-            blinkGreenWait();
         } else if (output_down) {
             armPivot.setPosition(0.1);
         }
@@ -305,12 +295,12 @@ public class FieldCentricUtil extends LinearOpMode {
                 plowServo.setPosition(0.2);
             } else {
                 plowUp = true;
-                plowServo.setPosition(0.82);
+                plowServo.setPosition(0.84);
             }
         }
         else if(intakeEncoderPosition < 950) {
             plowUp = true;
-            plowServo.setPosition(0.82);
+            plowServo.setPosition(0.84);
         }
         oldTouch = runPlow;
 
@@ -450,9 +440,11 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         // Intake slide power
-        if (abs(intake_slide_stick) > deadZone && intakeMotor.getCurrentPosition() < 2000) {
-            if(!isIntakeSlideAuto){
-                intakeMotor.setPower(-intake_slide_stick);
+        if (abs(intake_slide_stick) > deadZone) {
+            if(intakeMotor.getCurrentPosition() < 2000){
+                intakeMotor.setPower(intake_slide_stick);
+            } else {
+                intakeMotor.setPower(-0.1);
             }
 
             if (!oldInSlide) {
@@ -493,15 +485,12 @@ public class FieldCentricUtil extends LinearOpMode {
                         Thread transferThread = new Thread(transferSample);
 
                         transferThread.start();
-
-
                     } else {
                         armPosition = 0;
                         sampleServo.setPosition(0.7);
                         armPivot.setPosition(0.5);
                         isIntakeSlideAuto = true;
                         intakePosition = 0;
-                        flashRed();
                     }
                 }
 
@@ -523,15 +512,9 @@ public class FieldCentricUtil extends LinearOpMode {
                 isUp = true;
                 isIntakeSlideAuto = true;
                 intakePosition = 0;
-                blinkGreen();
-                autoTransferSample autotransferSample = new autoTransferSample();
-                Thread autotransferThread = new Thread(autotransferSample);
-
-                autotransferThread.start();
             } else if (!isUp && sensorDistance < 1 && blue) {
                 intakePivot.setPosition(0.31);
                 intake_wheel_power = -1;
-                flashRed();
             }
     }
 
@@ -572,7 +555,6 @@ public class FieldCentricUtil extends LinearOpMode {
                     armPivot.setPosition(0.5);
                     isIntakeSlideAuto = true;
                     intakePosition = 0;
-                    flashRed();
                 }
             }
         } else if (intake_pivot_down) {
@@ -592,21 +574,9 @@ public class FieldCentricUtil extends LinearOpMode {
             isUp = true;
             isIntakeSlideAuto = true;
             intakePosition = 0;
-            blinkGreen();
         } else if (!isUp && sensorDistance < 1 && red) {
-
             intakePivot.setPosition(0.31);
             intake_wheel_power = -1;
-            flashRed();
-
-        }
-    }
-
-    public void doIntake() {//depreciated
-        if (intakeController.targetReached) {
-            intakePivot.setPosition(0.71);
-            isUp = true;
-
         }
     }
 
@@ -618,63 +588,31 @@ public class FieldCentricUtil extends LinearOpMode {
         }
     }
 
-    public void writeRobotInfo() {
-        drive.updatePoseEstimate();
-
-        armEncoderPosition = armMotor.getCurrentPosition();
-        intakeEncoderPosition = intakeMotor.getCurrentPosition();
-        leftAssentEncoderPosition = leftAssentMotor.getCurrentPosition();
-        rightAssentEncoderPosition = rightAssentMotor.getCurrentPosition();
-        robotPoseX = drive.pose.position.x;
-        robotPoseY = drive.pose.position.y;
-        robotHeading = Math.toDegrees(drive.pose.heading.toDouble());
-
-        try {
-            fileReadWriter.writeFile(
-                    armEncoderPosition,
-                    intakeEncoderPosition,
-                    leftAssentEncoderPosition,
-                    rightAssentEncoderPosition,
-                    robotPoseX,
-                    robotPoseY,
-                    robotHeading
-            );
-        } catch (IOException e) {
-            // Nothing
-        }
-    }
-
     // Telemetry for Debugging
     public void telemetry() {
         drive.updatePoseEstimate();
-        telemetry.addLine("-----intake slide-----");
-        telemetry.addData("intake postion", intakePosition);
-        telemetry.addData("intake slide position", intakeMotor.getCurrentPosition());
-        telemetry.addData("intake slide power", intakeMotor.getPower());
-        telemetry.addData("intake slide auto", isIntakeSlideAuto);
-        telemetry.addLine("-----color distance sensor-----");
-        telemetry.addData("distance", ((DistanceSensor) sensor).getDistance(DistanceUnit.CM));
-        telemetry.addData("red", sensor.red());
-        telemetry.addData("green", sensor.green());
-        telemetry.addData("blue", sensor.blue());
-        telemetry.addData("red", red);
-        telemetry.addData("yellow", yellow);
-        telemetry.addData("blue", blue);
-        telemetry.addLine("-----intake assembly-----");
-        telemetry.addData("intake slide position", intakeMotor.getCurrentPosition());
-        telemetry.addData("intake wheel power", intake_wheel_power);
-        telemetry.addData("intake wrist position", intakePivot.getPosition());
-        telemetry.addData("plow position", plowServo.getPosition());
-        telemetry.addData("IsUp", isUp);
-        telemetry.addLine("-----lifter assembly-----");
-        telemetry.addData("lifter slide position", armMotor.getCurrentPosition());
-        telemetry.addData("output trough position", armPivot.getPosition());
-        telemetry.addData("specimen claw position", sampleServo.getPosition());
-        telemetry.addData("IMU", imu.getRobotYawPitchRollAngles());
-        telemetry.addData("Robot Pose X", drive.pose.position.x);
-        telemetry.addData("Robot Pose Y", drive.pose.position.y);
-        telemetry.addData("Robot Pose Heading", Math.toDegrees(drive.pose.heading.toDouble()));
-        telemetry.addData("loop time", time.milliseconds());
+        telemetry.addLine("-----Intake-----");
+        telemetry.addData("Slide Position", intakeMotor.getCurrentPosition());
+        telemetry.addData("Slide Power", intakeMotor.getPower());
+        telemetry.addData("Intake Pivot", intakePivot.getPosition());
+        telemetry.addData("Wheel Power", intake_wheel_power);
+        telemetry.addLine("-----Arm-----");
+        telemetry.addData("Slide Position", armMotor.getCurrentPosition());
+        telemetry.addData("Slide Power", armMotor.getPower());
+        telemetry.addData("Arm Pivot", armPivot.getPosition());
+        telemetry.addData("Grabber", sampleServo.getPosition());
+        telemetry.addLine("-----Assent-----");
+        telemetry.addData("Left Assent", leftAssentMotor.getCurrentPosition());
+        telemetry.addData("Right Assent", rightAssentMotor.getCurrentPosition());
+        telemetry.addData("Left Assent Power", leftAssentMotor.getPower());
+        telemetry.addData("Right Assent Power", rightAssentMotor.getPower());
+        telemetry.addLine("-----Other-----");
+        telemetry.addData("Robot Heading", imu.getRobotYawPitchRollAngles().getYaw());
+        telemetry.addData("Loop Time", time.milliseconds());
+        telemetry.addData("Sensor Distance", sensorDistance);
+        telemetry.addData("Sensor Red", sensor.red());
+        telemetry.addData("Sensor Green", sensor.green());
+        telemetry.addData("Sensor Blue", sensor.blue());
         telemetry.update();
         time.reset();
     }
@@ -689,7 +627,7 @@ public class FieldCentricUtil extends LinearOpMode {
     public void loopSensor() {
         sensorDistance = ((DistanceSensor) sensor).getDistance(DistanceUnit.CM);
 
-        if (sensor.red() > 4000 && sensor.green() > 6000) {
+        if (sensor.red() > 4000 && sensor.green() > 5000) {
             yellow = true;
         } else if (sensor.blue() > 3000) {
             blue = true;
@@ -707,9 +645,8 @@ public class FieldCentricUtil extends LinearOpMode {
         @Override
         public void run() {
             try {
-
                 transfer = true;
-                armPivot.setPosition(0.81);
+                armPivot.setPosition(0.84);
                 TimeUnit.MILLISECONDS.sleep(500);
                 sampleServo.setPosition(0.7);
                 intakePivot.setPosition(0.71);
@@ -732,47 +669,7 @@ public class FieldCentricUtil extends LinearOpMode {
             }
         }
     }
-    class autoTransferSample implements Runnable {
 
-        @Override
-        public void run() {
-            try {
-                TimeUnit.MILLISECONDS.sleep(1500);
-                if(armMotor.getCurrentPosition() < 20 &&  intakeMotor.getCurrentPosition() < 20){
-                    transfer = true;
-                    armPivot.setPosition(0.81);
-                    TimeUnit.MILLISECONDS.sleep(500);
-                    sampleServo.setPosition(0.7);
-                    intakePivot.setPosition(0.71);
-                    TimeUnit.MILLISECONDS.sleep(500);
-                    left.setPower(-0.3);
-                    right.setPower(-0.3);
-                    TimeUnit.MILLISECONDS.sleep(200);
-                    sampleServo.setPosition(0.770);
-                    left.setPower(0);
-                    right.setPower(0);
-                    TimeUnit.MILLISECONDS.sleep(300);
-                    intakePivot.setPosition(0.5);
-                    transfer = false;
-                    isUp = true;
-                    TimeUnit.MILLISECONDS.sleep(500);
-                    armPosition = 37;
-                }
-                else{
-                    armPosition = 0;
-                    sampleServo.setPosition(0.7);
-                    armPivot.setPosition(0.5);
-                    isIntakeSlideAuto = true;
-                    intakePosition = 0;
-                    flashRed();
-                }
-
-
-            } catch (InterruptedException e) {
-                // Nothing
-            }
-        }
-    }
     class OutputSample implements Runnable {
 
         @Override
@@ -788,34 +685,6 @@ public class FieldCentricUtil extends LinearOpMode {
             } catch (InterruptedException e) {
                 //Nothing
             }
-        }
-    }
-
-
-    public void flashRed(){
-        revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-        redLightTime = time.milliseconds();
-        lightColor = 1;
-    }
-
-    public void blinkGreen(){
-        revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        greenLightTime = time.milliseconds();
-        lightColor = 2;
-
-    }
-
-    public double redLightTime;
-    public double greenLightTime;
-    public int lightColor;// zero is purple, 1 is red, 2 is green
-    public void stateChecker(){
-        if(time.milliseconds()> redLightTime+ 750&& lightColor == 1){
-            revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-            lightColor = 0;
-        }
-        if(time.milliseconds()> greenLightTime+ 3000&& lightColor == 2){
-            revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
-            lightColor = 0;
         }
     }
 }

@@ -134,24 +134,23 @@ public class Intake {
 
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
-
-
             if (!initialized) {
                 intakePivot.setPosition(0.12);
                 left.setPower(1);
                 right.setPower(1);
-                intakeMotor.setPower(0.8);
+                controller.extendTo(14);
                 initialized = true;
                 sampleDetected = false;
             }
 
-            if (sampleDetected) {
+            if (sampleDetected || controller.targetReached) {
                 intakePivot.setPosition(0.5);
                 left.setPower(0);
                 right.setPower(0);
                 intakeMotor.setPower(0);
                 return false;
             } else {
+                controller.loopController();
                 SampleDetection();
                 return true;
             }
@@ -161,32 +160,93 @@ public class Intake {
         return new IntakeSample();
     }
 
-    // Transfers the sample
-    public class TransferSample implements Action {
+    public class IntakeSampleSlow implements Action {
+        private boolean initialized = false;
 
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
+            if (!initialized) {
+                intakePivot.setPosition(0.12);
+                left.setPower(1);
+                right.setPower(1);
+                controller.setMaxSpeed(0.3);
+                controller.extendTo(6);
+                initialized = true;
+                sampleDetected = false;
+            }
 
-            try {
-                sampleServo.setPosition(0.65);
-                intakePivot.setPosition(0.73);
-                TimeUnit.MILLISECONDS.sleep(500);
-                left.setPower(-0.3);
-                right.setPower(-0.3);
-                TimeUnit.MILLISECONDS.sleep(250);
-                sampleServo.setPosition(0.78);
+            if (sampleDetected || controller.targetReached) {
+                intakePivot.setPosition(0.5);
                 left.setPower(0);
                 right.setPower(0);
-                TimeUnit.MILLISECONDS.sleep(300);
-                intakePivot.setPosition(0.5);
-            } catch (InterruptedException e) {
-                // Nothing
+                intakeMotor.setPower(0);
+                return false;
+            } else {
+                controller.loopController();
+                SampleDetection();
+                return true;
             }
-            return false;
+        }
+    }
+    public Action intakeSampleSlow() {
+        return new IntakeSampleSlow();
+    }
+
+    // Transfers the sample
+    public class TransferSample implements Action {
+        private boolean initialized = false;
+        TransferThread transferThread = new TransferThread();
+        Thread thread = new Thread(transferThread);
+
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket p) {
+            if (!initialized) {
+                thread.start();
+                initialized = true;
+            }
+            return thread.getState() != Thread.State.TERMINATED;
         }
     }
     public Action transferSample() {
         return new TransferSample();
+    }
+
+    public class ToEndPositions implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket p) {
+            intakePivot.setPosition(0.71);
+            return false;
+        }
+    }
+    public Action toEndPositions() {
+        return new ToEndPositions();
+    }
+
+    public boolean threadRunning = false;
+    class TransferThread implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                threadRunning = true;
+                sampleServo.setPosition(0.7);
+                intakePivot.setPosition(0.71);
+                TimeUnit.MILLISECONDS.sleep(50);
+                left.setPower(-0.3);
+                right.setPower(-0.3);
+                TimeUnit.MILLISECONDS.sleep(200);
+                sampleServo.setPosition(0.770);
+                left.setPower(0);
+                right.setPower(0);
+                TimeUnit.MILLISECONDS.sleep(300);
+                intakePivot.setPosition(0.5);
+                threadRunning = false;
+            } catch (InterruptedException e) {
+                // Nothing
+            }
+        }
     }
 
     // Sample detection is required to tell if the robot has a sample

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @TeleOp
+@Disabled
 public class ColorBlobTest extends LinearOpMode
 {
     @SuppressLint("DefaultLocale")
@@ -53,7 +54,7 @@ public class ColorBlobTest extends LinearOpMode
         // Vision Portal for Camera
         VisionPortal portal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .setCameraResolution(new android.util.Size(1920, 1080))
+                .setCameraResolution(new android.util.Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .build();
 
@@ -62,6 +63,7 @@ public class ColorBlobTest extends LinearOpMode
         ArrayList<MatOfPoint> contours = new ArrayList<>();
         // File names
         String srcFileName = Environment.getExternalStorageDirectory().getPath() + "/VisionPortal-Frame.png";
+        String resultFileName = Environment.getExternalStorageDirectory().getPath() + "/gray.png";
         // Color Range for blocks
         ColorRange colorRange = ColorRange.YELLOW;
         String colorRangeString = "Yellow";
@@ -71,14 +73,6 @@ public class ColorBlobTest extends LinearOpMode
         // at which address is the matrix stored, and so on) and a pointer to the matrix containing the pixel values (taking any dimensionality depending
         // on the method chosen for storing) . The matrix header size is constant, however the size of the matrix itself may vary from image to image and
         // usually is larger by orders of magnitude
-        Mat blur = new Mat();
-        Mat mask = new Mat();
-        Mat hierarchy = new Mat();
-        Mat result = new Mat();
-        Mat edges = new Mat();
-        Mat roiMat;
-        Mat roiMat_userColorSpace;
-        Mat srcFrame;
 
         // ROI (Range of Interest)
         Rect roi;
@@ -87,6 +81,15 @@ public class ColorBlobTest extends LinearOpMode
         waitForStart();
         if (opModeIsActive()) {
             //portal.stopStreaming();
+
+            Mat blur = new Mat();
+            Mat mask = new Mat();
+            Mat hierarchy = new Mat();
+            Mat result = new Mat();
+            Mat edges = new Mat();
+            Mat roiMat;
+            Mat roiMat_userColorSpace;
+            Mat srcFrame;
             while (opModeIsActive()) {
 
                 // Change colorRange
@@ -127,11 +130,14 @@ public class ColorBlobTest extends LinearOpMode
                     Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2));
                     Imgproc.dilate(edges, edges, kernel);
 
+                    Imgcodecs.imwrite(resultFileName, edges);
+                    edges = Imgcodecs.imread(resultFileName);
+
                     // Add the edges to the original image
                     Core.subtract(srcFrame, edges, result);
 
                     // Change the roi for blob detection
-                    roi = roiImg.asOpenCvRect(1280, 720);
+                    roi = roiImg.asOpenCvRect(640, 480);
                     roiMat = result.submat(roi);
                     roiMat_userColorSpace = roiMat.clone();
 

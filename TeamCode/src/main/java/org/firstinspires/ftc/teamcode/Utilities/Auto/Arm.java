@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -30,6 +31,8 @@ public class Arm {
     ArmControllerParams armControllerParams = new ArmControllerParams();
     PIDF_Controller controller;
 
+    RevBlinkinLedDriver revBlinkinLedDriver;
+
     boolean run = true;
     double armPosition = 0;
 
@@ -38,6 +41,8 @@ public class Arm {
         armMotor = hardwareMap.get(DcMotorEx.class, "armMotor");
         armPivot = hardwareMap.get(Servo.class, "armPivot");
         sampleServo = hardwareMap.get(Servo.class, "sampleServo");
+
+        revBlinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "rev");
 
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -48,14 +53,16 @@ public class Arm {
                 .setControllerParams(armControllerParams.params)
                 .setMaxSpeed(1)
                 .setStopOnTargetReached(false)
-                .setEndPositionError(5)
+                .setEndPositionError(15)
+                //.setStopOnZero(true)
                 .build();
     }
 
     // Create init() for Auto
     public void init() {
         armPivot.setPosition(0.6);
-        sampleServo.setPosition(0.81);
+        sampleServo.setPosition(0.84);
+        revBlinkinLedDriver.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
     }
 
     public class RunController implements Action {
@@ -172,18 +179,10 @@ public class Arm {
 
             if (!initialized) {
                 armPosition = 0;
-                controller.extendTo(armPosition);
+                controller.retractTo(armPosition);
                 initialized = true;
             }
-
-            double pos = armMotor.getCurrentPosition();
-            p.put("Motor Position: ", pos);
-            if (controller.targetReached) {
-                return false;
-            } else {
-                controller.loopController();
-                return true;
-            }
+            return false;
         }
     }
     public Action armDown() {
@@ -212,7 +211,7 @@ public class Arm {
             if (armPivot.getPosition() >= 0.5) {
                 armPivot.setPosition(0.1);
             } else if (armPivot.getPosition() < 0.5) {
-                armPivot.setPosition(0.8);
+                armPivot.setPosition(0.84);
             }
             try{TimeUnit.MILLISECONDS.sleep(500);}
             catch (InterruptedException e){
@@ -225,12 +224,25 @@ public class Arm {
         return new PivotArm();
     }
 
+    public class ToEndPositions implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket p) {
+            armPivot.setPosition(0.45);
+            sampleServo.setPosition(0.77);
+            return false;
+        }
+    }
+    public Action toEndPositions() {
+        return new ToEndPositions();
+    }
+
     public class WaitTime implements Action {
 
         @Override
         public boolean run(@NonNull TelemetryPacket p) {
             try {
-                TimeUnit.MILLISECONDS.sleep(800);
+                TimeUnit.MILLISECONDS.sleep(200);
             } catch (InterruptedException e) {
                 //Nothing
             }
@@ -240,5 +252,4 @@ public class Arm {
     public Action waitTme() {
         return new WaitTime();
     }
-
 }

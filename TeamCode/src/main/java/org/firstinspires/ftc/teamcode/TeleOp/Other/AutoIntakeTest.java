@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOp.Other;
 import static java.lang.Math.abs;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.Utilities.TeleOp.AutoBlockDetection;
 
 
 @TeleOp
+@Disabled
 public class AutoIntakeTest extends LinearOpMode {
 
     DcMotorEx intakeMotor;
@@ -105,13 +107,18 @@ public class AutoIntakeTest extends LinearOpMode {
 
                 if (gamepad1.a) {
                     blockDetection.findSample();
+                    telemetry.addData("X", blockDetection.robotPosX);
+                    telemetry.addData("Y", blockDetection.robotPosY);
+                    telemetry.addData("Angle", blockDetection.angle);
+                    telemetry.addLine();
+                    telemetry.addData("Block X", blockDetection.blockPosX);
+                    telemetry.addData("Block Y", blockDetection.blockPosY);
+                    telemetry.addData("Block Angle", blockDetection.blockAngle);
+                    telemetry.update();
                 }
                 if (gamepad1.b) {
                     blockDetection.grabSample(drive);
                 }
-
-                telemetry.addData("Servo ", intakeRotatePosition);
-                telemetry.update();
             }
         }
     }
