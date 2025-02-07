@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import java.util.concurrent.TimeUnit;
 
 @TeleOp
+@Disabled
 public class TankDrive extends LinearOpMode {
 
     DcMotorEx leftMotor1;

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Utilities.TeleOp.FieldCentricUtil;
 
-@TeleOp(name = "Blue")
+@TeleOp(name = "Blue TeleOp")
 public class FieldCentricBlue extends FieldCentricUtil {
 
     @Override

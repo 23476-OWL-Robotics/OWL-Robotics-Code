@@ -181,7 +181,11 @@ public class PIDF_Controller{
         out = (p * error) + (i * integralSum) + (d * derivative) + (f * feedForward);
 
         // set the motor power
-        motor1.setPower(Math.min(out, maxSpeed));
+        if (stopOnZero && reference == 0 && encoderPosition < endPositionError) {
+            motor1.setPower(0);
+        } else {
+            motor1.setPower(Math.min(out, maxSpeed));
+        }
 
         if (encoderPosition < reference + endPositionError && encoderPosition > reference -endPositionError) {
             targetReached = true;
@@ -189,7 +193,7 @@ public class PIDF_Controller{
                 motor1.setPower(0);
                 running = false;
             }
-            if (stopOnZero && reference == 0) {
+            if (stopOnZero && encoderPosition < 5) {
                 motor1.setPower(0);
             }
         }

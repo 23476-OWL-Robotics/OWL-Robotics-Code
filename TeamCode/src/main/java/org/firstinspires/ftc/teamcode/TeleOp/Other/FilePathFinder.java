@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.TeleOp.Other;
 
 import android.os.Environment;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 @TeleOp
+@Disabled
 public class FilePathFinder extends LinearOpMode {
 
     @Override

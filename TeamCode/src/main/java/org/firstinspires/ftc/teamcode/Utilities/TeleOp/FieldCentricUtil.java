@@ -440,18 +440,16 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         // Intake slide power
-        if (abs(intake_slide_stick) > deadZone) {
-            if(intakeMotor.getCurrentPosition() < 2000){
-                intakeMotor.setPower(intake_slide_stick);
-            } else {
-                intakeMotor.setPower(-0.1);
-            }
+        if (abs(intake_slide_stick) > deadZone && intakeMotor.getCurrentPosition() < 1900) {
+            intakeMotor.setPower(intake_slide_stick);
 
             if (!oldInSlide) {
                 isIntakeSlideAuto = false;
             }
             oldInSlide = true;
-        } else if(!isIntakeSlideAuto) {
+        } else if (intake_slide_stick < -deadZone) {
+            intakeMotor.setPower(intake_slide_stick);
+        } else {
             intakeMotor.setPower(0);
             oldInSlide = false;
         }
@@ -590,7 +588,6 @@ public class FieldCentricUtil extends LinearOpMode {
 
     // Telemetry for Debugging
     public void telemetry() {
-        drive.updatePoseEstimate();
         telemetry.addLine("-----Intake-----");
         telemetry.addData("Slide Position", intakeMotor.getCurrentPosition());
         telemetry.addData("Slide Power", intakeMotor.getPower());
@@ -613,6 +610,7 @@ public class FieldCentricUtil extends LinearOpMode {
         telemetry.addData("Sensor Red", sensor.red());
         telemetry.addData("Sensor Green", sensor.green());
         telemetry.addData("Sensor Blue", sensor.blue());
+        telemetry.addData("Right Y", -gamepad2.right_stick_y);
         telemetry.update();
         time.reset();
     }
