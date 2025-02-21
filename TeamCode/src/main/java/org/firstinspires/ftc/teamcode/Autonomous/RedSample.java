@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,7 +15,7 @@ import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.Arm;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.Intake;
 
-@Autonomous(name = "Red", preselectTeleOp = "FieldCentricRed")
+@Autonomous(name = "Red", preselectTeleOp = "Red TeleOp")
 public class RedSample extends LinearOpMode {
 
     @Override
@@ -31,8 +33,8 @@ public class RedSample extends LinearOpMode {
         Pose2d action3Pose = new Pose2d(-58, -58, Math.toRadians(-135));
         Pose2d action4Pose = new Pose2d(-60, -44, Math.toRadians(-90));
         Pose2d action5Pose = new Pose2d(-58, -58, Math.toRadians(-135));
-        Pose2d action6Pose = new Pose2d(-61, -38, Math.toRadians(-55));
-        Pose2d action7Pose = new Pose2d(-58, -58, Math.toRadians(-135));
+        Pose2d action6Pose = new Pose2d(-61, -39, Math.toRadians(-60));
+        Pose2d action7Pose = new Pose2d(-56, -56, Math.toRadians(-135));
 
         Pose2d basketActionPose = new Pose2d(-55, -55, Math.toRadians(-135));
 
@@ -63,15 +65,17 @@ public class RedSample extends LinearOpMode {
                 .build();
         Action action5 = drive.actionBuilder(action5Pose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-61, -38, Math.toRadians(-55)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-61, -39, Math.toRadians(-60)), Math.toRadians(90))
                 .build();
         Action action6 = drive.actionBuilder(action6Pose)
                 .setTangent(Math.toRadians(0))
-                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-55, -60, Math.toRadians(-135)), Math.toRadians(-90))
                 .build();
         Action action7 = drive.actionBuilder(action7Pose)
                 .setTangent(Math.toRadians(45))
-                .splineToLinearHeading(new Pose2d(-24, 12, Math.toRadians(180)), Math.toRadians(0))
+                .splineToSplineHeading(new Pose2d(-36, -12, Math.toRadians(180)), Math.toRadians(0))
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(180)), Math.toRadians(0))
                 .build();
 
         Action basketAction1 = drive.actionBuilder(basketActionPose)
@@ -84,7 +88,7 @@ public class RedSample extends LinearOpMode {
                 .build();
         Action basketAction3 = drive.actionBuilder(basketActionPose)
                 .setTangent(-135)
-                .splineToLinearHeading(new Pose2d(-58, -58, Math.toRadians(-135)), Math.toRadians(-135))
+                .splineToLinearHeading(new Pose2d(-56, -56, Math.toRadians(-135)), Math.toRadians(-135))
                 .build();
 
 
@@ -105,6 +109,7 @@ public class RedSample extends LinearOpMode {
                                             arm.armUpSpecimen(),
                                             arm.pivotArm()
                                     ),
+                                    arm.waitTme(),
                                     arm.release(),
                                     new ParallelAction(//bring arm down, drive to intake first sample
                                             action1,

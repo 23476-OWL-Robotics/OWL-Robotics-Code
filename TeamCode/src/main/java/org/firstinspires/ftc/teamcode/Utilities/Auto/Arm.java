@@ -151,7 +151,7 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket p) {
 
             if (!initialized) {
-                armPosition = 13.3;
+                armPosition = 13.5;
                 controller.extendTo(armPosition);
                 initialized = true;
             }

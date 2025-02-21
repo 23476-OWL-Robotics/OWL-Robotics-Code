@@ -111,6 +111,10 @@ public class PIDF_Controller{
         this.stopOnTargetReached = stop;
     }
 
+    public void resetEncoderPosition() {
+        oldEncoderPosition = motor1.getCurrentPosition();
+    }
+
     // Create runController
     // You can stop/start the controller from running if needed
     public void runController(boolean run) {
@@ -160,11 +164,8 @@ public class PIDF_Controller{
         reference = target / ConversionUnit;
 
         // obtain the encoder position
-        if (motor1.getCurrentPosition() == 0) {
-            encoderPosition = motor1.getCurrentPosition() + oldEncoderPosition;
-        } else {
-            encoderPosition = motor1.getCurrentPosition();
-        }
+        encoderPosition = motor1.getCurrentPosition() - oldEncoderPosition;
+
         // calculate the error
         error = reference - encoderPosition;
 

@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -13,8 +12,8 @@ import org.firstinspires.ftc.teamcode.RoadRunner.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.Arm;
 import org.firstinspires.ftc.teamcode.Utilities.Auto.Intake;
 
-@Autonomous(name = "Blue", preselectTeleOp = "Blue TeleOp")
-public class BlueSample extends LinearOpMode {
+@Autonomous(preselectTeleOp = "Red TeleOp")
+public class RedUpACreek extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -24,38 +23,32 @@ public class BlueSample extends LinearOpMode {
         Arm arm = new Arm(hardwareMap);
         Intake intake = new Intake(hardwareMap);
 
-        // Starting Positions for each action
         Pose2d action0Pose = new Pose2d(-16.5, -62, Math.toRadians(180));
-        Pose2d action1Pose = new Pose2d(-10.5, -30, Math.toRadians(90));
-        Pose2d action2Pose = new Pose2d(-50, -44, Math.toRadians(-90));
+        Pose2d action1Pose = new Pose2d(-59, -58, Math.toRadians(-135));
+        Pose2d action2Pose = new Pose2d(-49, -44, Math.toRadians(-90));
         Pose2d action3Pose = new Pose2d(-58, -58, Math.toRadians(-135));
-        Pose2d action4Pose = new Pose2d(-60, -44, Math.toRadians(-90));
-        Pose2d action5Pose = new Pose2d(-58, -58, Math.toRadians(-135));
-        Pose2d action6Pose = new Pose2d(-61, -39, Math.toRadians(-60));
+        Pose2d action4Pose = new Pose2d(-58, -44, Math.toRadians(-90));
+        Pose2d action5Pose = new Pose2d(-57, -57, Math.toRadians(-135));
+        Pose2d action6Pose = new Pose2d(-60, -38, Math.toRadians(-60));
         Pose2d action7Pose = new Pose2d(-56, -56, Math.toRadians(-135));
 
         Pose2d basketActionPose = new Pose2d(-55, -55, Math.toRadians(-135));
 
-        // Actions for rr
         Action action0 = drive.actionBuilder(action0Pose)
-                .waitSeconds(0.5)
-                .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-10.5, -40, Math.toRadians(90)), Math.toRadians(90))
-                .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-10.5, -30, Math.toRadians(90)), Math.toRadians(90))
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-135))
                 .build();
         Action action1 = drive.actionBuilder(action1Pose)
-                .setTangent(Math.toRadians(-90))
-                .splineToSplineHeading(new Pose2d(-40, -44, Math.toRadians(-90)), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-50, -44), Math.toRadians(180))
+                .setTangent(Math.toRadians(45))
+                .splineToLinearHeading(new Pose2d(-49, -44, Math.toRadians(-90)), Math.toRadians(45))
                 .build();
         Action action2 = drive.actionBuilder(action2Pose)
                 .setTangent(Math.toRadians(-135))
-                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(-135)), Math.toRadians(-135))
                 .build();
         Action action3 = drive.actionBuilder(action3Pose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-60, -44, Math.toRadians(-90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-58, -44, Math.toRadians(-90)), Math.toRadians(90))
                 .build();
         Action action4 = drive.actionBuilder(action4Pose)
                 .setTangent(Math.toRadians(-90))
@@ -63,7 +56,7 @@ public class BlueSample extends LinearOpMode {
                 .build();
         Action action5 = drive.actionBuilder(action5Pose)
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(-61, -39, Math.toRadians(-60)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-60, -38, Math.toRadians(-60)), Math.toRadians(90))
                 .build();
         Action action6 = drive.actionBuilder(action6Pose)
                 .setTangent(Math.toRadians(0))
@@ -77,21 +70,23 @@ public class BlueSample extends LinearOpMode {
                 .build();
 
         Action basketAction1 = drive.actionBuilder(basketActionPose)
-                .setTangent(-135)
-                .splineToLinearHeading(new Pose2d(-58, -58, Math.toRadians(-135)), Math.toRadians(-135))
+                .setTangent(Math.toRadians(-135))
+                .splineToLinearHeading(new Pose2d(-59, -58, Math.toRadians(-135)), Math.toRadians(-135))
                 .build();
         Action basketAction2 = drive.actionBuilder(basketActionPose)
-                .setTangent(-135)
+                .setTangent(Math.toRadians(-135))
                 .splineToLinearHeading(new Pose2d(-58, -58, Math.toRadians(-135)), Math.toRadians(-135))
                 .build();
         Action basketAction3 = drive.actionBuilder(basketActionPose)
-                .setTangent(-135)
+                .setTangent(Math.toRadians(-135))
+                .splineToLinearHeading(new Pose2d(-57, -57, Math.toRadians(-135)), Math.toRadians(-135))
+                .build();
+        Action basketAction4 = drive.actionBuilder(basketActionPose)
+                .setTangent(Math.toRadians(-135))
                 .splineToLinearHeading(new Pose2d(-56, -56, Math.toRadians(-135)), Math.toRadians(-135))
                 .build();
 
-
-        // opModeInInit and opModeIsActive
-        while (opModeInInit()) {
+        if (opModeInInit()) {
             arm.init();
             intake.init();
         }
@@ -102,12 +97,14 @@ public class BlueSample extends LinearOpMode {
                     new ParallelAction(
                             arm.runController(),
                             new SequentialAction(
-                                    new ParallelAction(//drive near bar, bring up arm
+                                    new ParallelAction(
                                             action0,
-                                            arm.armUpSpecimen(),
+                                            arm.armUpHigh()
+                                    ),
+                                    new ParallelAction(
+                                            basketAction1,
                                             arm.pivotArm()
                                     ),
-                                    arm.waitTme(),
                                     arm.release(),
                                     new ParallelAction(//bring arm down, drive to intake first sample
                                             action1,
@@ -125,7 +122,7 @@ public class BlueSample extends LinearOpMode {
                                     ),
                                     arm.armUpHigh(),
                                     new ParallelAction(
-                                            basketAction1,
+                                            basketAction2,
                                             arm.pivotArm()
                                     ),
                                     arm.release(),
@@ -150,7 +147,7 @@ public class BlueSample extends LinearOpMode {
                                     arm.armUpHigh(),
                                     new ParallelAction(
                                             arm.pivotArm(),
-                                            basketAction2
+                                            basketAction3
                                     ),
                                     arm.release(),
                                     new ParallelAction(
@@ -174,7 +171,7 @@ public class BlueSample extends LinearOpMode {
                                     arm.armUpHigh(),
                                     new ParallelAction(
                                             arm.pivotArm(),
-                                            basketAction3
+                                            basketAction4
                                     ),
                                     arm.release(),
                                     new ParallelAction(

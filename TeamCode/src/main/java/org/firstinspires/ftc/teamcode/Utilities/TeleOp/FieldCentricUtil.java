@@ -404,9 +404,7 @@ public class FieldCentricUtil extends LinearOpMode {
             armPivot.setPosition(0.1);
         } else if (gamepad2.dpad_down) {
             sampleServo.setPosition(0.770);
-            armPosition = 10;
-
-
+            armPosition = 15;
         }
 
         if (lifter_slide_stick > deadZone) {
@@ -440,7 +438,7 @@ public class FieldCentricUtil extends LinearOpMode {
         }
 
         // Intake slide power
-        if (abs(intake_slide_stick) > deadZone && intakeMotor.getCurrentPosition() < 1900) {
+        if (abs(intake_slide_stick) > deadZone && intakeMotor.getCurrentPosition() < 1700) {
             intakeMotor.setPower(intake_slide_stick);
 
             if (!oldInSlide) {
@@ -477,7 +475,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
             if (intake_pivot_up) {//transfer
                 if(!transfer) {
-                    if (armMotor.getCurrentPosition() < 20 &&  intakeMotor.getCurrentPosition() < 20) {
+                    if (armMotor.getCurrentPosition() < 30) {
                         isIntakeSlideAuto = false;
                         TransferSample transferSample = new TransferSample();
                         Thread transferThread = new Thread(transferSample);
@@ -539,7 +537,7 @@ public class FieldCentricUtil extends LinearOpMode {
 
         if (intake_pivot_up) {
             if(!transfer) {
-                if (armMotor.getCurrentPosition() < 20 &&  intakeMotor.getCurrentPosition() < 20) {
+                if (armMotor.getCurrentPosition() < 20) {
                     isIntakeSlideAuto = false;
                     TransferSample transferSample = new TransferSample();
                     Thread transferThread = new Thread(transferSample);
