@@ -192,6 +192,25 @@ public class Intake {
         return new IntakeSampleSlow();
     }
 
+    public class OutputSample implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intakePivot.setPosition(0.4);
+            left.setPower(-1);
+            right.setPower(-1);
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            left.setPower(0);
+            right.setPower(0);
+            intakePivot.setPosition(0.5);
+            return false;
+        }
+    }
+
     // Transfers the sample
     public class TransferSample implements Action {
         private boolean initialized = false;
