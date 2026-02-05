@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
+import org.firstinspires.ftc.teamcode.Util.Utilities;
+
 @Disabled
 @Configurable
 @TeleOp(name = "ServoTuner", group = "Tuning")
@@ -42,7 +44,6 @@ public class ServoTuning extends OpMode {
     public static double Launcher_Rotation_Position = 0.5;
     public static double Launcher_Angle_Position = 0.07;
     public static double Transfer_Rotation_Position = 0.0;
-    public static double Transfer_Lift_Position = 0.1;
 
     public static double Left_LED_Color = 0.0;
     public static double Right_LED_Color = 0.0;
@@ -51,15 +52,14 @@ public class ServoTuning extends OpMode {
     public static Servo.Direction Launcher_Left_Angle_Direction = Servo.Direction.FORWARD;
     public static Servo.Direction Launcher_Right_Angle_Direction = Servo.Direction.REVERSE;
     public static Servo.Direction Transfer_Rotation_Direction = Servo.Direction.REVERSE;
-    public static Servo.Direction Transfer_Left_Lift_Direction = Servo.Direction.FORWARD;
-    public static Servo.Direction Transfer_Right_Lift_Direction = Servo.Direction.REVERSE;
 
-    Servo launcherRotationServo;
+    Servo launcherLeftRotationServo;
+    Servo launcherRightRotationServo;
+
     Servo launcherLeftAngleServo;
     Servo launcherRightAngleServo;
+
     Servo transferRotationServo;
-    Servo transferLeftLiftServo;
-    Servo transferRightLiftServo;
 
     Servo leftLED;
     Servo rightLED;
@@ -69,32 +69,24 @@ public class ServoTuning extends OpMode {
     @Override
     public void init() {
 
-        launcherRotationServo = hardwareMap.get(Servo.class, "launcherRotationServo");
+        launcherLeftRotationServo = hardwareMap.get(Servo.class, "launcherLeftRotationServo");
+        launcherRightRotationServo = hardwareMap.get(Servo.class, "launcherRightRotationServo");
+
         launcherLeftAngleServo = hardwareMap.get(Servo.class, "launcherLeftAngleServo");
         launcherRightAngleServo = hardwareMap.get(Servo.class, "launcherRightAngleServo");
 
         transferRotationServo = hardwareMap.get(Servo.class, "transferRotationServo");
-        transferLeftLiftServo = hardwareMap.get(Servo.class, "transferLeftLiftServo");
-        transferRightLiftServo = hardwareMap.get(Servo.class, "transferRightLiftServo");
 
         leftLED = hardwareMap.get(Servo.class, "leftLED");
         rightLED = hardwareMap.get(Servo.class, "rightLED");
 
-        ServoControllerEx launcherRotationController = (ServoControllerEx) launcherRotationServo.getController();
-        ServoControllerEx launcherLeftAngleController = (ServoControllerEx) launcherLeftAngleServo.getController();
-        ServoControllerEx launcherRightAngleController = (ServoControllerEx) launcherRightAngleServo.getController();
+        Utilities.Set_PWM_Range(launcherLeftRotationServo, new PwmControl.PwmRange(500, 2500));
+        Utilities.Set_PWM_Range(launcherRightRotationServo, new PwmControl.PwmRange(500, 2500));
 
-        ServoControllerEx transferRotationController = (ServoControllerEx) transferRotationServo.getController();
-        ServoControllerEx transferLeftLiftController = (ServoControllerEx) transferLeftLiftServo.getController();
-        ServoControllerEx transferRightLiftController = (ServoControllerEx) transferRightLiftServo.getController();
+        Utilities.Set_PWM_Range(launcherLeftAngleServo, new PwmControl.PwmRange(500, 2500));
+        Utilities.Set_PWM_Range(launcherRightAngleServo, new PwmControl.PwmRange(500, 2500));
 
-        launcherRotationController.setServoPwmRange(launcherRotationServo.getPortNumber(), new PwmControl.PwmRange(500, 2500));
-        launcherLeftAngleController.setServoPwmRange(launcherLeftAngleServo.getPortNumber(), new PwmControl.PwmRange(500, 2500));
-        launcherRightAngleController.setServoPwmRange(launcherRightAngleServo.getPortNumber(), new PwmControl.PwmRange(500, 2500));
-
-        transferRotationController.setServoPwmRange(transferRotationServo.getPortNumber(), new PwmControl.PwmRange(500, 2500));
-        transferLeftLiftController.setServoPwmRange(transferLeftLiftServo.getPortNumber(), new PwmControl.PwmRange(500, 2500));
-        transferRightLiftController.setServoPwmRange(transferRightLiftServo.getPortNumber(), new PwmControl.PwmRange(500, 2500));
+        Utilities.Set_PWM_Range(transferRotationServo, new PwmControl.PwmRange(500, 2500));
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
@@ -102,21 +94,22 @@ public class ServoTuning extends OpMode {
     @Override
     public void loop() {
 
-        launcherRotationServo.setDirection(Launcher_Rotation_Direction);
+        transferRotationServo.setDirection(Transfer_Rotation_Direction);
+
+        launcherLeftRotationServo.setDirection(Launcher_Rotation_Direction);
+        launcherRightRotationServo.setDirection(Launcher_Rotation_Direction);
+
         launcherLeftAngleServo.setDirection(Launcher_Left_Angle_Direction);
         launcherRightAngleServo.setDirection(Launcher_Right_Angle_Direction);
 
-        transferRotationServo.setDirection(Transfer_Rotation_Direction);
-        transferLeftLiftServo.setDirection(Transfer_Left_Lift_Direction);
-        transferRightLiftServo.setDirection(Transfer_Right_Lift_Direction);
-
-        launcherRotationServo.setPosition(Launcher_Rotation_Position);
-        launcherLeftAngleServo.setPosition(Launcher_Angle_Position);
-        launcherRightAngleServo.setPosition(Launcher_Angle_Position);
 
         transferRotationServo.setPosition(Transfer_Rotation_Position);
-        transferLeftLiftServo.setPosition(Transfer_Lift_Position);
-        transferRightLiftServo.setPosition(Transfer_Lift_Position);
+
+        launcherLeftRotationServo.setPosition(Launcher_Rotation_Position);
+        launcherRightRotationServo.setPosition(Launcher_Rotation_Position);
+
+        launcherLeftAngleServo.setPosition(Launcher_Angle_Position);
+        launcherRightAngleServo.setPosition(Launcher_Angle_Position);
 
         leftLED.setPosition(Left_LED_Color);
         rightLED.setPosition(Right_LED_Color);

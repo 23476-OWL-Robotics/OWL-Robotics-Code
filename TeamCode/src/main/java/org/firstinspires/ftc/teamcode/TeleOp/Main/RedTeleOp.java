@@ -162,7 +162,7 @@ public class RedTeleOp extends OpMode {
         }
 
         // If the transfer still have artifacts, and all timers are finished, launch that artifact.
-        if (transfer.AreTimersFinished() && transfer.getState() == Transfer.TransferState.Outtake) {
+        if (transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
             transfer.EjectSelectedArtifact();
             return;
         }

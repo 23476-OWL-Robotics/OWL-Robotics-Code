@@ -155,7 +155,7 @@ public class RedAutoGoal extends OpMode {
             return;
         }
 
-        if (launcherWarmupTimer.isFinished() && transfer.AreTimersFinished() && transfer.getState() == Transfer.TransferState.Outtake) {
+        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
             transfer.EjectSelectedArtifact();
         }
 
@@ -197,7 +197,7 @@ public class RedAutoGoal extends OpMode {
             return;
         }
 
-        if (launcherWarmupTimer.isFinished() && transfer.AreTimersFinished() && transfer.getState() == Transfer.TransferState.Outtake) {
+        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
             intake.stopIntake();
             transfer.EjectSelectedArtifact();
         }

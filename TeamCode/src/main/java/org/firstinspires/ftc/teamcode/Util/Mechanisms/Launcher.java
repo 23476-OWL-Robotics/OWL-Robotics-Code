@@ -16,7 +16,6 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.Coefficients;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.ControllerStates;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.VelocityController;
-import org.firstinspires.ftc.teamcode.Util.Timer;
 import org.firstinspires.ftc.teamcode.Util.Utilities;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -36,9 +35,11 @@ public class Launcher {
     VisionPortal tagPortal;
     AprilTagProcessor tagProcessor;
 
-    DcMotorEx launcherMotor;
+    DcMotorEx leftLaunchMotor;
+    DcMotorEx rightLaunchMotor;
 
-    Servo rotationServo;
+    Servo leftRotationServo;
+    Servo rightRotationServo;
     Servo leftAngleServo;
     Servo rightAngleServo;
 
@@ -90,23 +91,34 @@ public class Launcher {
     }
 
     public void init() {
-        launcherMotor = hardwareMap.get(DcMotorEx.class, "launcherMotor");
+        leftLaunchMotor = hardwareMap.get(DcMotorEx.class, "launcherLeftMotor");
+        rightLaunchMotor = hardwareMap.get(DcMotorEx.class, "launcherRightMotor");
 
-        rotationServo = hardwareMap.get(Servo.class, "launcherRotationServo");
+        leftRotationServo = hardwareMap.get(Servo.class, "launcherLeftRotationServo");
+        rightRotationServo = hardwareMap.get(Servo.class, "launcherRightRotationServo");
         leftAngleServo = hardwareMap.get(Servo.class, "launcherLeftAngleServo");
         rightAngleServo = hardwareMap.get(Servo.class, "launcherRightAngleServo");
 
-        launcherMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        launcherMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        leftLaunchMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightLaunchMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        rotationServo.setDirection(Servo.Direction.FORWARD);
+        leftLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        rightLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        leftRotationServo.setDirection(Servo.Direction.FORWARD);
+        rightRotationServo.setDirection(Servo.Direction.FORWARD);
+
         leftAngleServo.setDirection(Servo.Direction.FORWARD);
         rightAngleServo.setDirection(Servo.Direction.REVERSE);
 
+        Utilities.Set_PWM_Range(leftRotationServo, new PwmControl.PwmRange(500, 2500));
+        Utilities.Set_PWM_Range(rightRotationServo, new PwmControl.PwmRange(500, 2500));
         Utilities.Set_PWM_Range(leftAngleServo, new PwmControl.PwmRange(500, 2500));
         Utilities.Set_PWM_Range(rightAngleServo, new PwmControl.PwmRange(500, 2500));
 
-        rotationServo.setPosition(RotationServoZero);
+        leftRotationServo.setPosition(RotationServoZero);
+        rightRotationServo.setPosition(RotationServoZero);
+
         leftAngleServo.setPosition(LaunchServoZero);
         rightAngleServo.setPosition(LaunchServoZero);
 
@@ -138,25 +150,32 @@ public class Launcher {
             rotationPosition = (rotationAngle * rotationIncPerDeg) + RotationServoOffset;
 
             int setV = (int) (2 * (velocity * wheelCircumference));
+
             vController.setTargetRPM(setV-100);
             vController.setState(ControllerStates.RUN_CONTROLLER);
-            vController.runController(launcherMotor.getVelocity());
-            launcherMotor.setPower(vController.getOut());
+            vController.runController(GetAverageVelocity());
+
+            leftLaunchMotor.setPower(vController.getOut());
+            rightLaunchMotor.setPower(vController.getOut());
         } else {
             launchPosition = LaunchServoZero;
             rotationPosition = RotationServoZero;
 
             if (reverseMotor) {
-                launcherMotor.setPower(-0.08);
+                leftLaunchMotor.setPower(-0.08);
+                rightLaunchMotor.setPower(-0.08);
             } else {
-                launcherMotor.setPower(0);
+                leftLaunchMotor.setPower(0);
+                rightLaunchMotor.setPower(-0.08);
             }
             vController.setState(ControllerStates.STOP_CONTROLLER);
         }
 
         leftAngleServo.setPosition(launchPosition);
         rightAngleServo.setPosition(launchPosition);
-        rotationServo.setPosition(rotationPosition);
+
+        leftRotationServo.setPosition(rotationPosition);
+        rightRotationServo.setPosition(rotationPosition);
     }
 
     public void Telemetry() {
@@ -176,19 +195,6 @@ public class Launcher {
         telemetry.addData("Motor Power", vController.getOut());
         telemetry.addData("Controller State", vController.getState());
     }
-
-    /*
-    public void startMotor() {
-        int setV = (int) (2 * (velocity * wheelCircumference));
-        vController.setTargetRPM(setV);
-        vController.setState(ControllerStates.RUN_CONTROLLER);
-    }
-    public void stopMotor() {
-        vController.setTargetVelocity(0);
-        vController.setState(ControllerStates.STOP_CONTROLLER);
-    }
-
-     */
 
     public void setLauncherEnabled(boolean enabled) {
         this.launcherEnabled = enabled;
@@ -216,6 +222,10 @@ public class Launcher {
         return new Point3(x, y, z);
     }
 
+    private double GetAverageVelocity() {
+        return (leftLaunchMotor.getVelocity() + rightLaunchMotor.getVelocity()) / 2;
+    }
+
     private void RunCalculations(Pose robotPose) {
         if (!IsLegalLaunchingPosition(robotPose)) {
             launchAngle = 70;
@@ -223,6 +233,8 @@ public class Launcher {
             rotationOffset = 0;
             velocity = 0;
             return;
+        } else {
+            velocity = FindIdleMotorVelocity(robotPose);
         }
 
         CalculateRotationAngle(robotPose);
@@ -259,6 +271,29 @@ public class Launcher {
         return value;
     }
 
+    private double FindIdleMotorVelocity(Pose robotPose) {
+        // The Return Velocity
+        double v;
+
+        // Robots X and Y Distance from the Goal
+        double x, y;
+
+        // Find the x and y values
+        x = robotPose.getX() - goalPose.x;
+        y = robotPose.getY() - goalPose.y;
+
+        // Using Pythagorean Theorem to find the distance to the goal
+        double root = Math.sqrt(
+                Math.pow(x, 2) +
+                Math.pow(y, 2)
+        );
+
+        // Calculate the velocity (Best Equation I could come up with)
+        v = Math.pow((250 * x), 0.5) + 73;
+
+        return v;
+    }
+
     /**
         This function finds the launch angle from the position of the launcher and
         the position of the goal.
@@ -289,7 +324,7 @@ public class Launcher {
         }
 
 
-        // Find the velocity (Best Equation I could come up with
+        // Find the velocity (Best Equation I could come up with)
         v = Math.pow((250 * x), 0.5) + 73;
 
         // Set the velocity

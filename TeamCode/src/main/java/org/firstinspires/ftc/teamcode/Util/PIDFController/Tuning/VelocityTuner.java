@@ -65,7 +65,7 @@ public class VelocityTuner extends OpMode {
 
         vController.setState(CurrentState);
 
-        motor = hardwareMap.get(DcMotorEx.class, "launcherMotor");
+        motor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
         motor.setDirection(DcMotorSimple.Direction.REVERSE);
         motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }

@@ -59,7 +59,7 @@ public class PositionTuner extends OpMode {
                 .setEndState(EndState)
                 .build();
 
-        motor = hardwareMap.get(DcMotorEx.class, "motor");
+        motor = hardwareMap.get(DcMotorEx.class, "transferLiftMotor");
         motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 

@@ -30,6 +30,18 @@ public class Coefficients {
                         0.002583979328165375);
             }
         }
+
+        public static class LiftMotorCoefficients extends PositionCoefficients {
+
+            public LiftMotorCoefficients() {
+                super(
+                        0.0015,
+                        0,
+                        0.0,
+                        0.0,
+                        0.002583979328165375);
+            }
+        }
     }
 
     public static class VelocityCoefficients {
@@ -37,9 +49,9 @@ public class Coefficients {
         double i;
         double d;
 
-        int ticksPerRev;
+        double ticksPerRev;
 
-        public VelocityCoefficients(double p, double i, double d, int ticksPerRev) {
+        public VelocityCoefficients(double p, double i, double d, double ticksPerRev) {
             this.p = p;
             this.i = i;
             this.d = d;
@@ -64,6 +76,17 @@ public class Coefficients {
                       0.0,
                       0.0,
                       28);
+            }
+        }
+
+        public static class IntakeMotorCoefficients extends VelocityCoefficients {
+
+            public IntakeMotorCoefficients() {
+                super(
+                        0.0,
+                        0.0,
+                        0.0,
+                        145.1);
             }
         }
     }

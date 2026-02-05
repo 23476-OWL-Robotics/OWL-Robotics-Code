@@ -122,7 +122,7 @@ public class BlueAutoWall extends OpMode {
             return;
         }
 
-        if (transfer.AreTimersFinished() && transfer.getState() == Transfer.TransferState.Outtake) {
+        if (transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
             transfer.EjectSelectedArtifact();
         }
 
@@ -166,7 +166,7 @@ public class BlueAutoWall extends OpMode {
             return;
         }
 
-        if (launcherWarmupTimer.isFinished() && transfer.AreTimersFinished() && transfer.getState() == Transfer.TransferState.Outtake) {
+        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
             transfer.EjectSelectedArtifact();
         }
 

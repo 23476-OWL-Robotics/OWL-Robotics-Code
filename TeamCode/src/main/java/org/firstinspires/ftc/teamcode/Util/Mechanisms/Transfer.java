@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.Util.Mechanisms;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -11,6 +14,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Util.Artifact;
 import org.firstinspires.ftc.teamcode.Util.ArtifactPattern;
 import org.firstinspires.ftc.teamcode.Util.ArtifactType;
+import org.firstinspires.ftc.teamcode.Util.PIDFController.Coefficients;
+import org.firstinspires.ftc.teamcode.Util.PIDFController.ControllerStates;
+import org.firstinspires.ftc.teamcode.Util.PIDFController.PositionController;
 import org.firstinspires.ftc.teamcode.Util.Timer;
 import org.firstinspires.ftc.teamcode.Util.Utilities;
 
@@ -32,9 +38,11 @@ public class Transfer {
     ColorSensor sensor2;
     ColorSensor sensor3;
 
+    DigitalChannel limitSwitch;
+
     Servo rotationServo;
-    Servo leftLiftServo;
-    Servo rightLiftServo;
+
+    DcMotorEx liftMotor;
 
     Telemetry telemetry;
     OpMode opMode;
@@ -43,11 +51,12 @@ public class Transfer {
 
     TransferState state;
 
-    Timer ejectTimer;
+    PositionController pController;
+
     Timer rotationTimer;
 
-    final double LiftDown = 0.09;
-    final double LiftUp = 0.347;
+    final double LiftDown = 0.0;
+    final double LiftUp = 5.0;
 
     final double RotationSlot_1_Intake = 0.0;
     final double RotationSlot_2_Intake = 0.4;
@@ -58,12 +67,13 @@ public class Transfer {
     final int BlueLimit = 700;
 
     double RotationPosition = RotationSlot_1_Intake;
-    double LiftPosition = LiftDown;
 
     int currentSlot;
     int artifactIndex;
+    int liftMotorZero;
 
     boolean canMove = false;
+    boolean isEjecting = false;
 
     public Transfer(OpMode o) {
         this.opMode = o;
@@ -71,7 +81,6 @@ public class Transfer {
         this.telemetry = o.telemetry;
 
         rotationTimer = new Timer();
-        ejectTimer = new Timer();
     }
 
     public void setPreloads(ArtifactType slot1, ArtifactType slot2, ArtifactType slot3) {
@@ -95,17 +104,17 @@ public class Transfer {
         sensor2 = hardwareMap.get(RevColorSensorV3.class, "colorSensor2");
         sensor3 = hardwareMap.get(RevColorSensorV3.class, "colorSensor3");
 
+        limitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
+
         rotationServo = hardwareMap.get(Servo.class, "transferRotationServo");
-        leftLiftServo = hardwareMap.get(Servo.class, "transferLeftLiftServo");
-        rightLiftServo = hardwareMap.get(Servo.class, "transferRightLiftServo");
+        liftMotor = hardwareMap.get(DcMotorEx.class, "transferLeftMotor");
 
         Utilities.Set_PWM_Range(rotationServo, new PwmControl.PwmRange(500, 2500));
-        Utilities.Set_PWM_Range(leftLiftServo, new PwmControl.PwmRange(500, 2500));
-        Utilities.Set_PWM_Range(rightLiftServo, new PwmControl.PwmRange(500, 2500));
 
         rotationServo.setDirection(Servo.Direction.REVERSE);
-        leftLiftServo.setDirection(Servo.Direction.FORWARD);
-        rightLiftServo.setDirection(Servo.Direction.REVERSE);
+
+        //ToDo: Set Lift Motor Position;
+        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if (artifacts.isEmpty()) {
             artifacts.add(new Artifact(ArtifactType.EMPTY, 1));
@@ -113,12 +122,26 @@ public class Transfer {
             artifacts.add(new Artifact(ArtifactType.EMPTY, 3));
         }
 
+        pController = new PositionController.Builder()
+                .setCoefficients(new Coefficients.PositionCoefficients.LiftMotorCoefficients())
+                .setEndState(ControllerStates.HOLD_CONTROLLER)
+                .setEndPositionError(25)
+                .build();
+
         currentSlot = 1;
         artifactIndex = 0;
 
         rotationServo.setPosition(RotationPosition);
-        leftLiftServo.setPosition(LiftPosition);
-        rightLiftServo.setPosition(LiftPosition);
+    }
+
+    public boolean ZeroLiftMotor() {
+        if(limitSwitch.getState()) {
+            liftMotor.setPower(0);
+            return true;
+        } else {
+            liftMotor.setPower(-0.01);
+            return false;
+        }
     }
 
     public void setState(TransferState state) {
@@ -137,9 +160,10 @@ public class Transfer {
     }
 
     public void EjectSelectedArtifact() {
-        if (AreTimersFinished()) {
-            LiftPosition = LiftUp;
-            ejectTimer.setMillisecondTimer(1600);
+        if (CanMove()) {
+            pController.setTargetPosition(LiftUp);
+            isEjecting = true;
+
             artifacts.set(artifactIndex, new Artifact(ArtifactType.EMPTY, currentSlot));
 
             if (patternIndex < 2) {
@@ -153,17 +177,19 @@ public class Transfer {
     }
 
     public void loop() {
-        ejectTimer.loop();
         rotationTimer.loop();
 
-        if (!ejectTimer.isFinished() && ejectTimer.getMillisecondsRemaining() < 800) {
-            LiftPosition = LiftDown;
+        pController.runController(liftMotor.getCurrentPosition());
+
+        if (pController.getState() == ControllerStates.HOLD_CONTROLLER && isEjecting) {
+            pController.setTargetPosition(LiftDown);
+            isEjecting = false;
         }
 
         switch (state) {
             case Intake: {
 
-                if (AreTimersFinished()) {
+                if (CanMove()) {
                     // Set the current artifact color.
                     artifacts.set(artifactIndex, new Artifact(getArtifactColor(), currentSlot));
 
@@ -176,7 +202,7 @@ public class Transfer {
             } break;
             case Outtake: {
 
-                if (AreTimersFinished()) {
+                if (CanMove()) {
 
                     if (canMove) {
                         canMove = false;
@@ -188,8 +214,7 @@ public class Transfer {
         }
 
         rotationServo.setPosition(RotationPosition);
-        leftLiftServo.setPosition(LiftPosition);
-        rightLiftServo.setPosition(LiftPosition);
+        liftMotor.setPower(pController.getOut());
     }
 
     public void Telemetry() {
@@ -199,12 +224,10 @@ public class Transfer {
         telemetry.addData("Artifact 3 ", artifacts.get(2).getType());
         telemetry.addLine("----Servo Positions----");
         telemetry.addData("Rotation Servo", RotationPosition);
-        telemetry.addData("Eject Servo", LiftPosition);
         telemetry.addLine("----State----");
         telemetry.addData("State", state);
         telemetry.addLine("----Timers----");
         telemetry.addData("Rotation Timer", rotationTimer.getSecondsRemaining());
-        telemetry.addData("Eject Timer", ejectTimer.getMillisecondsRemaining());
         telemetry.addLine("----Others----");
         telemetry.addData("Current Slot", currentSlot);
         telemetry.addData("Current Artifact", artifactIndex);
@@ -243,12 +266,12 @@ public class Transfer {
     }
 
     // Checks if both the rotation and eject timers are finished.
-    public boolean AreTimersFinished() {
+    public boolean CanMove() {
         boolean value = true;
 
         if (!rotationTimer.isFinished()) {
             value = false;
-        } else if (!ejectTimer.isFinished()) {
+        } else if (isEjecting) {
             value = false;
         }
 
