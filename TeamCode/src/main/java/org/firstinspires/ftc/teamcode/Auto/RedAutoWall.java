@@ -175,17 +175,19 @@ public class RedAutoWall extends OpMode {
 
             launcher.setLauncherEnabled(false);
 
-            endTimer.setMillisecondTimer(1000);
+            follower.followPath(paths.park);
             setPathState(PathState.End);
         }
     }
 
     void EndFunction() {
 
-        if (endTimer.isFinished()) {
-            RedTeleOp.Start_Pose = follower.getPose();
-            terminateOpModeNow();
+        if (follower.isBusy()) {
+            return;
         }
+
+        RedTeleOp.Start_Pose = follower.getPose();
+        terminateOpModeNow();
     }
 
     void setPathState(PathState state) {

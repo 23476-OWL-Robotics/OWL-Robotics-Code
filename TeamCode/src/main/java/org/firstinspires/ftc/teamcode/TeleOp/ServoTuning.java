@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
 import org.firstinspires.ftc.teamcode.Util.Utilities;
 
-@Disabled
 @Configurable
 @TeleOp(name = "ServoTuner", group = "Tuning")
 public class ServoTuning extends OpMode {
@@ -21,7 +20,8 @@ public class ServoTuning extends OpMode {
         Launcher Rotation Zero: 0.5
         Launcher Rotation Direction: FORWARD
 
-        Launcher Angle Zero: 0.09
+        Launcher Angle Zero: 0.07
+        Launcher Angle Max: 1.0
         Left Launcher Angle Servo Direction: FORWARD
         Right Launcher Angle Servo Direction: REVERSE
 

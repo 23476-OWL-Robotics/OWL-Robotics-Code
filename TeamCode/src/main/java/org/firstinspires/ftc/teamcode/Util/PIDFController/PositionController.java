@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Util.PIDFController;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Auto.Creek.Red;
+
 public class PositionController {
 
     // Current State and EndState
@@ -122,7 +124,7 @@ public class PositionController {
 
     // Returns the CurrentPosition
     public double getCurrentPosition() {
-        return encoderPosition / coefficients.conversionUnit;
+        return encoderPosition * coefficients.conversionUnit;
     }
 
     // Set the controller state
@@ -152,7 +154,7 @@ public class PositionController {
 
     // Will return the needed motor power
     public double getOut() {
-        return out;
+        return Math.min(out, 0.8);
     }
 
     // Will return the controllers reference
@@ -174,7 +176,7 @@ public class PositionController {
     private void calculate() {
 
         // get the reference
-        reference = (int) target / coefficients.conversionUnit;
+        reference = target / coefficients.conversionUnit;
 
         // calculate the error
         error = reference - encoderPosition;

@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.paths.PathConstraints;
 
@@ -18,20 +19,24 @@ public class AutoPaths {
         public PathChain scorePickup1;
         public PathChain park;
 
+        public PathChain creekPark;
+
         public Auto_Blue_Goal(Follower follower) {
             CreatePaths(follower);
         }
 
-        public static Pose startPose = new Pose(21, 123, Math.toRadians(-36));
-        protected static Pose viewObeliskPose = new Pose(58, 125, Math.toRadians(235));
+        public static Pose startPose = new Pose(18, 124.5, Math.toRadians(-129));
+        protected static Pose viewObeliskPose = new Pose(56, 125, Math.toRadians(235));
         protected static Pose scorePose1 = new Pose(40, 100, Math.toRadians(-45));
-        protected static Pose startPickup1Pose = new Pose(46, 83, Math.toRadians(180));
+        protected static Pose startPickup1Pose = new Pose(46, 84, Math.toRadians(180));
         protected static Pose startPickup1Control = new Pose(50, 96);
-        protected static Pose nibble1Pickup1Pose = new Pose(41, 83.5, Math.toRadians(180));
-        protected static Pose nibble2Pickup1Pose = new Pose(36.5, 83.5, Math.toRadians(180));
-        protected static Pose endPickup1Pose = new Pose(24, 83.5, Math.toRadians(180));
+        protected static Pose nibble1Pickup1Pose = new Pose(38, 84, Math.toRadians(180));
+        protected static Pose nibble2Pickup1Pose = new Pose(34, 84, Math.toRadians(180));
+        protected static Pose endPickup1Pose = new Pose(18, 84, Math.toRadians(180));
         protected static Pose scorePickup1Control = new Pose(38, 88);
         protected static Pose endPose = new Pose(25, 70, Math.toRadians(-90));
+
+        protected static Pose creekEndPose = new Pose(56, 136, Math.toRadians(0));
 
         PathConstraints constraints = new PathConstraints(1, 0);
 
@@ -114,6 +119,17 @@ public class AutoPaths {
                     .setLinearHeadingInterpolation(scorePose1.getHeading(), endPose.getHeading())
                     .setConstraints(constraints)
                     .build();
+
+            creekPark = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    scorePose1,
+                                    creekEndPose
+                            )
+                    )
+                    .setLinearHeadingInterpolation(scorePose1.getHeading(), creekEndPose.getHeading())
+                    .setConstraints(constraints)
+                    .build();
         }
 
     }
@@ -123,6 +139,7 @@ public class AutoPaths {
         public PathChain lineupPickup1;
         public PathChain grabPickup1;
         public PathChain scorePickup1;
+        public PathChain park;
 
         public Auto_Blue_Wall(Follower follower) {
             CreatePaths(follower);
@@ -133,7 +150,8 @@ public class AutoPaths {
         protected static Pose nibble1Pickup1Pose = new Pose(39, 34.5, Math.toRadians(180));
         protected static Pose nibble2Pickup1Pose = new Pose(34.5, 34.5, Math.toRadians(180));
         protected static Pose endPickup1Pose = new Pose(24, 34.5, Math.toRadians(180));
-        protected static Pose endPose = new Pose(56, 12, Math.toRadians(-90));
+        protected static Pose scorePickup1Pose = new Pose(56, 12, Math.toRadians(-90));
+        protected static Pose endPose = new Pose(34, 12, Math.toRadians(-90));
 
         PathConstraints constraints = new PathConstraints(1, 0);
 
@@ -176,12 +194,24 @@ public class AutoPaths {
                     .addPath(
                             new BezierLine(
                                     endPickup1Pose,
+                                    scorePickup1Pose
+                            )
+                    )
+                    .setLinearHeadingInterpolation(endPickup1Pose.getHeading(), scorePickup1Pose.getHeading())
+                    .setConstraints(constraints)
+                    .build();
+
+            park = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    scorePickup1Pose,
                                     endPose
                             )
                     )
-                    .setLinearHeadingInterpolation(endPickup1Pose.getHeading(), endPose.getHeading())
+                    .setLinearHeadingInterpolation(scorePickup1Pose.getHeading(), endPose.getHeading())
                     .setConstraints(constraints)
                     .build();
+
         }
     }
 
@@ -193,6 +223,8 @@ public class AutoPaths {
         public PathChain grabPickup1;
         public PathChain scorePickup1;
         public PathChain park;
+
+        public PathChain creekPark;
 
         public Auto_Red_Goal(Follower follower) {
             CreatePaths(follower);
@@ -208,6 +240,8 @@ public class AutoPaths {
         protected static Pose endPickup1Pose = Auto_Blue_Goal.endPickup1Pose.mirror();
         protected static Pose scorePickup1Control = Auto_Blue_Goal.scorePickup1Control.mirror();
         protected static Pose endPose = Auto_Blue_Goal.endPose.mirror();
+
+        protected static Pose creekEndPose = Auto_Blue_Goal.creekEndPose.mirror();
 
         PathConstraints constraints = new PathConstraints(1, 0);
 
@@ -291,6 +325,17 @@ public class AutoPaths {
                     .setLinearHeadingInterpolation(scorePose1.getHeading(), endPose.getHeading())
                     .setConstraints(constraints)
                     .build();
+
+            creekPark = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    scorePose1,
+                                    creekEndPose
+                            )
+                    )
+                    .setLinearHeadingInterpolation(scorePose1.getHeading(), creekEndPose.getHeading())
+                    .setConstraints(constraints)
+                    .build();
         }
     }
 
@@ -299,6 +344,7 @@ public class AutoPaths {
         public PathChain lineupPickup1;
         public PathChain grabPickup1;
         public PathChain scorePickup1;
+        public PathChain park;
 
         public Auto_Red_Wall(Follower follower) {
             CreatePaths(follower);
@@ -309,6 +355,7 @@ public class AutoPaths {
         protected static Pose nibble1Pickup1Pose = Auto_Blue_Wall.nibble1Pickup1Pose.mirror();
         protected static Pose nibble2Pickup1Pose = Auto_Blue_Wall.nibble2Pickup1Pose.mirror();
         protected static Pose endPickup1Pose = Auto_Blue_Wall.endPickup1Pose.mirror();
+        protected static Pose scorePickup1Pose = Auto_Blue_Wall.scorePickup1Pose.mirror();
         protected static Pose endPose = Auto_Blue_Wall.endPose.mirror();
 
         PathConstraints constraints = new PathConstraints(1, 0);
@@ -352,10 +399,21 @@ public class AutoPaths {
                     .addPath(
                             new BezierLine(
                                     endPickup1Pose,
+                                    scorePickup1Pose
+                            )
+                    )
+                    .setLinearHeadingInterpolation(endPickup1Pose.getHeading(), scorePickup1Pose.getHeading())
+                    .setConstraints(constraints)
+                    .build();
+
+            park = follower.pathBuilder()
+                    .addPath(
+                            new BezierLine(
+                                    scorePickup1Pose,
                                     endPose
                             )
                     )
-                    .setLinearHeadingInterpolation(endPickup1Pose.getHeading(), endPose.getHeading())
+                    .setLinearHeadingInterpolation(scorePickup1Pose.getHeading(), endPose.getHeading())
                     .setConstraints(constraints)
                     .build();
         }

@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Creek;
 
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.PedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.TeleOp.Main.BlueTeleOp;
+import org.firstinspires.ftc.teamcode.TeleOp.Main.RedTeleOp;
 import org.firstinspires.ftc.teamcode.Util.ArtifactType;
 import org.firstinspires.ftc.teamcode.Util.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Util.Mechanisms.Launcher;
@@ -19,15 +19,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Blue Goal", group = "Blue", preselectTeleOp = "Blue TeleOp")
-public class BlueAutoGoal extends OpMode {
+@Autonomous(name = "Red Goal Creek", group = "Red", preselectTeleOp = "Red TeleOp")
+public class Red extends OpMode {
 
     private enum PathState {
         Start,
         ViewObelisk,
         ScorePreloads,
-        GrabPickup1,
-        ScorePickup1,
         End
     }
 
@@ -40,10 +38,9 @@ public class BlueAutoGoal extends OpMode {
     Transfer transfer;
     Launcher launcher;
 
-    AutoPaths.Auto_Blue_Goal paths;
+    AutoPaths.Auto_Red_Goal paths;
     AprilTagProcessor tagProcessor;
 
-    final double intakeSpeed = 0.32;
     final double regularSpeed = 0.85;
     boolean lineup = false;
     boolean foundTag = false;
@@ -56,9 +53,9 @@ public class BlueAutoGoal extends OpMode {
     @Override
     public void init() {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(AutoPaths.Auto_Blue_Goal.startPose);
+        follower.setStartingPose(AutoPaths.Auto_Red_Goal.startPose);
         follower.setMaxPower(regularSpeed);
-        paths = new AutoPaths.Auto_Blue_Goal(follower);
+        paths = new AutoPaths.Auto_Red_Goal(follower);
 
         state = PathState.Start;
 
@@ -82,7 +79,7 @@ public class BlueAutoGoal extends OpMode {
 
         launcher.init();
         launcher.setLauncherEnabled(false);
-        launcher.setTargetGoal(Utilities.BlueGoalPose);
+        launcher.setTargetGoal(Utilities.RedGoalPose);
 
         lights.init();
         lights.Set_Purple();
@@ -94,7 +91,7 @@ public class BlueAutoGoal extends OpMode {
         loopTime.resetTimer();
         follower.update();
 
-        BlueTeleOp.Start_Pose = follower.getPose();
+        RedTeleOp.Start_Pose = follower.getPose();
 
         transfer.loop();
         launcher.loop(follower.getPose());
@@ -105,10 +102,9 @@ public class BlueAutoGoal extends OpMode {
             case Start: StartFunction(); break;
             case ViewObelisk: ObeliskFunction(); break;
             case ScorePreloads: PreloadsFunction(); break;
-            case GrabPickup1: Pickup1Function(); break;
-            case ScorePickup1: Score1Function(); break;
             case End: EndFunction(); break;
         }
+
         telemetry.addData("loopTime", loopTime.getElapsedTime());
         telemetry.update();
     }
@@ -121,7 +117,7 @@ public class BlueAutoGoal extends OpMode {
 
     void ObeliskFunction() {
         if (follower.isBusy()) {
-            obeliskTimer.setMillisecondTimer(2000);
+            obeliskTimer.setMillisecondTimer(1000);
             return;
         }
 
@@ -132,9 +128,9 @@ public class BlueAutoGoal extends OpMode {
             detections.removeIf(d -> d.id == 24 || d.id == 25);
 
             switch (tagProcessor.getDetections().get(0).id) {
-                case 21: transfer.setPattern(Utilities.PatternID_21); BlueTeleOp.Obelisk_Pattern = Utilities.PatternID_21; break;
-                case 22: transfer.setPattern(Utilities.PatternID_22); BlueTeleOp.Obelisk_Pattern = Utilities.PatternID_22; break;
-                case 23: transfer.setPattern(Utilities.PatternID_23); BlueTeleOp.Obelisk_Pattern = Utilities.PatternID_23; break;
+                case 21: transfer.setPattern(Utilities.PatternID_21); RedTeleOp.Obelisk_Pattern = Utilities.PatternID_21; break;
+                case 22: transfer.setPattern(Utilities.PatternID_22); RedTeleOp.Obelisk_Pattern = Utilities.PatternID_22; break;
+                case 23: transfer.setPattern(Utilities.PatternID_23); RedTeleOp.Obelisk_Pattern = Utilities.PatternID_23; break;
             }
             foundTag = true;
         }
@@ -165,49 +161,7 @@ public class BlueAutoGoal extends OpMode {
 
             intake.startIntake();
 
-            follower.followPath(paths.lineupPickup1, true);
-            setPathState(PathState.GrabPickup1);
-        }
-    }
-
-    // Grabs the first three artifacts
-    void Pickup1Function() {
-        if (follower.isBusy()) {
-            return;
-        }
-
-        if (!lineup) {
-            follower.setMaxPower(intakeSpeed);
-            follower.followPath(paths.grabPickup1, true);
-            lineup = true;
-            return;
-        }
-
-        launcher.setLauncherEnabled(true);
-
-        follower.setMaxPower(regularSpeed);
-        follower.followPath(paths.scorePickup1, true);
-        setPathState(PathState.ScorePickup1);
-    }
-
-    void Score1Function() {
-        if (follower.isBusy()) {
-            launcherWarmupTimer.setMillisecondTimer(1000);
-            transfer.setState(Transfer.TransferState.Outtake);
-            return;
-        }
-
-        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
-            intake.stopIntake();
-            transfer.EjectSelectedArtifact();
-        }
-
-        if (transfer.getState() == Transfer.TransferState.Intake) {
-            lineup = false;
-
-            launcher.setLauncherEnabled(false);
-
-            follower.followPath(paths.park, true);
+            follower.followPath(paths.creekPark, true);
             setPathState(PathState.End);
         }
     }
@@ -219,7 +173,7 @@ public class BlueAutoGoal extends OpMode {
         }
 
         if (endTimer.isFinished()) {
-            BlueTeleOp.Start_Pose = follower.getPose();
+            RedTeleOp.Start_Pose = follower.getPose();
             terminateOpModeNow();
         }
     }

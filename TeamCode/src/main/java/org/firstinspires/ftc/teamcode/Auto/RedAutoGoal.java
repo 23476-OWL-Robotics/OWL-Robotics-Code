@@ -194,6 +194,7 @@ public class RedAutoGoal extends OpMode {
     void Score1Function() {
         if (follower.isBusy()) {
             launcherWarmupTimer.setMillisecondTimer(1000);
+            transfer.setState(Transfer.TransferState.Outtake);
             return;
         }
 

@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PwmControl;
@@ -56,7 +57,7 @@ public class Transfer {
     Timer rotationTimer;
 
     final double LiftDown = 0.0;
-    final double LiftUp = 5.0;
+    final double LiftUp = 5;
 
     final double RotationSlot_1_Intake = 0.0;
     final double RotationSlot_2_Intake = 0.4;
@@ -70,10 +71,12 @@ public class Transfer {
 
     int currentSlot;
     int artifactIndex;
-    int liftMotorZero;
+    int liftMotorOffset;
 
-    boolean canMove = false;
+    boolean canRotate = false;
     boolean isEjecting = false;
+    boolean startedZero = true;
+    boolean runZeroing = false;
 
     public Transfer(OpMode o) {
         this.opMode = o;
@@ -107,13 +110,13 @@ public class Transfer {
         limitSwitch = hardwareMap.get(DigitalChannel.class, "limitSwitch");
 
         rotationServo = hardwareMap.get(Servo.class, "transferRotationServo");
-        liftMotor = hardwareMap.get(DcMotorEx.class, "transferLeftMotor");
+        liftMotor = hardwareMap.get(DcMotorEx.class, "transferLiftMotor");
 
         Utilities.Set_PWM_Range(rotationServo, new PwmControl.PwmRange(500, 2500));
 
         rotationServo.setDirection(Servo.Direction.REVERSE);
 
-        //ToDo: Set Lift Motor Position;
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         if (artifacts.isEmpty()) {
@@ -124,8 +127,8 @@ public class Transfer {
 
         pController = new PositionController.Builder()
                 .setCoefficients(new Coefficients.PositionCoefficients.LiftMotorCoefficients())
-                .setEndState(ControllerStates.HOLD_CONTROLLER)
-                .setEndPositionError(25)
+                .setEndState(ControllerStates.STOP_CONTROLLER)
+                .setEndPositionError(15)
                 .build();
 
         currentSlot = 1;
@@ -137,11 +140,18 @@ public class Transfer {
     public boolean ZeroLiftMotor() {
         if(limitSwitch.getState()) {
             liftMotor.setPower(0);
+            liftMotorOffset = liftMotor.getCurrentPosition();
             return true;
         } else {
-            liftMotor.setPower(-0.01);
+            liftMotor.setPower(-0.15);
             return false;
         }
+    }
+
+    public void ZeroLiftMotor_Running() {
+        runZeroing = true;
+        startedZero = true;
+
     }
 
     public void setState(TransferState state) {
@@ -162,6 +172,7 @@ public class Transfer {
     public void EjectSelectedArtifact() {
         if (CanMove()) {
             pController.setTargetPosition(LiftUp);
+            pController.setState(ControllerStates.RUN_CONTROLLER);
             isEjecting = true;
 
             artifacts.set(artifactIndex, new Artifact(ArtifactType.EMPTY, currentSlot));
@@ -172,17 +183,18 @@ public class Transfer {
                 patternIndex = 0;
             }
 
-            canMove = true;
+            canRotate = true;
         }
     }
 
     public void loop() {
         rotationTimer.loop();
 
-        pController.runController(liftMotor.getCurrentPosition());
+        pController.runController((liftMotor.getCurrentPosition() - liftMotorOffset));
 
-        if (pController.getState() == ControllerStates.HOLD_CONTROLLER && isEjecting) {
+        if (pController.getState() == ControllerStates.STOP_CONTROLLER && isEjecting) {
             pController.setTargetPosition(LiftDown);
+            pController.setState(ControllerStates.RUN_CONTROLLER);
             isEjecting = false;
         }
 
@@ -190,6 +202,27 @@ public class Transfer {
             case Intake: {
 
                 if (CanMove()) {
+
+                    if (runZeroing) {
+                        if (startedZero) {
+                            if (limitSwitch.getState()) {
+                                liftMotor.setPower(0.15);
+                            } else if (!limitSwitch.getState()) {
+                                liftMotor.setPower(0);
+                                startedZero = false;
+                            }
+                        } else {
+
+                            if (limitSwitch.getState()) {
+                                liftMotor.setPower(0);
+                                liftMotorOffset = liftMotor.getCurrentPosition();
+                                runZeroing = false;
+                            } else {
+                                liftMotor.setPower(-0.15);
+                            }
+                        }
+                    }
+
                     // Set the current artifact color.
                     artifacts.set(artifactIndex, new Artifact(getArtifactColor(), currentSlot));
 
@@ -204,8 +237,8 @@ public class Transfer {
 
                 if (CanMove()) {
 
-                    if (canMove) {
-                        canMove = false;
+                    if (canRotate) {
+                        canRotate = false;
                         MoveToArtifact(artifactPattern.get(patternIndex));
                     }
                 }
@@ -231,6 +264,12 @@ public class Transfer {
         telemetry.addLine("----Others----");
         telemetry.addData("Current Slot", currentSlot);
         telemetry.addData("Current Artifact", artifactIndex);
+        telemetry.addData("Limit Switch", limitSwitch.getState());
+        telemetry.addData("Motor Offset", liftMotorOffset);
+        telemetry.addData("Motor Position", pController.getCurrentPosition());
+        telemetry.addData("Controller Target", pController.getTargetPosition());
+        telemetry.addData("Controller Out", pController.getOut());
+        telemetry.addData("Motor Position 2", liftMotor.getCurrentPosition());
     }
 
     // When called, this function sorts a copied array list of artifacts then moves to the next appropriate slot
@@ -267,11 +306,13 @@ public class Transfer {
 
     // Checks if both the rotation and eject timers are finished.
     public boolean CanMove() {
-        boolean value = true;
+        boolean value = rotationTimer.isFinished();
 
-        if (!rotationTimer.isFinished()) {
+        if (isEjecting) {
             value = false;
-        } else if (isEjecting) {
+        }
+
+        if (pController.getState() == ControllerStates.RUN_CONTROLLER) {
             value = false;
         }
 
@@ -338,20 +379,20 @@ public class Transfer {
             case 1: {
 
                 switch (newSlot) {
-                    case 2: rotationTimer.setMillisecondTimer(1000); break;
-                    case 3: rotationTimer.setMillisecondTimer(1500); break;
+                    case 2: rotationTimer.setMillisecondTimer(500); break;
+                    case 3: rotationTimer.setMillisecondTimer(1000); break;
                 }
                 break;
             }
             case 2: {
-                rotationTimer.setMillisecondTimer(1000);
+                rotationTimer.setMillisecondTimer(500);
                 break;
             }
             case 3: {
 
                 switch (newSlot) {
-                    case 2: rotationTimer.setMillisecondTimer(1000); break;
-                    case 1: rotationTimer.setMillisecondTimer(1500); break;
+                    case 2: rotationTimer.setMillisecondTimer(500); break;
+                    case 1: rotationTimer.setMillisecondTimer(1000); break;
                 }
                 break;
             }

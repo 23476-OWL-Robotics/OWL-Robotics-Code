@@ -175,17 +175,19 @@ public class BlueAutoWall extends OpMode {
 
             launcher.setLauncherEnabled(false);
 
-            endTimer.setMillisecondTimer(1000);
+            follower.followPath(paths.park, true);
             setPathState(PathState.End);
         }
     }
 
     void EndFunction() {
 
-        if (endTimer.isFinished()) {
-            BlueTeleOp.Start_Pose = follower.getPose();
-            terminateOpModeNow();
+        if (follower.isBusy()) {
+            return;
         }
+
+        BlueTeleOp.Start_Pose = follower.getPose();
+        terminateOpModeNow();
     }
 
     void setPathState(PathState state) {

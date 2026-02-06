@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Auto;
+package org.firstinspires.ftc.teamcode.Auto.Creek;
 
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -19,15 +19,13 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "Blue Goal", group = "Blue", preselectTeleOp = "Blue TeleOp")
-public class BlueAutoGoal extends OpMode {
+@Autonomous(name = "Blue Goal Creek", group = "Blue", preselectTeleOp = "Blue TeleOp")
+public class Blue extends OpMode {
 
     private enum PathState {
         Start,
         ViewObelisk,
         ScorePreloads,
-        GrabPickup1,
-        ScorePickup1,
         End
     }
 
@@ -43,7 +41,6 @@ public class BlueAutoGoal extends OpMode {
     AutoPaths.Auto_Blue_Goal paths;
     AprilTagProcessor tagProcessor;
 
-    final double intakeSpeed = 0.32;
     final double regularSpeed = 0.85;
     boolean lineup = false;
     boolean foundTag = false;
@@ -105,8 +102,6 @@ public class BlueAutoGoal extends OpMode {
             case Start: StartFunction(); break;
             case ViewObelisk: ObeliskFunction(); break;
             case ScorePreloads: PreloadsFunction(); break;
-            case GrabPickup1: Pickup1Function(); break;
-            case ScorePickup1: Score1Function(); break;
             case End: EndFunction(); break;
         }
         telemetry.addData("loopTime", loopTime.getElapsedTime());
@@ -165,49 +160,7 @@ public class BlueAutoGoal extends OpMode {
 
             intake.startIntake();
 
-            follower.followPath(paths.lineupPickup1, true);
-            setPathState(PathState.GrabPickup1);
-        }
-    }
-
-    // Grabs the first three artifacts
-    void Pickup1Function() {
-        if (follower.isBusy()) {
-            return;
-        }
-
-        if (!lineup) {
-            follower.setMaxPower(intakeSpeed);
-            follower.followPath(paths.grabPickup1, true);
-            lineup = true;
-            return;
-        }
-
-        launcher.setLauncherEnabled(true);
-
-        follower.setMaxPower(regularSpeed);
-        follower.followPath(paths.scorePickup1, true);
-        setPathState(PathState.ScorePickup1);
-    }
-
-    void Score1Function() {
-        if (follower.isBusy()) {
-            launcherWarmupTimer.setMillisecondTimer(1000);
-            transfer.setState(Transfer.TransferState.Outtake);
-            return;
-        }
-
-        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
-            intake.stopIntake();
-            transfer.EjectSelectedArtifact();
-        }
-
-        if (transfer.getState() == Transfer.TransferState.Intake) {
-            lineup = false;
-
-            launcher.setLauncherEnabled(false);
-
-            follower.followPath(paths.park, true);
+            follower.followPath(paths.creekPark, true);
             setPathState(PathState.End);
         }
     }

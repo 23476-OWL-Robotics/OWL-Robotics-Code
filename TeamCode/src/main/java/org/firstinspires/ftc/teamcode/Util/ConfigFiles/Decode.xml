@@ -2,22 +2,30 @@
 <Robot type="FirstInspires-FTC">
     <LynxUsbDevice name="Control Hub Portal" serialNumber="(embedded)" parentModuleAddress="173">
         <LynxModule name="Expansion Hub 2" port="2">
-            <goBILDA5202SeriesMotor name="launcherMotor" port="0" />
-            <Servo name="leftLauncherAngleServo" port="0" />
-            <Servo name="rightLauncherAngleServo" port="1" />
-            <Servo name="launcherRotationServo" port="2" />
+            <goBILDA5202SeriesMotor name="intakeMotor" port="0" />
+            <goBILDA5202SeriesMotor name="transferLiftMotor" port="1" />
+            <goBILDA5202SeriesMotor name="launcherRightMotor" port="2" />
+            <goBILDA5202SeriesMotor name="launcherLeftMotor" port="3" />
+            <Servo name="launcherLeftAngleServo" port="0" />
+            <Servo name="launcherRightAngleServo" port="1" />
+            <Servo name="launcherLeftRotationServo" port="2" />
+            <Servo name="leftLED" port="5" />
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
-            <goBILDA5202SeriesMotor name="frontLeftMotor" port="0" />
-            <goBILDA5202SeriesMotor name="backLeftMotor" port="1" />
+            <goBILDA5202SeriesMotor name="backLeftMotor" port="0" />
+            <goBILDA5202SeriesMotor name="frontLeftMotor" port="1" />
             <goBILDA5202SeriesMotor name="frontRightMotor" port="2" />
             <goBILDA5202SeriesMotor name="backRightMotor" port="3" />
             <Servo name="transferRotationServo" port="0" />
-            <Servo name="transferEjectServo" port="1" />
+            <Servo name="launcherRightRotationServo" port="1" />
+            <Servo name="rightLED" port="5" />
+            <DigitalDevice name="limitSwitch" port="0" />
             <LynxEmbeddedIMU name="imu" port="0" bus="0" />
-            <RevColorSensorV3 name="transferSensor1" port="0" bus="1" />
-            <RevColorSensorV3 name="transferSensor2" port="0" bus="2" />
-            <RevColorSensorV3 name="transferSensor3" port="0" bus="3" />
+            <goBILDAPinpoint name="pinpoint" port="1" bus="0" />
+            <RevColorSensorV3 name="colorSensor1" port="0" bus="1" />
+            <RevColorSensorV3 name="colorSensor2" port="0" bus="2" />
+            <RevColorSensorV3 name="colorSensor3" port="0" bus="3" />
         </LynxModule>
     </LynxUsbDevice>
+    <Webcam name="Tag Camera" serialNumber="F9315F60" />
 </Robot>

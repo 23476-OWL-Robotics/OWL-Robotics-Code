@@ -35,11 +35,11 @@ public class Coefficients {
 
             public LiftMotorCoefficients() {
                 super(
-                        0.0015,
-                        0,
+                        0.007,
                         0.0,
-                        0.0,
-                        0.002583979328165375);
+                        0.0000012,
+                        0.01,
+                        0.011560694);
             }
         }
     }

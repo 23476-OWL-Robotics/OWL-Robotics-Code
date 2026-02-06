@@ -250,9 +250,9 @@ public class Launcher {
             if (robotPose.getY() <= robotPose.getX() +35 && robotPose.getY() <= -robotPose.getX() + 109){
 
                 if (goalPose == Utilities.RedGoalPose) {
-                    rotationOffset = -11;
+                    rotationOffset = 0;
                 } else if (goalPose == Utilities.BlueGoalPose){
-                    rotationOffset = 20;
+                    rotationOffset = 0;
                 }
 
                 value = true;
@@ -359,7 +359,7 @@ public class Launcher {
     private void CalculateRotationAngle(Pose robotPose) {
 
         // Rotation Angle
-        double a;
+        double a = 0;
 
         // Robots Distance from the Goal
         double x, y;
@@ -371,9 +371,17 @@ public class Launcher {
         y = robotPose.getY() - goalPose.y;
 
         double theta = Math.toDegrees(Math.atan(y / x));
-        if (theta < 0) theta = Math.abs(theta) + 90;
 
-        a = Math.abs(Math.toDegrees(robotPose.getHeading()) - 180) + theta;
+        if (theta < 0) {
+            theta = Math.abs(theta) + 90;
+        }
+
+        if (goalPose == Utilities.RedGoalPose) {
+            a = Math.abs(Math.toDegrees(robotPose.getHeading()) - 180) + Math.abs(theta);
+        }
+        if (goalPose == Utilities.BlueGoalPose) {
+            a = Math.abs(Math.toDegrees(robotPose.getHeading()) - 180) - Math.abs(theta + 90);
+        }
 
         if (a > 180) a = a-360;
 
@@ -382,7 +390,6 @@ public class Launcher {
 
             if (!detections.isEmpty()) {
                 AprilTagDetection tag = detections.get(0);
-                a += tag.ftcPose.bearing;
                 cameraBearing = tag.ftcPose.bearing;
                 telemetry.addData("Tag Bearing", tag.ftcPose.bearing);
             }
@@ -391,7 +398,6 @@ public class Launcher {
         }
 
         a += rotationOffset;
-
 
         // Set the rotation angle
         rotationAngle = a;

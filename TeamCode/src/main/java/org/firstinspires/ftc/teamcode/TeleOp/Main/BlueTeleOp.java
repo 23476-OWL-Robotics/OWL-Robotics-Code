@@ -61,10 +61,6 @@ public class BlueTeleOp extends OpMode {
         intake.init();
         intake.stopIntake();
 
-        transfer.init();
-        transfer.setState(Transfer.TransferState.Intake);
-        transfer.setPattern(Obelisk_Pattern);
-
         launcher.init();
         launcher.setTargetGoal(Utilities.BlueGoalPose);
 
@@ -77,6 +73,12 @@ public class BlueTeleOp extends OpMode {
         loopLime.resetTimer();
         if (!isRunning) {
             isRunning = m.Start_OpMode();
+
+            if (isRunning) {
+                transfer.init();
+                transfer.setState(Transfer.TransferState.Intake);
+                transfer.setPattern(Obelisk_Pattern);
+            }
             lights.Set_Red();
             return;
         }

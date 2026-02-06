@@ -193,24 +193,21 @@ public class VelocityController {
         out += Math.min((coefficients.p * error) + (coefficients.i * integralSum) + (coefficients.d * derivative), 0.2);
         out = Math.min(out, 1);
 
-        // sets the controller state to endState when the controller is within an acceptable distance from target
-        if (velocity < (reference + endErrorValue) && velocity > (reference - endErrorValue)) {
-            holdVelocity = velocity;
-            state = endState;
+        holdVelocity = velocity;
 
+        // save error
+        lastError = error;
+
+        // sets the controller state to endState when the controller is within an acceptable velocity from target
+        if (velocity < (reference + endErrorValue) && velocity > (reference - endErrorValue)) {
+            state = endState;
             timer.reset();
 
             return;
         }
 
-        // save error
-        lastError = error;
-
         // reset timer
         timer.reset();
-
-        // set holdEncoderPosition
-        holdVelocity = velocity;
     }
 
     private void hold() {
