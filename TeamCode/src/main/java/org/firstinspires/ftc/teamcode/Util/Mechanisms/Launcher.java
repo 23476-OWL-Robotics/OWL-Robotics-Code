@@ -58,8 +58,8 @@ public class Launcher {
     final double wheelDiameter = 2.8346;
     final double wheelCircumference = pi * wheelDiameter;
 
-    final double launchIncPerDeg = 0.03;
-    final double rotationIncPerDeg = 0.0026666667;
+    final double launchIncPerDeg = 0.029;
+    final double rotationIncPerDeg = 0.014285714;
 
     final double launcherHeight = 10.25;
 
@@ -99,8 +99,8 @@ public class Launcher {
         leftAngleServo = hardwareMap.get(Servo.class, "launcherLeftAngleServo");
         rightAngleServo = hardwareMap.get(Servo.class, "launcherRightAngleServo");
 
-        leftLaunchMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightLaunchMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftLaunchMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightLaunchMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightLaunchMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -166,7 +166,7 @@ public class Launcher {
                 rightLaunchMotor.setPower(-0.08);
             } else {
                 leftLaunchMotor.setPower(0);
-                rightLaunchMotor.setPower(-0.08);
+                rightLaunchMotor.setPower(0);
             }
             vController.setState(ControllerStates.STOP_CONTROLLER);
         }
@@ -233,8 +233,6 @@ public class Launcher {
             rotationOffset = 0;
             velocity = 0;
             return;
-        } else {
-            velocity = FindIdleMotorVelocity(robotPose);
         }
 
         CalculateRotationAngle(robotPose);
@@ -269,29 +267,6 @@ public class Launcher {
 
         legalPose = value;
         return value;
-    }
-
-    private double FindIdleMotorVelocity(Pose robotPose) {
-        // The Return Velocity
-        double v;
-
-        // Robots X and Y Distance from the Goal
-        double x, y;
-
-        // Find the x and y values
-        x = robotPose.getX() - goalPose.x;
-        y = robotPose.getY() - goalPose.y;
-
-        // Using Pythagorean Theorem to find the distance to the goal
-        double root = Math.sqrt(
-                Math.pow(x, 2) +
-                Math.pow(y, 2)
-        );
-
-        // Calculate the velocity (Best Equation I could come up with)
-        v = Math.pow((250 * x), 0.5) + 73;
-
-        return v;
     }
 
     /**

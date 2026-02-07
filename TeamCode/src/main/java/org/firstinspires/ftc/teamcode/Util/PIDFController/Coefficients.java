@@ -37,7 +37,7 @@ public class Coefficients {
                 super(
                         0.007,
                         0.0,
-                        0.0000012,
+                        0.00001,
                         0.01,
                         0.011560694);
             }
@@ -72,9 +72,9 @@ public class Coefficients {
         public static class LauncherMotorCoefficients extends VelocityCoefficients {
 
             public LauncherMotorCoefficients() {
-                super(0.00001,
+                super(0.00004,
                       0.0,
-                      0.0,
+                      0.00002,
                       28);
             }
         }
@@ -83,9 +83,9 @@ public class Coefficients {
 
             public IntakeMotorCoefficients() {
                 super(
+                        0.00005,
                         0.0,
-                        0.0,
-                        0.0,
+                        0.000001,
                         145.1);
             }
         }

@@ -14,13 +14,14 @@ import org.firstinspires.ftc.teamcode.Util.Mechanisms.Intake;
 import org.firstinspires.ftc.teamcode.Util.Mechanisms.Launcher;
 import org.firstinspires.ftc.teamcode.Util.Mechanisms.Lights;
 import org.firstinspires.ftc.teamcode.Util.Mechanisms.Transfer;
+import org.firstinspires.ftc.teamcode.Util.Paths.AutoPaths;
 import org.firstinspires.ftc.teamcode.Util.Timer;
 import org.firstinspires.ftc.teamcode.Util.Utilities;
 
 @TeleOp(name = "Red TeleOp", group = "Main")
 public class RedTeleOp extends OpMode {
 
-    public static Pose Start_Pose = new Pose(0, 0, Math.toRadians(0));
+    public static Pose Start_Pose = AutoPaths.Auto_Red_Goal.startPose;
     public static ArtifactPattern Obelisk_Pattern = new ArtifactPattern(ArtifactType.PURPLE, ArtifactType.GREEN, ArtifactType.PURPLE);
 
     GamepadMappings m;
@@ -78,22 +79,20 @@ public class RedTeleOp extends OpMode {
                 transfer.init();
                 transfer.setState(Transfer.TransferState.Intake);
                 transfer.setPattern(Obelisk_Pattern);
+
+                transfer.ZeroLiftMotor_Running();
             }
             lights.Set_Red();
             return;
-        }
-
-        if (lights.DoneBlinking()) {
-            lights.Set_Green();
         }
 
         follower.update();
         Start_Pose = follower.getPose();
 
         driveTrain.FieldCentric(m);
+        intake.loop();
         transfer.loop();
         launcher.loop(follower.getPose());
-        lights.loop();
 
         stateChangeTimer.loop();
 
@@ -104,7 +103,7 @@ public class RedTeleOp extends OpMode {
 
                 if (canRumble) {
                     m.Rumble_Both(300);
-                    lights.Blink_Blue(2);
+                    lights.Set_Blue();
                     canRumble = false;
                 }
             } break;
@@ -114,17 +113,17 @@ public class RedTeleOp extends OpMode {
 
                 if (!canRumble) {
                     m.Rumble_Both(300);
-                    lights.Blink_Blue(2);
+                    lights.Set_Green();
                     canRumble = true;
                 }
             }
         }
 
         if (m.Transfer_Eject() && transfer.getState() == Transfer.TransferState.Outtake) {
-            launchArtifacts = true;
+            //launchArtifacts = true;
+            transfer.EjectSelectedArtifact();
         } else if (m.Transfer_Eject() && transfer.getState() == Transfer.TransferState.Intake) {
             m.Rumble_Gamepad_2(800);
-            lights.Blink_Red(4);
         }
         LaunchAllArtifacts();
 
@@ -134,7 +133,6 @@ public class RedTeleOp extends OpMode {
 
             if (transfer.getState() == oldState) {
                 m.Rumble_Gamepad_2(800);
-                lights.Blink_Red(4);
             }
             stateChangeTimer.setMillisecondTimer(500);
         }
@@ -155,6 +153,7 @@ public class RedTeleOp extends OpMode {
         }
 
         telemetry.addData("Loop Time", loopLime.getElapsedTime());
+        transfer.Telemetry();
         telemetry.update();
     }
 
@@ -164,13 +163,14 @@ public class RedTeleOp extends OpMode {
         }
 
         // If the transfer still have artifacts, and all timers are finished, launch that artifact.
-        if (transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
+        if (transfer.getState() == Transfer.TransferState.Outtake) {
             transfer.EjectSelectedArtifact();
             return;
         }
 
         if (transfer.getState() == Transfer.TransferState.Intake) {
             launchArtifacts = false;
+            transfer.ZeroLiftMotor_Running();
         }
     }
 }

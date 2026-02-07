@@ -26,8 +26,12 @@ public class PositionController {
     double holdEncoderPosition;
     double out;
 
+    boolean runThread = false;
+
     // Motor Coefficients
     Coefficients.PositionCoefficients coefficients;
+
+    Thread pidThread;
 
     // Controller constructor class
     private PositionController(Builder builder) {
@@ -37,6 +41,19 @@ public class PositionController {
         this.coefficients = builder.coefficients;
 
         this.endErrorValue = builder.endErrorValue;
+
+        pidThread = new Thread(new ThreadLoop());
+    }
+
+    class ThreadLoop implements Runnable {
+
+        @Override
+        public void run() {
+
+            while (runThread) {
+                encoderPosition = 0;
+            }
+        }
     }
 
     // Builder Class

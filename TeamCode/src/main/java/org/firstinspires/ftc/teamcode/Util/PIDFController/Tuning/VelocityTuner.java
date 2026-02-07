@@ -7,6 +7,7 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -15,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Util.PIDFController.Coefficients;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.ControllerStates;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.VelocityController;
 
-@Disabled
+//@Disabled
 @Configurable
 @TeleOp(name = "Velocity PID Tuner", group = "Tuning")
 public class VelocityTuner extends OpMode {
@@ -25,7 +26,7 @@ public class VelocityTuner extends OpMode {
     private VelocityController vController;
 
     // Ticks Per Rev
-    public static int TicksPerRev = 0;
+    public static double TicksPerRev = 145.1;
 
     // PIDF Parameters
     public static double Kp = 0.0;
@@ -33,7 +34,7 @@ public class VelocityTuner extends OpMode {
     public static double Kd = 0.0;
 
     // End Velocity Error
-    public static int EndVelocityError = 15;
+    public static int EndVelocityError = 50;
 
     // End State and Current State
     public static ControllerStates EndState = ControllerStates.HOLD_CONTROLLER;
@@ -43,7 +44,8 @@ public class VelocityTuner extends OpMode {
     public static int TargetRPM = 0;
 
     // Motor
-    DcMotorEx motor;
+    DcMotorEx motor1;
+    DcMotorEx motor2;
 
     // Velocity Coefficients
     Coefficients.VelocityCoefficients coefficients = new Coefficients.VelocityCoefficients(
@@ -65,9 +67,14 @@ public class VelocityTuner extends OpMode {
 
         vController.setState(CurrentState);
 
-        motor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motor1 = hardwareMap.get(DcMotorEx.class, "launcherLeftMotor");
+        motor2 = hardwareMap.get(DcMotorEx.class, "launcherRightMotor");
+
+        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor2.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        motor1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
@@ -84,12 +91,14 @@ public class VelocityTuner extends OpMode {
 
         vController.setState(CurrentState);
 
-        vController.runController(motor.getVelocity());
+        vController.runController((motor1.getVelocity() + motor2.getVelocity()) / 2);
 
-        motor.setPower(vController.getOut());
+        motor1.setPower(vController.getOut());
+        motor2.setPower(vController.getOut());
 
         telemetryM.addData("Target Velocity", vController.getTargetVelocity());
-        telemetryM.addData("Current Velocity", motor.getVelocity());
+        telemetryM.addData("Current Velocity 1", motor1.getVelocity());
+        telemetryM.addData("Current Velocity 2", motor2.getVelocity());
         telemetryM.addLine("");
         telemetryM.addData("Target RPM", vController.getTargetRPM());
         telemetryM.addData("Current RPM", vController.getCurrentRPM());

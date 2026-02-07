@@ -56,8 +56,8 @@ public class Transfer {
 
     Timer rotationTimer;
 
-    final double LiftDown = 0.0;
-    final double LiftUp = 5;
+    final double LiftDown = 00.0;
+    final double LiftUp = 5.0;
 
     final double RotationSlot_1_Intake = 0.0;
     final double RotationSlot_2_Intake = 0.4;
@@ -151,7 +151,6 @@ public class Transfer {
     public void ZeroLiftMotor_Running() {
         runZeroing = true;
         startedZero = true;
-
     }
 
     public void setState(TransferState state) {
@@ -232,22 +231,35 @@ public class Transfer {
                     }
                 }
 
+                liftMotor.setPower(pController.getOut());
+
             } break;
             case Outtake: {
 
                 if (CanMove()) {
 
-                    if (canRotate) {
+                    if (!limitSwitch.getState()) {
+                        liftMotor.setPower(-0.15);
+                        break;
+                    }
+
+                    if (limitSwitch.getState()) {
+                        liftMotor.setPower(0);
+                        liftMotorOffset = liftMotor.getCurrentPosition();
+                    }
+
+                    if (canRotate && limitSwitch.getState()) {
                         canRotate = false;
                         MoveToArtifact(artifactPattern.get(patternIndex));
                     }
                 }
+
+                liftMotor.setPower(pController.getOut());
                 
             } break;
         }
 
         rotationServo.setPosition(RotationPosition);
-        liftMotor.setPower(pController.getOut());
     }
 
     public void Telemetry() {

@@ -23,9 +23,11 @@ public class Intake {
 
     HardwareMap hardwareMap;
 
-    final int IntakeRPM = 1000;
-    final int ReverseRPM = -500;
+    final int IntakeRPM = 400;
+    final int ReverseRPM = -300;
     final int StopRPM = 0;
+
+    boolean stop = false;
 
     public Intake(OpMode o) {
         this.opMode = o;
@@ -50,17 +52,27 @@ public class Intake {
     public void loop() {
         vController.runController(intakeMotor.getVelocity());
 
-        intakeMotor.setPower(vController.getOut());
+        if (!stop) {
+            intakeMotor.setPower(vController.getOut());
+        } else {
+            intakeMotor.setPower(StopRPM);
+        }
     }
 
     public void startIntake() {
         vController.setTargetRPM(IntakeRPM);
+        vController.setState(ControllerStates.RUN_CONTROLLER);
+        stop = false;
     }
     public void reverseIntake() {
         vController.setTargetRPM(ReverseRPM);
+        vController.setState(ControllerStates.RUN_CONTROLLER);
+        stop = false;
     }
     public void stopIntake() {
         vController.setTargetRPM(StopRPM);
+        vController.setState(ControllerStates.RUN_CONTROLLER);
+        stop = true;
     }
 
     public void Telemetry() {
