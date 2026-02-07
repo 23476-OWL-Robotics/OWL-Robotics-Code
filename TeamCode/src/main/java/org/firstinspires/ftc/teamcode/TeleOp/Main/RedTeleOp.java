@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.TeleOp.Main;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -17,6 +18,8 @@ import org.firstinspires.ftc.teamcode.Util.Mechanisms.Transfer;
 import org.firstinspires.ftc.teamcode.Util.Paths.AutoPaths;
 import org.firstinspires.ftc.teamcode.Util.Timer;
 import org.firstinspires.ftc.teamcode.Util.Utilities;
+
+import java.util.List;
 
 @TeleOp(name = "Red TeleOp", group = "Main")
 public class RedTeleOp extends OpMode {
@@ -40,6 +43,7 @@ public class RedTeleOp extends OpMode {
 
     Timer stateChangeTimer;
     com.pedropathing.util.Timer loopLime;
+    List<LynxModule> allHubs;
 
     @Override
     public void init() {
@@ -67,11 +71,22 @@ public class RedTeleOp extends OpMode {
 
         stateChangeTimer = new Timer();
         loopLime = new com.pedropathing.util.Timer();
+
+        allHubs = hardwareMap.getAll(LynxModule.class);
+
+        for (LynxModule module : allHubs) {
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
     }
 
     @Override
     public void loop() {
         loopLime.resetTimer();
+
+        for (LynxModule module : allHubs) {
+            module.clearBulkCache();
+        }
+
         if (!isRunning) {
             isRunning = m.Start_OpMode();
 

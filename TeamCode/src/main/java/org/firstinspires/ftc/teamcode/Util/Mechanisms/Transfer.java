@@ -56,7 +56,7 @@ public class Transfer {
 
     Timer rotationTimer;
 
-    final double LiftDown = 00.0;
+    final double LiftDown = 0.0;
     final double LiftUp = 5.0;
 
     final double RotationSlot_1_Intake = 0.0;
