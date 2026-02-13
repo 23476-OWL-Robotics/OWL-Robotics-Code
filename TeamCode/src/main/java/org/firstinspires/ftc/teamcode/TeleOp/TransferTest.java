@@ -4,6 +4,8 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +16,10 @@ import org.firstinspires.ftc.teamcode.Util.GamepadMappings;
 import org.firstinspires.ftc.teamcode.Util.Mechanisms.Transfer;
 import org.firstinspires.ftc.teamcode.Util.Utilities;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@Disabled
 @Configurable
 @TeleOp(name = "Transfer Test", group = "Tests")
 public class TransferTest extends OpMode {
@@ -27,6 +33,10 @@ public class TransferTest extends OpMode {
 
     DcMotorEx leftLaunchMotor;
     DcMotorEx rightLaunchMotor;
+
+    int loopTime = 50;
+    long elapsedTime = 0;
+    boolean controlTime = false;
 
     @Override
     public void init() {
@@ -59,6 +69,7 @@ public class TransferTest extends OpMode {
     @Override
     public void loop() {
         elapsedTimer.resetTimer();
+
         transfer.loop();
 
         if (transfer.getState() == Transfer.TransferState.Outtake && m.gamepad1.a) {
@@ -77,8 +88,26 @@ public class TransferTest extends OpMode {
             rightLaunchMotor.setPower(0);
         }
 
+        elapsedTime = elapsedTimer.getElapsedTime();
+
+        if (gamepad1.dpad_left) {
+            controlTime = true;
+        } else if (gamepad1.dpad_right) {
+            controlTime = false;
+        }
+
+        if (controlTime && elapsedTime < loopTime) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(loopTime - elapsedTime);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        telemetry.addData("Elapsed Time", elapsedTimer.getElapsedTime());
+        telemetry.addData("Limiting Time", controlTime);
+        telemetry.addLine();
         transfer.Telemetry();
-        telemetry.addData("Elapsed Timer", elapsedTimer.getElapsedTime());
         telemetry.update();
         telemetryM.update(telemetry);
     }

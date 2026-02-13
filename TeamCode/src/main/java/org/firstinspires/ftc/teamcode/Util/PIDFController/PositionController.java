@@ -1,17 +1,19 @@
 package org.firstinspires.ftc.teamcode.Util.PIDFController;
 
+import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.Auto.Creek.Red;
 
 public class PositionController {
 
     // Current State and EndState
-    ControllerStates state;
-    ControllerStates endState;
+    volatile ControllerStates state;
+    volatile ControllerStates endState;
 
     // create ElapsedTime
     ElapsedTime timer = new ElapsedTime();
+    DcMotorEx motor;
 
     // All variables for calculating out
     double reference;
@@ -26,34 +28,28 @@ public class PositionController {
     double holdEncoderPosition;
     double out;
 
-    boolean runThread = false;
+    double motorPower;
+
+    int motorOffset = 0;
 
     // Motor Coefficients
     Coefficients.PositionCoefficients coefficients;
 
-    Thread pidThread;
+    Thread thread;
+    PIDThread pidThread;
 
     // Controller constructor class
     private PositionController(Builder builder) {
         state = ControllerStates.STOP_CONTROLLER;
         endState = builder.endState;
+        motor = builder.motor;
 
         this.coefficients = builder.coefficients;
 
         this.endErrorValue = builder.endErrorValue;
 
-        pidThread = new Thread(new ThreadLoop());
-    }
-
-    class ThreadLoop implements Runnable {
-
-        @Override
-        public void run() {
-
-            while (runThread) {
-                encoderPosition = 0;
-            }
-        }
+        pidThread = new PIDThread();
+        thread = new Thread(pidThread);
     }
 
     // Builder Class
@@ -61,6 +57,7 @@ public class PositionController {
         double endErrorValue;
         Coefficients.PositionCoefficients coefficients;
         ControllerStates endState;
+        DcMotorEx motor;
 
         // set the coefficients
         public Builder setCoefficients(double p, double i, double d, double f, double conversionUnit) {
@@ -89,6 +86,11 @@ public class PositionController {
             return this;
         }
 
+        public Builder setMotor(DcMotorEx motor) {
+            this.motor = motor;
+            return this;
+        }
+
         // build
         public PositionController build() {
             if (coefficients == null) {
@@ -97,13 +99,110 @@ public class PositionController {
             if (endState == null) {
                 throw new IllegalArgumentException("You Must Set an End State for the Controller");
             }
+            if (motor == null) {
+                throw new IllegalArgumentException("You Must Set a Motor for the Controller");
+            }
 
             return new PositionController(this);
         }
     }
 
+    public void startController() {
+        setState(ControllerStates.RUN_CONTROLLER);
+        pidThread.startThread();
+    }
+
+    public void stopController() {
+        pidThread.stopThread();
+        setState(ControllerStates.STOP_CONTROLLER);
+    }
+
+    public void terminateThread() {
+        thread.interrupt();
+    }
+
+    public synchronized Thread.State getThreadState() {
+        return thread.getState();
+    }
+
+    public synchronized long getThreadLoopTime() {
+        return pidThread.getThreadLoopTime();
+    }
+
+    public synchronized void setMotorOffset(int o) {
+        motorOffset = 0;
+    }
+
+    // Set the target position
+    public synchronized void setTargetPosition(double target) {
+        this.target = target;
+    }
+
+    // Returns the Target
+    public synchronized double getTargetPosition() {
+        return target;
+    }
+
+    // Returns the CurrentPosition
+    public synchronized double getCurrentPosition() {
+        return encoderPosition * coefficients.conversionUnit;
+    }
+
+    public synchronized double getMotorPosition() {
+        return encoderPosition;
+    }
+
+    public synchronized double getMotorPower() {
+        return motorPower;
+    }
+
+    // Set the controller state
+    public synchronized void setState(ControllerStates state) {
+        this.state = state;
+    }
+
+    // Will return the current state of the controller
+    public synchronized ControllerStates getState() {
+        return state;
+    }
+
+    // Will return the current endState of the controller
+    public synchronized ControllerStates getEndState() {
+        return endState;
+    }
+
+    // Will return the current encoder position
+    public synchronized double getEncoderPosition() {
+        return encoderPosition;
+    }
+
+    // Will return the position that the motor is being held at
+    public synchronized double getHoldEncoderPosition() {
+        return holdEncoderPosition;
+    }
+
+    // Will return the needed motor power
+    public synchronized double getOut() {
+        return Math.min(out, 0.8);
+    }
+
+    // Will return the controllers reference
+    public synchronized double getReference() {
+        return reference;
+    }
+
+    // Set the Coefficients
+    public synchronized void setCoefficients(Coefficients.PositionCoefficients c) {
+        this.coefficients = c;
+    }
+
+    // Will return the controller current coefficients
+    public synchronized Coefficients.PositionCoefficients getCoefficients() {
+        return coefficients;
+    }
+
     // runController Loop
-    public void runController(double encoderPosition) {
+    private void runController(double encoderPosition) {
 
         // Set encoderPosition
         this.encoderPosition = encoderPosition;
@@ -127,66 +226,6 @@ public class PositionController {
                 holdEncoderPosition = encoderPosition;
                 break;
         }
-    }
-
-    // Set the target position
-    public void setTargetPosition(double target) {
-        this.target = target;
-    }
-
-    // Returns the Target
-    public double getTargetPosition() {
-        return target;
-    }
-
-    // Returns the CurrentPosition
-    public double getCurrentPosition() {
-        return encoderPosition * coefficients.conversionUnit;
-    }
-
-    // Set the controller state
-    public void setState(ControllerStates state) {
-        this.state = state;
-    }
-
-    // Will return the current state of the controller
-    public ControllerStates getState() {
-        return state;
-    }
-
-    // Will return the current endState of the controller
-    public ControllerStates getEndState() {
-        return endState;
-    }
-
-    // Will return the current encoder position
-    public double getEncoderPosition() {
-        return encoderPosition;
-    }
-
-    // Will return the position that the motor is being held at
-    public double getHoldEncoderPosition() {
-        return holdEncoderPosition;
-    }
-
-    // Will return the needed motor power
-    public double getOut() {
-        return Math.min(out, 0.8);
-    }
-
-    // Will return the controllers reference
-    public double getReference() {
-        return reference;
-    }
-
-    // Set the Coefficients
-    public void setCoefficients(Coefficients.PositionCoefficients c) {
-        this.coefficients = c;
-    }
-
-    // Will return the controller current coefficients
-    public Coefficients.PositionCoefficients getCoefficients() {
-        return coefficients;
     }
 
     // Calculates out
@@ -245,6 +284,49 @@ public class PositionController {
 
             // motor power
             out = (coefficients.p * error);
+        }
+    }
+
+    class PIDThread implements Runnable {
+
+        private boolean runThread = true;
+        private long threadLoopTime = 0;
+        Timer loopTime = new Timer();
+
+        public void startThread() {
+            if (thread.getState() == Thread.State.TERMINATED || thread.getState() == Thread.State.NEW) {
+                runThread = true;
+                thread.start();
+            }
+        }
+        public synchronized void stopThread() {
+            runThread = false;
+        }
+
+        public synchronized long getThreadLoopTime() {
+            return threadLoopTime;
+        }
+
+        @Override
+        public void run() {
+            while (runThread) {
+                runController(motor.getCurrentPosition() - motorOffset);
+                motor.setPower(Math.min(out, 0.8));
+                motorPower = motor.getPower();
+
+                if (getState() == ControllerStates.STOP_CONTROLLER) {
+                    stopThread();
+                }
+
+                if (Thread.currentThread().isInterrupted()) {
+                    startThread();
+                }
+
+                threadLoopTime = loopTime.getElapsedTime();
+                loopTime.resetTimer();
+            }
+            out = 0;
+            motor.setPower(0);
         }
     }
 }

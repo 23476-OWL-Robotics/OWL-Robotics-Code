@@ -38,7 +38,7 @@ public class GamepadMappings {
         return gamepad1.b && gamepad1.dpad_right;
     }
 
-    public double Intake_Reverse_Sinner() {
+    public double Intake_Reverse_Spinner() {
         return gamepad2.right_trigger;
     }
     public double Launcher_Reverse_Motor() {
@@ -50,6 +50,9 @@ public class GamepadMappings {
     }
     public boolean Transfer_State_Change() {
         return gamepad2.x;
+    }
+    public boolean Transfer_Reset() {
+        return gamepad2.left_bumper && gamepad2.right_bumper;
     }
 
     public boolean Obelisk_Tag() {

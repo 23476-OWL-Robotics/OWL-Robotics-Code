@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
 import org.firstinspires.ftc.teamcode.Util.Utilities;
 
+@Disabled
 @Configurable
 @TeleOp(name = "ServoTuner", group = "Tuning")
 public class ServoTuning extends OpMode {

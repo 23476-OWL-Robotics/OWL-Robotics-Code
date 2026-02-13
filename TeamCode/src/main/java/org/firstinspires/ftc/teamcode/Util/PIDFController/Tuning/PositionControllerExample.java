@@ -38,6 +38,7 @@ public class PositionControllerExample extends OpMode {
                 .setCoefficients(new Coefficients.PositionCoefficients.ExampleCoefficients())
                 .setEndState(ControllerStates.HOLD_CONTROLLER)
                 .setEndPositionError(5)
+                .setMotor(testMotor)
                 .build();
 
         pController.setState(ControllerStates.STOP_CONTROLLER);
@@ -47,22 +48,15 @@ public class PositionControllerExample extends OpMode {
 
     @Override
     public void loop() {
-        pController.runController(testMotor.getCurrentPosition());
 
         if (gamepad1.a) {
             pController.setTargetPosition(Target);
-            pController.setState(ControllerStates.RUN_CONTROLLER);
+            pController.startController();
         }
 
         if (gamepad1.y) {
-            pController.setState(ControllerStates.STOP_CONTROLLER);
+            pController.stopController();
         }
-
-        if (gamepad1.b) {
-            pController.setState(ControllerStates.HOLD_CONTROLLER);
-        }
-
-        testMotor.setPower(pController.getOut());
 
         telemetryM.addData("Controller Reference", pController.getReference());
         telemetryM.addData("Controller State", pController.getState());

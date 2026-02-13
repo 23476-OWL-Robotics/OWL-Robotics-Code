@@ -42,8 +42,7 @@ public class RedTeleOp extends OpMode {
     boolean canRumble = true;
 
     Timer stateChangeTimer;
-    com.pedropathing.util.Timer loopLime;
-    List<LynxModule> allHubs;
+    com.pedropathing.util.Timer loopTime;
 
     @Override
     public void init() {
@@ -70,22 +69,11 @@ public class RedTeleOp extends OpMode {
         launcher.setTargetGoal(Utilities.RedGoalPose);
 
         stateChangeTimer = new Timer();
-        loopLime = new com.pedropathing.util.Timer();
-
-        allHubs = hardwareMap.getAll(LynxModule.class);
-
-        for (LynxModule module : allHubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
+        loopTime = new com.pedropathing.util.Timer();
     }
 
     @Override
     public void loop() {
-        loopLime.resetTimer();
-
-        for (LynxModule module : allHubs) {
-            module.clearBulkCache();
-        }
 
         if (!isRunning) {
             isRunning = m.Start_OpMode();
@@ -102,7 +90,7 @@ public class RedTeleOp extends OpMode {
         }
 
         follower.update();
-        Start_Pose = follower.getPose();
+        //Start_Pose = follower.getPose();
 
         driveTrain.FieldCentric(m);
         intake.loop();
@@ -135,8 +123,7 @@ public class RedTeleOp extends OpMode {
         }
 
         if (m.Transfer_Eject() && transfer.getState() == Transfer.TransferState.Outtake) {
-            //launchArtifacts = true;
-            transfer.EjectSelectedArtifact();
+            launchArtifacts = true;
         } else if (m.Transfer_Eject() && transfer.getState() == Transfer.TransferState.Intake) {
             m.Rumble_Gamepad_2(800);
         }
@@ -152,7 +139,11 @@ public class RedTeleOp extends OpMode {
             stateChangeTimer.setMillisecondTimer(500);
         }
 
-        if (m.Intake_Reverse_Sinner() > 0.2) {
+        if (m.Transfer_Reset()) {
+            transfer.hardReset();
+        }
+
+        if (m.Intake_Reverse_Spinner() > 0.2) {
             intake.reverseIntake();
         }
 
@@ -167,9 +158,13 @@ public class RedTeleOp extends OpMode {
             terminateOpModeNow();
         }
 
-        telemetry.addData("Loop Time", loopLime.getElapsedTime());
+        telemetry.addData("Loop Time", loopTime.getElapsedTime());
+        telemetry.addLine();
         transfer.Telemetry();
+        launcher.Telemetry();
         telemetry.update();
+
+        loopTime.resetTimer();
     }
 
     void LaunchAllArtifacts() {

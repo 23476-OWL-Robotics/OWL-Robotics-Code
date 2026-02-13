@@ -43,7 +43,6 @@ public class BlueTeleOp extends OpMode {
 
     Timer stateChangeTimer;
     com.pedropathing.util.Timer loopLime;
-    List<LynxModule> allHubs;
 
     @Override
     public void init() {
@@ -71,21 +70,11 @@ public class BlueTeleOp extends OpMode {
 
         stateChangeTimer = new Timer();
         loopLime = new com.pedropathing.util.Timer();
-
-        allHubs = hardwareMap.getAll(LynxModule.class);
-
-        for (LynxModule module : allHubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
     }
 
     @Override
     public void loop() {
         loopLime.resetTimer();
-
-        for (LynxModule module : allHubs) {
-            module.clearBulkCache();
-        }
 
         if (!isRunning) {
             isRunning = m.Start_OpMode();
@@ -102,7 +91,7 @@ public class BlueTeleOp extends OpMode {
         }
 
         follower.update();
-        Start_Pose = follower.getPose();
+        //Start_Pose = follower.getPose();
 
         driveTrain.FieldCentric(m);
         intake.loop();
@@ -123,7 +112,7 @@ public class BlueTeleOp extends OpMode {
                 }
             } break;
             case Outtake:  {
-                intake.stopIntake();
+                intake.reverseIntake();
                 launcher.setLauncherEnabled(true);
 
                 if (!canRumble) {
@@ -151,7 +140,11 @@ public class BlueTeleOp extends OpMode {
             stateChangeTimer.setMillisecondTimer(500);
         }
 
-        if (m.Intake_Reverse_Sinner() > 0.2) {
+        if (m.Transfer_Reset()) {
+            transfer.hardReset();
+        }
+
+        if (m.Intake_Reverse_Spinner() > 0.2) {
             intake.reverseIntake();
         }
 
@@ -166,8 +159,6 @@ public class BlueTeleOp extends OpMode {
             terminateOpModeNow();
         }
 
-        transfer.Telemetry();
-        launcher.Telemetry();
         telemetry.addData("Loop Time", loopLime.getElapsedTime());
         telemetry.update();
     }

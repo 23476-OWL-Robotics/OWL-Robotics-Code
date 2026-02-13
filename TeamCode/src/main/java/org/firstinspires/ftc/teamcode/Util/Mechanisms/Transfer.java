@@ -55,6 +55,7 @@ public class Transfer {
     PositionController pController;
 
     Timer rotationTimer;
+    Timer liftErrorTimer;
 
     final double LiftDown = 0.0;
     final double LiftUp = 5.0;
@@ -71,9 +72,9 @@ public class Transfer {
 
     int currentSlot;
     int artifactIndex;
-    int liftMotorOffset;
 
     boolean canRotate = false;
+    boolean needToRotate = false;
     boolean isEjecting = false;
     boolean startedZero = true;
     boolean runZeroing = false;
@@ -84,6 +85,7 @@ public class Transfer {
         this.telemetry = o.telemetry;
 
         rotationTimer = new Timer();
+        liftErrorTimer = new Timer();
     }
 
     public void setPreloads(ArtifactType slot1, ArtifactType slot2, ArtifactType slot3) {
@@ -129,6 +131,7 @@ public class Transfer {
                 .setCoefficients(new Coefficients.PositionCoefficients.LiftMotorCoefficients())
                 .setEndState(ControllerStates.STOP_CONTROLLER)
                 .setEndPositionError(15)
+                .setMotor(liftMotor)
                 .build();
 
         currentSlot = 1;
@@ -140,7 +143,7 @@ public class Transfer {
     public boolean ZeroLiftMotor() {
         if(limitSwitch.getState()) {
             liftMotor.setPower(0);
-            liftMotorOffset = liftMotor.getCurrentPosition();
+            pController.setMotorOffset(liftMotor.getCurrentPosition());
             return true;
         } else {
             liftMotor.setPower(-0.15);
@@ -168,11 +171,18 @@ public class Transfer {
         return state;
     }
 
+    public void hardReset() {
+        pController.stopController();
+        setPreloads(ArtifactType.EMPTY, ArtifactType.EMPTY, ArtifactType.EMPTY);
+        setState(TransferState.Intake);
+    }
+
     public void EjectSelectedArtifact() {
-        if (CanMove()) {
+        if (CanMove() && !canRotate) {
             pController.setTargetPosition(LiftUp);
-            pController.setState(ControllerStates.RUN_CONTROLLER);
+            pController.startController();
             isEjecting = true;
+            liftErrorTimer.setMillisecondTimer(900);
 
             artifacts.set(artifactIndex, new Artifact(ArtifactType.EMPTY, currentSlot));
 
@@ -188,12 +198,11 @@ public class Transfer {
 
     public void loop() {
         rotationTimer.loop();
+        liftErrorTimer.loop();
 
-        pController.runController((liftMotor.getCurrentPosition() - liftMotorOffset));
-
-        if (pController.getState() == ControllerStates.STOP_CONTROLLER && isEjecting) {
+        if (pController.getThreadState() == Thread.State.TERMINATED && isEjecting) {
             pController.setTargetPosition(LiftDown);
-            pController.setState(ControllerStates.RUN_CONTROLLER);
+            pController.startController();
             isEjecting = false;
         }
 
@@ -214,7 +223,7 @@ public class Transfer {
 
                             if (limitSwitch.getState()) {
                                 liftMotor.setPower(0);
-                                liftMotorOffset = liftMotor.getCurrentPosition();
+                                pController.setMotorOffset(liftMotor.getCurrentPosition());
                                 runZeroing = false;
                             } else {
                                 liftMotor.setPower(-0.15);
@@ -231,10 +240,12 @@ public class Transfer {
                     }
                 }
 
-                liftMotor.setPower(pController.getOut());
-
             } break;
             case Outtake: {
+
+                if (isEjecting && liftErrorTimer.isFinished()) {
+                    pController.stopController();
+                }
 
                 if (CanMove()) {
 
@@ -245,7 +256,7 @@ public class Transfer {
 
                     if (limitSwitch.getState()) {
                         liftMotor.setPower(0);
-                        liftMotorOffset = liftMotor.getCurrentPosition();
+                        pController.setMotorOffset(liftMotor.getCurrentPosition());
                     }
 
                     if (canRotate && limitSwitch.getState()) {
@@ -253,8 +264,6 @@ public class Transfer {
                         MoveToArtifact(artifactPattern.get(patternIndex));
                     }
                 }
-
-                liftMotor.setPower(pController.getOut());
                 
             } break;
         }
@@ -273,15 +282,20 @@ public class Transfer {
         telemetry.addData("State", state);
         telemetry.addLine("----Timers----");
         telemetry.addData("Rotation Timer", rotationTimer.getSecondsRemaining());
+        telemetry.addData("Lift Error Timer", liftErrorTimer.getMillisecondsRemaining());
         telemetry.addLine("----Others----");
         telemetry.addData("Current Slot", currentSlot);
         telemetry.addData("Current Artifact", artifactIndex);
         telemetry.addData("Limit Switch", limitSwitch.getState());
-        telemetry.addData("Motor Offset", liftMotorOffset);
-        telemetry.addData("Motor Position", pController.getCurrentPosition());
+        telemetry.addLine("----PID Controller----");
+        telemetry.addData("Motor Position", pController.getMotorPosition());
+        telemetry.addData("Motor Power", pController.getMotorPower());
+        telemetry.addData("Controller Reference", pController.getReference());
         telemetry.addData("Controller Target", pController.getTargetPosition());
         telemetry.addData("Controller Out", pController.getOut());
-        telemetry.addData("Motor Position 2", liftMotor.getCurrentPosition());
+        telemetry.addData("Controller State", pController.getState());
+        telemetry.addData("Thread Loop Time", pController.getThreadLoopTime());
+        telemetry.addData("Thread State", pController.getThreadState());
     }
 
     // When called, this function sorts a copied array list of artifacts then moves to the next appropriate slot

@@ -25,9 +25,9 @@ public class RedAutoGoal extends OpMode {
     private enum PathState {
         Start,
         ViewObelisk,
-        ScorePreloads,
+        Score,
         GrabPickup1,
-        ScorePickup1,
+        GrabPickup2,
         End
     }
 
@@ -44,8 +44,9 @@ public class RedAutoGoal extends OpMode {
     AprilTagProcessor tagProcessor;
 
     final double intakeSpeed = 0.32;
-    final double regularSpeed = 0.85;
+    final double regularSpeed = 1.0;
     boolean lineup = false;
+    boolean switchTransfer = false;
     boolean foundTag = false;
 
     Timer obeliskTimer;
@@ -81,7 +82,7 @@ public class RedAutoGoal extends OpMode {
         transfer.setState(Transfer.TransferState.Outtake);
 
         launcher.init();
-        launcher.setLauncherEnabled(false);
+        launcher.setLauncherEnabled(true);
         launcher.setTargetGoal(Utilities.RedGoalPose);
 
         lights.init();
@@ -90,12 +91,20 @@ public class RedAutoGoal extends OpMode {
         tagProcessor = launcher.getTagProcessor();
     }
 
+    @Override
+    public void init_loop() {
+        if (transfer.ZeroLiftMotor()) return;
+        transfer.Telemetry();
+        telemetry.update();
+    }
+
     public void loop() {
         loopTime.resetTimer();
         follower.update();
 
         RedTeleOp.Start_Pose = follower.getPose();
 
+        intake.loop();
         transfer.loop();
         launcher.loop(follower.getPose());
 
@@ -104,9 +113,9 @@ public class RedAutoGoal extends OpMode {
         switch (state) {
             case Start: StartFunction(); break;
             case ViewObelisk: ObeliskFunction(); break;
-            case ScorePreloads: PreloadsFunction(); break;
+            case Score: ScoreFunction(); break;
             case GrabPickup1: Pickup1Function(); break;
-            case ScorePickup1: Score1Function(); break;
+            case GrabPickup2: Pickup2Function(); break;
             case End: EndFunction(); break;
         }
 
@@ -144,15 +153,25 @@ public class RedAutoGoal extends OpMode {
             launcher.setLauncherEnabled(true);
 
             follower.followPath(paths.scorePreloads, true);
-            setPathState(PathState.ScorePreloads);
+            setPathState(PathState.Score);
         }
     }
 
     // Once the follower is done, cycle through and launch the current artifacts.
-    void PreloadsFunction() {
+    void ScoreFunction() {
         if (follower.isBusy()) {
-            launcherWarmupTimer.setMillisecondTimer(1200);
+            launcherWarmupTimer.setMillisecondTimer(500);
+
+            if (follower.getCurrentPathChain() != paths.scorePreloads) {
+                switchTransfer = true;
+                intake.reverseIntake();
+            }
             return;
+        }
+
+        if (switchTransfer) {
+            transfer.setState(Transfer.TransferState.Outtake);
+            switchTransfer = false;
         }
 
         if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
@@ -160,14 +179,24 @@ public class RedAutoGoal extends OpMode {
         }
 
         if (transfer.getState() == Transfer.TransferState.Intake) {
-            lineup = false;
-
             launcher.setLauncherEnabled(false);
 
             intake.startIntake();
 
-            follower.followPath(paths.lineupPickup1, true);
-            setPathState(PathState.GrabPickup1);
+            if (follower.getCurrentPathChain() == paths.scorePreloads) {
+                follower.followPath(paths.lineupPickup1, true);
+                setPathState(PathState.GrabPickup1);
+            }
+            if (follower.getCurrentPathChain() == paths.scorePickup1) {
+                follower.followPath(paths.lineupPickup2, true);
+                lineup = false;
+                setPathState(PathState.GrabPickup2);
+            }
+            if (follower.getCurrentPathChain() == paths.scorePickup2) {
+                follower.followPath(paths.park, true);
+                lineup = false;
+                setPathState(PathState.End);
+            }
         }
     }
 
@@ -179,8 +208,17 @@ public class RedAutoGoal extends OpMode {
 
         if (!lineup) {
             follower.setMaxPower(intakeSpeed);
-            follower.followPath(paths.grabPickup1, true);
+            follower.followPath(paths.grabArtifact1Pickup1, false);
             lineup = true;
+            return;
+        }
+
+        if (follower.getCurrentPathChain() == paths.grabArtifact1Pickup1) {
+            follower.followPath(paths.grabArtifact2Pickup1, false);
+            return;
+        }
+        if (follower.getCurrentPathChain() == paths.grabArtifact2Pickup1) {
+            follower.followPath(paths.grabArtifact3Pickup1, false);
             return;
         }
 
@@ -188,34 +226,41 @@ public class RedAutoGoal extends OpMode {
 
         follower.setMaxPower(regularSpeed);
         follower.followPath(paths.scorePickup1, true);
-        setPathState(PathState.ScorePickup1);
+        setPathState(PathState.Score);
     }
 
-    void Score1Function() {
+    void Pickup2Function() {
         if (follower.isBusy()) {
-            launcherWarmupTimer.setMillisecondTimer(1000);
-            transfer.setState(Transfer.TransferState.Outtake);
             return;
         }
 
-        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
-            intake.stopIntake();
-            transfer.EjectSelectedArtifact();
+        if (!lineup) {
+            follower.setMaxPower(intakeSpeed);
+            follower.followPath(paths.grabArtifact1Pickup2, false);
+            lineup = true;
+            return;
         }
 
-        if (transfer.getState() == Transfer.TransferState.Intake) {
-            lineup = false;
-
-            launcher.setLauncherEnabled(false);
-
-            follower.followPath(paths.park, true);
-            setPathState(PathState.End);
+        if (follower.getCurrentPathChain() == paths.grabArtifact1Pickup2) {
+            follower.followPath(paths.grabArtifact2Pickup2, false);
+            return;
         }
+        if (follower.getCurrentPathChain() == paths.grabArtifact2Pickup2) {
+            follower.followPath(paths.grabArtifact3Pickup2, false);
+            return;
+        }
+
+        launcher.setLauncherEnabled(true);
+
+        follower.setMaxPower(regularSpeed);
+        follower.followPath(paths.scorePickup2, true);
+        setPathState(PathState.Score);
     }
 
     void EndFunction() {
+        endTimer.loop();
         if (follower.isBusy()) {
-            endTimer.setMillisecondTimer(1000);
+            endTimer.setMillisecondTimer(800);
             return;
         }
 
@@ -232,6 +277,5 @@ public class RedAutoGoal extends OpMode {
     void loopTimers() {
         obeliskTimer.loop();
         launcherWarmupTimer.loop();
-        endTimer.loop();
     }
 }

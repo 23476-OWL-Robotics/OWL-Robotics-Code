@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.Util.PIDFController.Coefficients;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.ControllerStates;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.VelocityController;
 
-//@Disabled
+@Disabled
 @Configurable
 @TeleOp(name = "Velocity PID Tuner", group = "Tuning")
 public class VelocityTuner extends OpMode {

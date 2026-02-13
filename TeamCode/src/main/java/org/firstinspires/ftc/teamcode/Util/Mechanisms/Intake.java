@@ -23,8 +23,8 @@ public class Intake {
 
     HardwareMap hardwareMap;
 
-    final int IntakeRPM = 400;
-    final int ReverseRPM = -300;
+    final int IntakeRPM = 450;
+    final int ReverseRPM = -500;
     final int StopRPM = 0;
 
     boolean stop = false;

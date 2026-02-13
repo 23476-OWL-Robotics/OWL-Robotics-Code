@@ -21,9 +21,8 @@ public class RedAutoWall extends OpMode {
 
     private enum PathState {
         Start,
-        ScorePreloads,
+        Score,
         GrabPickup1,
-        ScorePickup1,
         End
     }
 
@@ -40,7 +39,7 @@ public class RedAutoWall extends OpMode {
     AprilTagProcessor tagProcessor;
 
     final double intakeSpeed = 0.32;
-    final double regularSpeed = 0.85;
+    final double regularSpeed = 1.0;
     boolean lineup = false;
 
     Timer obeliskTimer;
@@ -73,11 +72,10 @@ public class RedAutoWall extends OpMode {
         transfer.init();
         transfer.setPreloads(ArtifactType.PURPLE, ArtifactType.GREEN, ArtifactType.PURPLE);
         transfer.setPattern(Utilities.PatternID_22);
-        RedTeleOp.Obelisk_Pattern = Utilities.PatternID_22;
         transfer.setState(Transfer.TransferState.Outtake);
 
         launcher.init();
-        launcher.setLauncherEnabled(false);
+        launcher.setLauncherEnabled(true);
         launcher.setTargetGoal(Utilities.RedGoalPose);
 
         lights.init();
@@ -86,12 +84,20 @@ public class RedAutoWall extends OpMode {
         tagProcessor = launcher.getTagProcessor();
     }
 
+    @Override
+    public void init_loop() {
+        if (transfer.ZeroLiftMotor()) return;
+        transfer.Telemetry();
+        telemetry.update();
+    }
+
     public void loop() {
         loopTime.resetTimer();
         follower.update();
 
         RedTeleOp.Start_Pose = follower.getPose();
 
+        intake.loop();
         transfer.loop();
         launcher.loop(follower.getPose());
 
@@ -99,9 +105,8 @@ public class RedAutoWall extends OpMode {
 
         switch (state) {
             case Start: StartFunction(); break;
-            case ScorePreloads: PreloadsFunction(); break;
+            case Score: ScoreFunction(); break;
             case GrabPickup1: Pickup1Function(); break;
-            case ScorePickup1: Score1Function(); break;
             case End: EndFunction(); break;
         }
 
@@ -113,28 +118,34 @@ public class RedAutoWall extends OpMode {
     void StartFunction() {
         launcher.setLauncherEnabled(true);
         launcherWarmupTimer.setMillisecondTimer(3000);
-        setPathState(PathState.ScorePreloads);
+        setPathState(PathState.Score);
     }
 
     // Once the follower is done, cycle through and launch the current artifacts.
-    void PreloadsFunction() {
-        if (!launcherWarmupTimer.isFinished()) {
+    void ScoreFunction() {
+        if (follower.isBusy()) {
+            launcherWarmupTimer.setMillisecondTimer(3000);
             return;
         }
 
-        if (transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
+        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
             transfer.EjectSelectedArtifact();
         }
 
         if (transfer.getState() == Transfer.TransferState.Intake) {
-            lineup = false;
-
             launcher.setLauncherEnabled(false);
 
             intake.startIntake();
 
-            follower.followPath(paths.lineupPickup1, true);
-            setPathState(PathState.GrabPickup1);
+            if (follower.getCurrentPathChain() != paths.scorePickup1) {
+                follower.followPath(paths.lineupPickup1, true);
+                lineup = false;
+                setPathState(PathState.GrabPickup1);
+            }
+            if (follower.getCurrentPathChain() == paths.scorePickup1) {
+                follower.followPath(paths.park, true);
+                setPathState(PathState.End);
+            }
         }
     }
 
@@ -146,48 +157,38 @@ public class RedAutoWall extends OpMode {
 
         if (!lineup) {
             follower.setMaxPower(intakeSpeed);
-            follower.followPath(paths.grabPickup1, true);
+            follower.followPath(paths.grabArtifact1Pickup1, false);
             lineup = true;
+            return;
+        }
+
+        if (follower.getCurrentPathChain() == paths.grabArtifact1Pickup1) {
+            follower.followPath(paths.grabArtifact2Pickup1, false);
+            return;
+        }
+        if (follower.getCurrentPathChain() == paths.grabArtifact2Pickup1) {
+            follower.followPath(paths.grabArtifact3Pickup1, false);
             return;
         }
 
         launcher.setLauncherEnabled(true);
 
         follower.setMaxPower(regularSpeed);
-        intake.stopIntake();
-        
         follower.followPath(paths.scorePickup1, true);
-        setPathState(PathState.ScorePickup1);
-    }
-
-    void Score1Function() {
-        if (follower.isBusy()) {
-            launcherWarmupTimer.setMillisecondTimer(3000);
-            return;
-        }
-
-        if (launcherWarmupTimer.isFinished() && transfer.CanMove() && transfer.getState() == Transfer.TransferState.Outtake) {
-            transfer.EjectSelectedArtifact();
-        }
-
-        if (transfer.getState() == Transfer.TransferState.Intake) {
-            lineup = false;
-
-            launcher.setLauncherEnabled(false);
-
-            follower.followPath(paths.park);
-            setPathState(PathState.End);
-        }
+        setPathState(PathState.Score);
     }
 
     void EndFunction() {
-
+        endTimer.loop();
         if (follower.isBusy()) {
+            endTimer.setMillisecondTimer(800);
             return;
         }
 
-        RedTeleOp.Start_Pose = follower.getPose();
-        terminateOpModeNow();
+        if (endTimer.isFinished()) {
+            RedTeleOp.Start_Pose = follower.getPose();
+            terminateOpModeNow();
+        }
     }
 
     void setPathState(PathState state) {
@@ -197,6 +198,5 @@ public class RedAutoWall extends OpMode {
     void loopTimers() {
         obeliskTimer.loop();
         launcherWarmupTimer.loop();
-        endTimer.loop();
     }
 }

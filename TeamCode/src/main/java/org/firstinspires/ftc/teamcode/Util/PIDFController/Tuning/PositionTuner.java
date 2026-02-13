@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Util.PIDFController.Coefficients;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.ControllerStates;
 import org.firstinspires.ftc.teamcode.Util.PIDFController.PositionController;
 
-//@Disabled
+@Disabled
 @Configurable
 @TeleOp(name = "Position PIDF Tuner", group = "Tuning")
 public class PositionTuner extends OpMode {
@@ -27,17 +27,16 @@ public class PositionTuner extends OpMode {
     public static double ConversionUnit = 0.011560694;
 
     // PIDF Parameters
-    public static double Kp = 0.0;
+    public static double Kp = 0.007;
     public static double Ki = 0.0;
-    public static double Kd = 0.0;
-    public static double Kf = 0.0;
+    public static double Kd = 0.00001;
+    public static double Kf = 0.01;
 
     // End Velocity Error
     public static int EndPositionError = 15;
 
     // End State
-    public static ControllerStates EndState = ControllerStates.RUN_CONTROLLER;
-    public static ControllerStates CurrentState = ControllerStates.RUN_CONTROLLER;
+    public static ControllerStates EndState = ControllerStates.STOP_CONTROLLER;
 
     // Target for FTC Dash
     public static double TargetPosition = 0.0;
@@ -55,15 +54,16 @@ public class PositionTuner extends OpMode {
     public void init() {
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
 
+        motor = hardwareMap.get(DcMotorEx.class, "transferLiftMotor");
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
         pController = new PositionController.Builder()
                 .setCoefficients(coefficients)
                 .setEndPositionError(EndPositionError)
                 .setEndState(EndState)
+                .setMotor(motor)
                 .build();
-
-        motor = hardwareMap.get(DcMotorEx.class, "transferLiftMotor");
-        motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
     @Override
@@ -77,23 +77,27 @@ public class PositionTuner extends OpMode {
                 ConversionUnit
         );
 
-        pController.setCoefficients(coefficients);
         pController.setTargetPosition(TargetPosition);
+        pController.setCoefficients(coefficients);
 
-        pController.setState(CurrentState);
+        if (gamepad1.a) {
+            pController.startController();
+        }
+        if (gamepad1.b) {
+            pController.stopController();
+        }
 
-        pController.runController(motor.getCurrentPosition());
-
-        motor.setPower(pController.getOut());
-
-        telemetryM.addData("Target Position", pController.getTargetPosition());
+        telemetryM.addLine("Press X To Run Controller");
+        telemetryM.addData("Target Position", TargetPosition);
         telemetryM.addData("Current Position", pController.getCurrentPosition());
         telemetryM.addLine("");
-        telemetryM.addData("Motor Position", pController.getEncoderPosition());
+        telemetryM.addData("Motor Position", motor.getCurrentPosition());
         telemetryM.addData("Reference", pController.getReference());
         telemetryM.addLine("");
         telemetryM.addData("Controller Out", pController.getOut());
         telemetryM.addData("Controller State", pController.getState());
+        telemetryM.addData("Thread State", pController.getThreadState());
+        telemetryM.addData("Thread Loop Time", pController.getThreadLoopTime());
 
         telemetry = telemetryM.getWrapper();
         telemetryM.update();

@@ -58,7 +58,7 @@ public class Launcher {
     final double wheelDiameter = 2.8346;
     final double wheelCircumference = pi * wheelDiameter;
 
-    final double launchIncPerDeg = 0.029;
+    final double launchIncPerDeg = 0.03;
     final double rotationIncPerDeg = 0.014285714;
 
     final double launcherHeight = 10.25;
@@ -144,16 +144,17 @@ public class Launcher {
     public void loop(Pose robotPose) {
 
         if (launcherEnabled) {
-            RunCalculations(robotPose);
+            this.RunCalculations(robotPose);
 
+            if ((70-launchAngle) * launchIncPerDeg > 1) launchAngle = 70;
             launchPosition = ((70-launchAngle) * launchIncPerDeg) + LaunchServoOffset;
             rotationPosition = (rotationAngle * rotationIncPerDeg) + RotationServoOffset;
 
-            int setV = (int) (2 * (velocity * wheelCircumference));
+            int setV = (int) (2 * ((velocity - 20) * wheelCircumference));
 
-            vController.setTargetRPM(setV-100);
+            vController.setTargetRPM(setV);
             vController.setState(ControllerStates.RUN_CONTROLLER);
-            vController.runController(GetAverageVelocity());
+            vController.runController(this.GetAverageVelocity());
 
             leftLaunchMotor.setPower(vController.getOut());
             rightLaunchMotor.setPower(vController.getOut());
@@ -231,7 +232,7 @@ public class Launcher {
             launchAngle = 70;
             rotationAngle = 0;
             rotationOffset = 0;
-            velocity = 0;
+            velocity = CalculateLaunchIdleVelocity(robotPose);
             return;
         }
 
@@ -267,6 +268,25 @@ public class Launcher {
 
         legalPose = value;
         return value;
+    }
+
+    public double CalculateLaunchIdleVelocity(Pose launchPose) {
+        // Needed Velocity
+        double v;
+
+        // x is the distance from base of the robot to the base of the Goal.
+        // y is the Height from the shooter to the height of the goal.
+        double x;
+
+        // Use pythagorean theorem to find the distance from base of the robot to the base of the Goal.
+        x = Math.sqrt(
+                Math.pow(Math.abs(launchPose.getX() - goalPose.x), 2) +
+                        Math.pow(Math.abs(launchPose.getY() - goalPose.y), 2));
+
+        // Find the velocity (Best Equation I could come up with)
+        v = Math.pow((250 * x), 0.5) + 73;
+
+        return v;
     }
 
     /**
@@ -323,6 +343,10 @@ public class Launcher {
             (g * x)
             );
 
+        if (a > Math.toRadians(70)) {
+            a = Math.toRadians(70);
+        }
+
         if (Double.isNaN(a)) {
             a = Math.toRadians(70);
         }
@@ -358,7 +382,7 @@ public class Launcher {
             a = Math.abs(Math.toDegrees(robotPose.getHeading()) - 180) - Math.abs(theta + 90);
         }
 
-        if (a > 180) a = a-360;
+        if (a > 180) a = a - 360;
 
         if (a < rotationAngleThreshold && a > -rotationAngleThreshold) {
             ArrayList<AprilTagDetection> detections = filterByID(tagProcessor.getDetections());
@@ -366,7 +390,9 @@ public class Launcher {
             if (!detections.isEmpty()) {
                 AprilTagDetection tag = detections.get(0);
                 cameraBearing = tag.ftcPose.bearing;
-                telemetry.addData("Tag Bearing", tag.ftcPose.bearing);
+                if (Math.abs(tag.ftcPose.bearing) > 3) {
+                    //a -= cameraBearing;
+                };
             }
         } else {
             a = 0;

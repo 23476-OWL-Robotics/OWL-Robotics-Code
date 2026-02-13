@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.Util.Timer;
 
+@Disabled
 @Configurable
 @TeleOp(name = "Motor Tuning", group = "Tuning")
 public class MotorTuning extends OpMode {
