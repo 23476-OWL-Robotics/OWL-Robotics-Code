@@ -1,6 +1,6 @@
 ## NOTICE
 
-This repository contains the public FTC SDK for the INTO THE DEEP (2024-2025) competition season.
+This repository contains the public FTC SDK for the DECODE (2025-2026) competition season.
 
 ## Welcome!
 This GitHub repository contains the source code that is used to build an Android app to control a *FIRST* Tech Challenge competition robot.  To use this SDK, download/clone the entire project to your local computer.
@@ -59,6 +59,91 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
 
 # Release Information
 
+## Version 11.2.1 (20260724-093406)
+
+### Bug Fixes
+* Fixes issue [2099](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/2099). Gradle and the AGP are now updated to 9.1 and 8.13.2 respectively.
+ 
+## Version 11.2 (20260707-102819)
+
+### Breaking Changes
+* Gradle is upgraded to v9.1 and the Android Gradle Plugin is updated to v8.13.2.  AGP v8.13.2 requires Android Studio Narwhal 3 Feature Drop or later.  Earlier versions of Android Studio will fail to sync the project.  Older versions of Android Studio may prompt the user to downgrade AGP.  Do not do this.  Gradle v9.1 removed support for features that older versions of the AGP use. Updating Gradle fixes a Windows 11 problem some teams may encounter if they have agressive security software installed on their machine.  For more context see [this Gradle issue](https://github.com/gradle/gradle/issues/31438)
+
+### Enhancements
+* New type of OpMode is now available. (`@Utility`)
+   * Utility opmodes that are not disabled will show up in the Utility menu (requires 11.2 or later DS and RC) 
+* TestHardware Utility now available
+  * It allows you to test all servos, CR servos, motors, Color sensors, distance sensors, touch sensors, IMUs, webcams, and analog sensors in the config
+* TestGamepad Utility now available
+  * It allows you to see the results of your two gamepads to make sure it is what you expect and find problems with your gamepads. 
+* Adds methods to PwmControl interface to allow you to setPulseWidth and getPulseWidth 
+   * Both of these are in microseconds (uSeconds)
+   * This is an ADVANCED feature.   There is not a supporting sample.
+   * NOTE: You may see a slight difference since the hardware is not accurate to the microsecond
+* Adds ability to set UVC camera "quirks" from user code to control compatibility flags used inside the low level UVC driver. Addresses issue [1428](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1428)
+* Changes Apriltag Axis Display order on camera preview screen, to reflect updated Z axis direction.
+* The Driver Station app init button has a light teal background with the word init if
+   * the driver station and robot controller are connected and have the same team number
+   * there is at least one gamepad attached
+   * the timer is enabled (for an Autonomous OpMode)
+
+### Bug Fixes
+* Fixes issue [1949](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1949) overwriting the group with the default group when registering a OpMode with OpModeManager.register(OpModeMeta name, Class<? extends OpMode> clazz)
+* Fixes issue mentioned in [1890](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1890) where if 
+  for a servo you change the direction or scaleRange and send the same setPosition that was sent 
+  before, then it wouldn't update the servo.
+* Fixes an issue where Self-Inspect doesn't flag a driver station using -RC in it's name. The message is now:
+  * The team numbers in the robot controller and driver station names do not match, or a device name is invalid. Refer to the FTC Competition Manual for device naming rules.
+
+## Version 11.1 (20251231-104637)
+
+### Enhancements
+
+* Gamepad triggers can now be accessed as booleans and have edge detection supported.
+* GoBildaPinpointDriver now supports Pinpoint v2 functionality
+* Adds webcam calibrations for goBILDA's USB camera.
+
+### Bug Fixes
+* Fixes issue [1654](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1654) in GoBildaPinpointDriver that caused error if resolution was set in other than MM
+* Fixes issue [1628](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1628) Blocks editor displays incorrect Java code for gamepad edge detection blocks.
+* Fixes possible race condition issue [1884](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1884) on Driver Station startup when Driver Station name doesn't match the Robot Controller name.
+* Fixes issue [1863](https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1863) - Incorrect package paths in samples.
+* Fixes an issue where an OnBotJava filename that begins with a lowercase character would fail to properly rename the file if the user tried to rename it so that it begins with an uppercase character.
+
+## Version 11.0 (20250827-105138)
+
+### Enhancements
+
+* OnBotJava now has the concept of a project.  
+  A project is a collection of related files.  A project may be chosen by selecting 'Example Project'
+  from the 'File type:' dropdown.  Doing so will populate the dropdown to the immediate right with 
+  a list of projects to choose from.
+  When selecting a project all of the related files appear in the left pane of the workspace 
+  underneath a directory with the chosen project name.
+  This is useful for example for ConceptExternalHardwareClass which has a dependency upon
+  RobotHardware.  This feature simplifies the usage of this Concept example by automatically
+  pulling in dependent classes.
+* Adds support for AndyMark ToF, IMU, and Color sensors.
+* The Driver Station app indicates if WiFi is disabled on the device.
+* Adds several features to the Color Processing software:
+  * DECODE colors `ARTIFACT_GREEN` and `ARTIFACT_PURPLE`
+  * Choice of the order of pre-processing steps Erode and Dilate
+  * Best-fit preview shape called `circleFit`, an alternate to the existing `boxFit`
+  * Sample OpMode `ConceptVisionColorLocator_Circle`, an alternate to the renamed `ConceptVisionColorLocator_Rectangle`
+* The Driver Station app play button has a green background with a white play symbol if
+  * the driver station and robot controller are connected and have the same team number
+  * there is at least one gamepad attached
+  * the timer is enabled (for an Autonomous OpMode)
+* Updated AprilTag Library for DECODE. Notably, getCurrentGameTagLibrary() now returns DECODE tags.
+  * Since the AprilTags on the Obelisk should not be used for localization, the ConceptAprilTagLocalization samples only use those tags without the name 'Obelisk' in them.
+* OctoQuad I2C driver updated to support firmware v3.x 
+  * Adds support for odometry localizer on MK2 hardware revision
+  * Adds ability to track position for an absolute encoder across multiple rotations
+  * Note that some driver APIs have changed; minor updates to user software may be required
+  * Requires firmware v3.x. For instructions on updating firmware, see
+    https://github.com/DigitalChickenLabs/OctoQuad/blob/master/documentation/OctoQuadDatasheet_Rev_3.0C.pdf
+
+
 ## Version 10.3 (20250625-090416)
 
 ### Breaking Changes
@@ -83,6 +168,7 @@ The readme.md file located in the [/TeamCode/src/main/java/org/firstinspires/ftc
   to rename the file, the rename will fail.
 
 ### Enhancements
+* Adds a configuration item for a Full Range Servo.  Selecting this item expands the pulse width range from 500us to 2500us.  For comparison, the legacy Servo type defines the pulse width range as 600us to 2400us.
 * Improved the OBJ new file creation flow workflow. The new flow allows you to easily use samples, craft new custom OpModes and make new Java classes.
 * Added support for gamepad edge detection.
   * A new sample program `ConceptGamepadEdgeDetection` demonstrates its use.
